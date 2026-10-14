@@ -1,0 +1,105 @@
+// Shubham Super Shopee ERP - Prisma schema
+// Single-shop retail ERP: Inventory, Purchases, Income, Expenses, Udhar (credit), Customers, Suppliers
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id            String    @id @default(cuid())
+  name          String
+  brand         String?
+  category      String?
+  sku           String?
+  purchasePrice Float     @default(0)
+  sellingPrice  Float     @default(0)
+  quantity      Float     @default(0)
+  unitType      String    @default("pcs")
+  minStockAlert Float     @default(5)
+  expiryDate    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Purchase {
+  id           String   @id @default(cuid())
+  supplierName String
+  productName  String
+  quantity     Float
+  unitPrice    Float
+  totalAmount  Float
+  purchaseDate DateTime
+  notes        String?
+  createdAt    DateTime @default(now())
+}
+
+model Income {
+  id        String   @id @default(cuid())
+  source    String
+  category  String
+  amount    Float
+  date      DateTime
+  notes     String?
+  createdAt DateTime @default(now())
+}
+
+model Expense {
+  id        String   @id @default(cuid())
+  category  String
+  amount    Float
+  date      DateTime
+  notes     String?
+  createdAt DateTime @default(now())
+}
+
+model Udhar {
+  id           String         @id @default(cuid())
+  customerName String
+  phone        String?
+  description  String
+  amount       Float
+  date         DateTime
+  dueDate      DateTime?
+  status       String         @default("PENDING") // PENDING | PARTIAL | PAID
+  notes        String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  payments     UdharPayment[]
+}
+
+model UdharPayment {
+  id        String   @id @default(cuid())
+  udhar     Udhar    @relation(fields: [udharId], references: [id], onDelete: Cascade)
+  udharId   String
+  amount    Float
+  date      DateTime
+  notes     String?
+  createdAt DateTime @default(now())
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+}
+
+model Supplier {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+}
+
+model Setting {
+  id    String @id @default("singleton")
+  key   String @unique
+  value String
+}
