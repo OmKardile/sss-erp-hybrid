@@ -149,6 +149,17 @@ export function CommandPalette() {
         },
       },
       {
+        id: "global-search",
+        label: "Search Everything (Products, Customers, Transactions…)",
+        icon: Search,
+        group: "Quick Actions",
+        keywords: "search find global lookup query",
+        run: () => {
+          useNav.getState().setSearchOpen(true);
+          setOpen(false);
+        },
+      },
+      {
         id: "goto-products-add",
         label: "Open Products & Add New",
         icon: Package,

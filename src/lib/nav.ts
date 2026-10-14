@@ -24,6 +24,8 @@ interface NavState {
   paletteOpen: boolean;
   setPaletteOpen: (open: boolean) => void;
   togglePalette: () => void;
+  searchOpen: boolean;
+  setSearchOpen: (open: boolean) => void;
 }
 
 export const useNav = create<NavState>((set, get) => ({
@@ -34,4 +36,6 @@ export const useNav = create<NavState>((set, get) => ({
   paletteOpen: false,
   setPaletteOpen: (open) => set({ paletteOpen: open }),
   togglePalette: () => set({ paletteOpen: !get().paletteOpen }),
+  searchOpen: false,
+  setSearchOpen: (open) => set({ searchOpen: open }),
 }));

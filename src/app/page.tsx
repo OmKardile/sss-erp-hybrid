@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { AppShell } from "@/components/layout/app-shell";
 import { CommandPalette } from "@/components/layout/command-palette";
+import { GlobalSearch } from "@/components/layout/global-search";
 import { useNav } from "@/lib/nav";
 import { DashboardView } from "@/components/modules/dashboard-view";
 import { PosView } from "@/components/modules/pos-view";
@@ -54,6 +55,7 @@ export default function Home() {
         </motion.div>
       </AnimatePresence>
       <CommandPalette />
+      <GlobalSearch />
     </AppShell>
   );
 }

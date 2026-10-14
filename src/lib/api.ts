@@ -159,6 +159,8 @@ export const api = {
     send: (data: { type: string; recipients: string; message: string }) =>
       request<any>("/api/notifications", { method: "POST", body: JSON.stringify(data) }),
   },
+  currency: () => request<{ currencies: any; base: string }>("/api/currency"),
+  search: (q: string) => request<{ results: any[]; total: number; counts: any }>(`/api/search?q=${encodeURIComponent(q)}`),
   // Backup / restore
   backup: {
     export: () => request<any>("/api/backup"),

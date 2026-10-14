@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Menu, Moon, Sun, Database, RefreshCw, Command as CommandIcon } from "lucide-react";
+import { Menu, Moon, Sun, Database, RefreshCw, Command as CommandIcon, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNav } from "@/lib/nav";
 import { NAV_ITEMS } from "./nav-config";
@@ -17,6 +17,7 @@ export function Topbar() {
   const setMobile = useNav((s) => s.setMobileNav);
   const setNav = useNav((s) => s.set);
   const togglePalette = useNav((s) => s.togglePalette);
+  const setSearchOpen = useNav((s) => s.setSearchOpen);
   const qc = useQueryClient();
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -81,6 +82,16 @@ export function Topbar() {
         </div>
 
         <div className="flex items-center gap-1.5">
+          {/* Global search trigger */}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setSearchOpen(true)}
+            aria-label="Global search"
+            className="relative"
+          >
+            <Search className="h-4 w-4" />
+          </Button>
           {/* Command palette trigger */}
           <Button
             variant="outline"
