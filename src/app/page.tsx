@@ -17,6 +17,7 @@ import { OverviewView } from "@/components/modules/overview-view";
 import { ReportsView } from "@/components/modules/reports-view";
 import { SettingsView } from "@/components/modules/settings-view";
 import { SalesView } from "@/components/modules/sales-view";
+import { AuditView } from "@/components/modules/audit-view";
 
 const VIEWS = {
   dashboard: DashboardView,
@@ -31,6 +32,7 @@ const VIEWS = {
   suppliers: SuppliersView,
   overview: OverviewView,
   reports: ReportsView,
+  audit: AuditView,
   settings: SettingsView,
 } as const;
 

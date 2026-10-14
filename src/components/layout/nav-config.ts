@@ -12,6 +12,7 @@ import {
   Truck,
   BarChart3,
   FileText,
+  History,
   Settings,
 } from "lucide-react";
 import type { ModuleKey } from "@/lib/nav";
@@ -124,6 +125,15 @@ export const NAV_ITEMS: NavItem[] = [
     icon: FileText,
     group: "Insights",
     description: "Generate & download business reports",
+  },
+  {
+    key: "audit",
+    label: "Audit Log",
+    short: "Audit",
+    icon: History,
+    group: "Insights",
+    description: "Unified timeline of all record changes",
+    badge: "New",
   },
   {
     key: "settings",

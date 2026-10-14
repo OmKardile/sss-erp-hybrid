@@ -152,6 +152,7 @@ export const api = {
         body: JSON.stringify(entries),
       }),
   },
+  audit: () => request<{ events: any[]; total: number; counts: any }>("/api/audit"),
   // Backup / restore
   backup: {
     export: () => request<any>("/api/backup"),

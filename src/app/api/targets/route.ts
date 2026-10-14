@@ -30,11 +30,35 @@ export async function GET() {
   const current = enriched.find((t) => t.month === currentMonth) || null;
   const currentActual = monthlyActual.get(currentMonth) || 0;
 
+  // Auto-suggest: based on average monthly sales (last 3 months), with a 10% growth bump.
+  // Falls back to current month's sales if no prior months have data.
+  const last3Months: string[] = [];
+  for (let i = 1; i <= 3; i++) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    last3Months.push(d.toISOString().substring(0, 7));
+  }
+  let last3Actuals = last3Months.map((m) => monthlyActual.get(m) || 0).filter((v) => v > 0);
+  let monthsConsidered = last3Actuals.length;
+  // Fallback: if no prior months have sales, use current month's actual
+  if (last3Actuals.length === 0 && currentActual > 0) {
+    last3Actuals = [currentActual];
+    monthsConsidered = 1;
+  }
+  const avgMonthly =
+    last3Actuals.length > 0
+      ? last3Actuals.reduce((s, v) => s + v, 0) / last3Actuals.length
+      : 0;
+  const suggested = avgMonthly > 0 ? Math.round((avgMonthly * 1.1) / 1000) * 1000 : 0; // round to nearest 1000, +10% growth
+
   return NextResponse.json({
     currentMonth,
     current,
     currentActual,
     targets: enriched,
+    suggested,
+    avgMonthly,
+    monthsWithSales: monthsConsidered,
   });
 }
 

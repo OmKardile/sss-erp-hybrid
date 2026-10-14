@@ -15,6 +15,7 @@ import {
   AlertCircle,
   Pencil,
   Trash2,
+  Sparkles,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { formatCurrency, monthLabel } from "@/lib/format";
@@ -93,6 +94,15 @@ export function SalesTargetWidget() {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     setMut.mutate({ month: form.month, amount: Number(form.amount) || 0 });
+  };
+
+  const applySuggested = () => {
+    if (data?.suggested && data.suggested > 0) {
+      setForm((f) => ({ ...f, amount: String(data.suggested) }));
+      toast.info(`Auto-filled ₹${data.suggested.toLocaleString("en-IN")}`, {
+        description: `Based on avg ₹${Math.round(data.avgMonthly).toLocaleString("en-IN")}/mo (last ${data.monthsWithSales} months) +10% growth`,
+      });
+    }
   };
 
   const pct = current?.pct || 0;
@@ -248,7 +258,18 @@ export function SalesTargetWidget() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Target Amount (₹) *</Label>
+              <div className="flex items-center justify-between">
+                <Label>Target Amount (₹) *</Label>
+                {data?.suggested && data.suggested > 0 && (
+                  <button
+                    type="button"
+                    onClick={applySuggested}
+                    className="flex items-center gap-1 text-[11px] font-medium text-violet-600 hover:underline"
+                  >
+                    <Sparkles className="h-3 w-3" /> Suggest ₹{(data.suggested / 1000).toFixed(0)}k
+                  </button>
+                )}
+              </div>
               <Input
                 type="number"
                 step="0.01"
@@ -257,6 +278,11 @@ export function SalesTargetWidget() {
                 onChange={(e) => setForm({ ...form, amount: e.target.value })}
                 placeholder="e.g. 100000"
               />
+              {data?.suggested && data.suggested > 0 && (
+                <p className="text-[11px] text-muted-foreground">
+                  Avg: ₹{Math.round(data.avgMonthly).toLocaleString("en-IN")}/mo ({data.monthsWithSales}m) · Suggested +10%: ₹{data.suggested.toLocaleString("en-IN")}
+                </p>
+              )}
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>Cancel</Button>

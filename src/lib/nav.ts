@@ -13,6 +13,7 @@ export type ModuleKey =
   | "suppliers"
   | "overview"
   | "reports"
+  | "audit"
   | "settings";
 
 interface NavState {
