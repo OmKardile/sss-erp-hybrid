@@ -161,6 +161,7 @@ export const api = {
   },
   currency: () => request<{ currencies: any; base: string }>("/api/currency"),
   search: (q: string) => request<{ results: any[]; total: number; counts: any }>(`/api/search?q=${encodeURIComponent(q)}`),
+  health: () => request<any>("/api/health"),
   // Backup / restore
   backup: {
     export: () => request<any>("/api/backup"),

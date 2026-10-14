@@ -6,6 +6,7 @@ import { Menu, Moon, Sun, Database, RefreshCw, Command as CommandIcon, Search } 
 import { Button } from "@/components/ui/button";
 import { useNav } from "@/lib/nav";
 import { NAV_ITEMS } from "./nav-config";
+import { CurrencySelector } from "./currency-selector";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
@@ -105,6 +106,8 @@ export function Topbar() {
               ⌘K
             </kbd>
           </Button>
+
+          <CurrencySelector />
 
           <Button
             variant="outline"

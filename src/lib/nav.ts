@@ -26,6 +26,8 @@ interface NavState {
   togglePalette: () => void;
   searchOpen: boolean;
   setSearchOpen: (open: boolean) => void;
+  currency: string;
+  setCurrency: (c: string) => void;
 }
 
 export const useNav = create<NavState>((set, get) => ({
@@ -38,4 +40,6 @@ export const useNav = create<NavState>((set, get) => ({
   togglePalette: () => set({ paletteOpen: !get().paletteOpen }),
   searchOpen: false,
   setSearchOpen: (open) => set({ searchOpen: open }),
+  currency: "INR",
+  setCurrency: (c) => set({ currency: c }),
 }));
