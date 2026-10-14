@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { InventoryValuation } from "./inventory-valuation";
 
 export function ReportsView() {
   const { data, isLoading } = useQuery({ queryKey: ["reports"], queryFn: () => api.reports() });
@@ -130,6 +131,9 @@ export function ReportsView() {
         <StatCard index={2} title="Suppliers" value={`${s.supplierCount}`} icon={Truck} tone="amber" />
         <StatCard index={3} title="Low Stock Items" value={`${data.lowStock.length}`} icon={Boxes} tone={data.lowStock.length > 0 ? "rose" : "emerald"} />
       </div>
+
+      {/* Inventory Valuation */}
+      <InventoryValuation />
 
       {/* Low stock alert list */}
       <SectionCard

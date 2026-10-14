@@ -33,6 +33,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { NotificationsPanel } from "./notifications-panel";
 
 export function SettingsView() {
   const qc = useQueryClient();
@@ -179,6 +180,8 @@ export function SettingsView() {
         </SectionCard>
 
         <StoreConfigSection />
+
+        <NotificationsPanelSection />
 
         <SectionCard title="Data Operations" description="Seed demo data or wipe the database.">
           <div className="space-y-3">
@@ -408,5 +411,14 @@ function StoreConfigSection() {
         </div>
       </div>
     </SectionCard>
+  );
+}
+
+function NotificationsPanelSection() {
+  return (
+    <div>
+      <h3 className="mb-3 text-sm font-semibold text-foreground">Notifications & Alerts</h3>
+      <NotificationsPanel />
+    </div>
   );
 }

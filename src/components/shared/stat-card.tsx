@@ -80,7 +80,7 @@ export function StatCard({
         <CardContent className="relative p-5">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="truncate text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 {title}
               </p>
               <p className="mt-2 text-2xl font-bold tracking-tight text-foreground">{value}</p>

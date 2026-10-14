@@ -153,6 +153,12 @@ export const api = {
       }),
   },
   audit: () => request<{ events: any[]; total: number; counts: any }>("/api/audit"),
+  valuation: (method: string) => request<any>(`/api/valuation?method=${method}`),
+  notifications: {
+    list: () => request<{ notifications: any[]; count: number; criticalCount: number; warningCount: number }>("/api/notifications"),
+    send: (data: { type: string; recipients: string; message: string }) =>
+      request<any>("/api/notifications", { method: "POST", body: JSON.stringify(data) }),
+  },
   // Backup / restore
   backup: {
     export: () => request<any>("/api/backup"),
