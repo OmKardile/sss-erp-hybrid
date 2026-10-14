@@ -14,6 +14,7 @@ import {
   Tags,
   PackageCheck,
   Layers,
+  ClipboardCheck,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Product, UnitType } from "@/lib/types";
@@ -50,6 +51,7 @@ import {
 } from "@/components/ui/table";
 import { StatCard } from "@/components/shared/stat-card";
 import { RestockCenter } from "./restock-center";
+import { InventoryAdjustment } from "./inventory-adjustment";
 
 const UNIT_TYPES: UnitType[] = ["pcs", "kg", "gm", "box", "litre", "dozen"];
 const CATEGORIES = ["Groceries", "Dairy", "Snacks", "Beverages", "Household", "Personal Care", "Stationery", "Other"];
@@ -81,6 +83,7 @@ export function ProductsView() {
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [adjustOpen, setAdjustOpen] = useState(false);
 
   const createMut = useMutation({
     mutationFn: (data: any) => api.products.create(data),
@@ -179,9 +182,14 @@ export function ProductsView() {
         description="Manage your catalogue, track stock and get low-stock alerts."
         icon={Package}
         actions={
-          <Button onClick={openAdd} className="gap-2">
-            <Plus className="h-4 w-4" /> Add Product
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setAdjustOpen(true)} variant="outline" className="gap-2 border-teal-500/30 text-teal-700 hover:bg-teal-500/10 dark:text-teal-400">
+              <ClipboardCheck className="h-4 w-4" /> Stock-take
+            </Button>
+            <Button onClick={openAdd} className="gap-2">
+              <Plus className="h-4 w-4" /> Add Product
+            </Button>
+          </div>
         }
       />
 
@@ -479,6 +487,8 @@ export function ProductsView() {
         confirmText="Delete"
         onConfirm={() => deleteId && deleteMut.mutate(deleteId)}
       />
+
+      <InventoryAdjustment open={adjustOpen} onClose={() => setAdjustOpen(false)} />
     </div>
   );
 }

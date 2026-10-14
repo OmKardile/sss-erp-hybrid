@@ -45,6 +45,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { RecentActivity } from "./recent-activity";
 import { TodaySalesWidget } from "./today-sales-widget";
 import { ExpiryWidget } from "./expiry-widget";
+import { SalesTargetWidget } from "./sales-target-widget";
 
 const PIE_COLORS = ["#10b981", "#14b8a6", "#f59e0b", "#f43f5e", "#8b5cf6", "#06b6d4", "#84cc16"];
 
@@ -425,8 +426,11 @@ export function DashboardView() {
         <RecentActivity />
       </div>
 
-      {/* Expiry tracker (only renders if products have expiry dates) */}
-      <ExpiryWidget />
+      {/* Expiry tracker + Sales target */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <SalesTargetWidget />
+        <ExpiryWidget />
+      </div>
 
       {summary.totalProducts === 0 && (
         <EmptyState

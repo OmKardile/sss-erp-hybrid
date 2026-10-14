@@ -3,11 +3,12 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Truck, Plus, Pencil, Trash2, Search, Phone, MapPin, Calendar, ShoppingBag, IndianRupee } from "lucide-react";
+import { Truck, Plus, Pencil, Trash2, Search, Phone, MapPin, Calendar, ShoppingBag, IndianRupee, BookOpenCheck } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Supplier } from "@/lib/types";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { PageHeader } from "@/components/shared/page-header";
+import { SupplierLedger } from "./supplier-ledger";
 import { SectionCard } from "@/components/shared/section-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -39,6 +40,8 @@ export function SuppliersView() {
   const [editing, setEditing] = useState<Supplier | null>(null);
   const [form, setForm] = useState(empty);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [ledgerSupplier, setLedgerSupplier] = useState<Supplier | null>(null);
+  const [ledgerOpen, setLedgerOpen] = useState(false);
 
   const createMut = useMutation({
     mutationFn: (data: any) => api.suppliers.create(data),
@@ -211,6 +214,17 @@ export function SuppliersView() {
                           No purchases yet
                         </div>
                       )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-3 w-full gap-2 border-amber-500/30 text-amber-700 hover:bg-amber-500/10 dark:text-amber-400"
+                        onClick={() => {
+                          setLedgerSupplier(s);
+                          setLedgerOpen(true);
+                        }}
+                      >
+                        <BookOpenCheck className="h-3.5 w-3.5" /> View Ledger
+                      </Button>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -253,6 +267,15 @@ export function SuppliersView() {
         description="This removes the supplier from your directory."
         confirmText="Delete"
         onConfirm={() => deleteId && deleteMut.mutate(deleteId)}
+      />
+
+      <SupplierLedger
+        supplier={ledgerSupplier}
+        open={ledgerOpen}
+        onClose={() => {
+          setLedgerOpen(false);
+          setLedgerSupplier(null);
+        }}
       />
     </div>
   );

@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 // GET = full DB export as JSON
 export async function GET() {
-  const [products, purchases, income, expenses, udhars, payments, customers, suppliers, sales, saleItems] =
+  const [products, purchases, income, expenses, udhars, payments, customers, suppliers, sales, saleItems, targets, adjustments] =
     await Promise.all([
       db.product.findMany(),
       db.purchase.findMany(),
@@ -17,10 +17,12 @@ export async function GET() {
       db.supplier.findMany(),
       db.sale.findMany({ include: { items: true } }),
       db.saleItem.findMany(),
+      db.target.findMany(),
+      db.adjustment.findMany(),
     ]);
 
   const backup = {
-    version: 3,
+    version: 4,
     exportedAt: new Date().toISOString(),
     store: "Shubham Super Shopee",
     data: {
@@ -34,6 +36,8 @@ export async function GET() {
       suppliers,
       sales,
       saleItems,
+      targets,
+      adjustments,
     },
   };
   return NextResponse.json(backup);
@@ -50,6 +54,8 @@ export async function POST(req: NextRequest) {
 
     await db.$transaction(async (tx) => {
       // Wipe (order matters for FK)
+      await tx.adjustment.deleteMany();
+      await tx.target.deleteMany();
       await tx.saleItem.deleteMany();
       await tx.sale.deleteMany();
       await tx.udharPayment.deleteMany();
@@ -224,6 +230,37 @@ export async function POST(req: NextRequest) {
           });
         }
       }
+      if (Array.isArray(data.targets)) {
+        for (const t of data.targets) {
+          await tx.target.create({
+            data: {
+              id: String(t.id),
+              month: String(t.month),
+              amount: Number(t.amount) || 0,
+              createdAt: t.createdAt ? new Date(t.createdAt) : new Date(),
+              updatedAt: t.updatedAt ? new Date(t.updatedAt) : new Date(),
+            },
+          });
+        }
+      }
+      if (Array.isArray(data.adjustments)) {
+        for (const a of data.adjustments) {
+          await tx.adjustment.create({
+            data: {
+              id: String(a.id),
+              productId: String(a.productId),
+              productName: String(a.productName),
+              oldQty: Number(a.oldQty) || 0,
+              newQty: Number(a.newQty) || 0,
+              diff: Number(a.diff) || 0,
+              reason: String(a.reason ?? "Stock-take"),
+              notes: a.notes ?? null,
+              date: toDate(a.date) ?? new Date(),
+              createdAt: a.createdAt ? new Date(a.createdAt) : new Date(),
+            },
+          });
+        }
+      }
     });
 
     return NextResponse.json({ success: true, message: "Backup restored successfully" });
@@ -238,6 +275,8 @@ export async function POST(req: NextRequest) {
 // DELETE = wipe all data
 export async function DELETE() {
   await db.$transaction(async (tx) => {
+    await tx.adjustment.deleteMany();
+    await tx.target.deleteMany();
     await tx.saleItem.deleteMany();
     await tx.sale.deleteMany();
     await tx.udharPayment.deleteMany();

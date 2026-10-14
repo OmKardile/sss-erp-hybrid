@@ -96,6 +96,7 @@ export const api = {
       request<Supplier>(`/api/suppliers/${id}`, { method: "PUT", body: JSON.stringify(data) }),
     remove: (id: string) =>
       request<{ success: boolean }>(`/api/suppliers/${id}`, { method: "DELETE" }),
+    ledger: (id: string) => request<any>(`/api/suppliers/${id}/ledger`),
   },
   // Aggregate
   dashboard: () =>
@@ -122,6 +123,18 @@ export const api = {
   salesToday: () => request<any>("/api/sales/today"),
   restock: () => request<any>("/api/restock"),
   expiry: () => request<any>("/api/expiry"),
+  targets: {
+    list: () => request<any>("/api/targets"),
+    set: (month: string, amount: number) =>
+      request<any>("/api/targets", { method: "POST", body: JSON.stringify({ month, amount }) }),
+    remove: (month: string) =>
+      request<{ success: boolean }>(`/api/targets?month=${encodeURIComponent(month)}`, { method: "DELETE" }),
+  },
+  adjustments: {
+    list: () => request<any[]>("/api/adjustments"),
+    create: (data: { productId: string; newQty: number; reason?: string; notes?: string }) =>
+      request<any>("/api/adjustments", { method: "POST", body: JSON.stringify(data) }),
+  },
   // Backup / restore
   backup: {
     export: () => request<any>("/api/backup"),

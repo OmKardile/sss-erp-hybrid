@@ -127,6 +127,29 @@ model SaleItem {
   createdAt DateTime @default(now())
 }
 
+// Monthly sales targets (one per year-month). Used by Sales Target tracking.
+model Target {
+  id        String   @id @default(cuid())
+  month     String   @unique // "2026-10"
+  amount    Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Inventory adjustments (stock-take) with reason & audit.
+model Adjustment {
+  id        String   @id @default(cuid())
+  productId String
+  productName String
+  oldQty    Float
+  newQty    Float
+  diff      Float
+  reason    String   @default("Stock-take")
+  notes     String?
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+}
+
 model Setting {
   id    String @id @default("singleton")
   key   String @unique

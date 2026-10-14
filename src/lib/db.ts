@@ -10,10 +10,10 @@ function createClient() {
 
 let db = globalForPrisma.prisma ?? createClient()
 
-// Staleness check: if 'sale' model is missing, the cached client predates the Sale schema.
+// Staleness check: if any recent model is missing, the cached client predates the latest schema.
 // Recreate the client so newly-added models are available without a full server restart.
 if (process.env.NODE_ENV !== 'production') {
-  if (!(db as any).sale) {
+  if (!(db as any).target || !(db as any).adjustment || !(db as any).sale) {
     try {
       db.$disconnect?.()
     } catch {}
