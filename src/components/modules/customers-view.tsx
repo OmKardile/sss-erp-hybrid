@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Users, Plus, Pencil, Trash2, Search, Phone, MapPin, User, Calendar } from "lucide-react";
+import { Users, Plus, Pencil, Trash2, Search, Phone, MapPin, User, Calendar, BookOpenCheck } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Customer } from "@/lib/types";
 import { formatDate } from "@/lib/format";
@@ -12,6 +12,7 @@ import { SectionCard } from "@/components/shared/section-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { StatCard } from "@/components/shared/stat-card";
+import { CustomerLedger } from "./customer-ledger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,6 +40,8 @@ export function CustomersView() {
   const [editing, setEditing] = useState<Customer | null>(null);
   const [form, setForm] = useState(empty);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [ledgerCustomer, setLedgerCustomer] = useState<Customer | null>(null);
+  const [ledgerOpen, setLedgerOpen] = useState(false);
 
   const createMut = useMutation({
     mutationFn: (data: any) => api.customers.create(data),
@@ -208,6 +211,17 @@ export function CustomersView() {
                           )}
                         </div>
                       )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-3 w-full gap-2 border-violet-500/30 text-violet-700 hover:bg-violet-500/10 dark:text-violet-400"
+                        onClick={() => {
+                          setLedgerCustomer(c);
+                          setLedgerOpen(true);
+                        }}
+                      >
+                        <BookOpenCheck className="h-3.5 w-3.5" /> View Ledger
+                      </Button>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -250,6 +264,15 @@ export function CustomersView() {
         description="This removes the customer from your directory."
         confirmText="Delete"
         onConfirm={() => deleteId && deleteMut.mutate(deleteId)}
+      />
+
+      <CustomerLedger
+        customer={ledgerCustomer}
+        open={ledgerOpen}
+        onClose={() => {
+          setLedgerOpen(false);
+          setLedgerCustomer(null);
+        }}
       />
     </div>
   );

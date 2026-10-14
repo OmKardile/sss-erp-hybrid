@@ -85,6 +85,7 @@ export const api = {
       request<Customer>(`/api/customers/${id}`, { method: "PUT", body: JSON.stringify(data) }),
     remove: (id: string) =>
       request<{ success: boolean }>(`/api/customers/${id}`, { method: "DELETE" }),
+    ledger: (id: string) => request<any>(`/api/customers/${id}/ledger`),
   },
   // Suppliers
   suppliers: {
@@ -119,6 +120,8 @@ export const api = {
     request<any[]>(limit ? `/api/sales?limit=${limit}` : "/api/sales"),
   salesAnalytics: () => request<any>("/api/sales/analytics"),
   salesToday: () => request<any>("/api/sales/today"),
+  restock: () => request<any>("/api/restock"),
+  expiry: () => request<any>("/api/expiry"),
   // Backup / restore
   backup: {
     export: () => request<any>("/api/backup"),

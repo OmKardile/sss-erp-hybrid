@@ -49,6 +49,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { StatCard } from "@/components/shared/stat-card";
+import { RestockCenter } from "./restock-center";
 
 const UNIT_TYPES: UnitType[] = ["pcs", "kg", "gm", "box", "litre", "dozen"];
 const CATEGORIES = ["Groceries", "Dairy", "Snacks", "Beverages", "Household", "Personal Care", "Stationery", "Other"];
@@ -190,6 +191,8 @@ export function ProductsView() {
         <StatCard index={2} title="Inventory Value" value={formatCurrency(stats.totalValue, { compact: true })} icon={PackageCheck} tone="amber" />
         <StatCard index={3} title="Low Stock Items" value={`${stats.lowStock}`} icon={AlertTriangle} tone={stats.lowStock > 0 ? "rose" : "emerald"} />
       </div>
+
+      {stats.lowStock > 0 && <RestockCenter />}
 
       <SectionCard
         title="Product Catalogue"

@@ -31,11 +31,12 @@ export async function POST(req: NextRequest) {
         notes: body.notes ? String(body.notes).trim() : null,
       },
     });
-    // Optional: bump product stock if a matching product exists
+    // Optional: bump product stock if a matching product exists (case-insensitive name match)
     if (body.autoStock !== false) {
-      const existing = await db.product.findFirst({
-        where: { name: { equals: purchase.productName, mode: "insensitive" } },
-      });
+      const all = await db.product.findMany();
+      const existing = all.find(
+        (p) => p.name.toLowerCase() === purchase.productName.toLowerCase()
+      );
       if (existing) {
         await db.product.update({
           where: { id: existing.id },
