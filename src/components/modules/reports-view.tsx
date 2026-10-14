@@ -16,6 +16,7 @@ import {
   Calendar,
   FileSpreadsheet,
   FileJson,
+  Printer,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { formatCurrency, formatDate } from "@/lib/format";
@@ -81,7 +82,10 @@ export function ReportsView() {
         description="Generate and download a complete business snapshot."
         icon={FileText}
         actions={
-          <div className="flex gap-2">
+          <div className="flex gap-2 no-print">
+            <Button onClick={() => window.print()} variant="outline" className="gap-2">
+              <Printer className="h-4 w-4" /> Print
+            </Button>
             <Button onClick={() => download("json")} variant="outline" className="gap-2">
               <FileJson className="h-4 w-4" /> JSON
             </Button>
@@ -235,7 +239,7 @@ export function ReportsView() {
             </div>
             <div>
               <p className="font-semibold text-foreground">Download full report</p>
-              <p className="text-sm text-muted-foreground">Complete snapshot including all products, transactions & ledgers.</p>
+              <p className="text-sm text-muted-foreground">Complete snapshot including all products, transactions &amp; ledgers.</p>
             </div>
           </div>
           <div className="flex gap-2">

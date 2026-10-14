@@ -24,6 +24,20 @@ export async function POST(req: NextRequest) {
     const discount: number = Number(body.discount) || 0;
     const notes: string | null = body.notes ? String(body.notes).trim() : null;
 
+    // Tax: read from settings (taxEnabled + taxRate), unless overridden in body
+    let taxRate = 0;
+    let taxEnabled = false;
+    if (typeof body.taxRate === "number") {
+      taxRate = body.taxRate;
+      taxEnabled = taxRate > 0;
+    } else {
+      const settings = await db.setting.findMany();
+      const get = (k: string) => settings.find((s) => s.key === k)?.value;
+      taxEnabled = get("taxEnabled") === "true";
+      taxRate = Number(get("taxRate")) || 0;
+    }
+    const applyTax = taxEnabled && taxRate > 0;
+
     // Validate stock levels
     for (const it of items) {
       const product = await db.product.findUnique({ where: { id: it.productId } });
@@ -39,7 +53,9 @@ export async function POST(req: NextRequest) {
     }
 
     const subtotal = items.reduce((s, it) => s + it.price * it.quantity, 0);
-    const total = Math.max(0, subtotal - discount);
+    const discounted = Math.max(0, subtotal - discount);
+    const taxAmount = applyTax ? +(discounted * (taxRate / 100)).toFixed(2) : 0;
+    const total = +(discounted + taxAmount).toFixed(2);
 
     // Transaction: decrement stock + create income + create sale + sale items
     const result = await db.$transaction(async (tx) => {
@@ -55,7 +71,7 @@ export async function POST(req: NextRequest) {
           category: "Sales",
           amount: total,
           date: saleDate,
-          notes: `POS sale · ${paymentMethod} · ${items.length} item(s)${notes ? ` · ${notes}` : ""}`,
+          notes: `POS sale · ${paymentMethod} · ${items.length} item(s)${applyTax ? ` · tax ${taxRate}%` : ""}${notes ? ` · ${notes}` : ""}`,
         },
       });
       const sale = await tx.sale.create({
@@ -81,7 +97,7 @@ export async function POST(req: NextRequest) {
         },
         include: { items: true },
       });
-      return { income, sale, subtotal, total, discount };
+      return { income, sale, subtotal, total, discount, taxRate, taxAmount };
     });
 
     return NextResponse.json(
@@ -91,6 +107,8 @@ export async function POST(req: NextRequest) {
           items: items.map((it) => ({ ...it, lineTotal: it.price * it.quantity })),
           subtotal,
           discount,
+          taxRate: applyTax ? taxRate : 0,
+          taxAmount,
           total,
           customerName,
           paymentMethod,

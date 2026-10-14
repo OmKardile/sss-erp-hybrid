@@ -57,6 +57,16 @@ export function PosView() {
     queryKey: ["products"],
     queryFn: () => api.products.list(),
   });
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: () => api.settings.get(),
+    staleTime: 60_000,
+  });
+  const taxEnabled = settings?.taxEnabled === "true";
+  const taxRate = Number(settings?.taxRate) || 0;
+  const storeName = settings?.storeName || "Shubham Super Shopee";
+  const receiptFooter = settings?.receiptFooter || "Thank you for shopping with us!";
+  const gstNumber = settings?.gstNumber || "";
 
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
@@ -148,7 +158,10 @@ export function PosView() {
 
   const subtotal = cart.reduce((s, i) => s + i.product.sellingPrice * i.qty, 0);
   const discountNum = Number(discount) || 0;
-  const total = Math.max(0, subtotal - discountNum);
+  const discounted = Math.max(0, subtotal - discountNum);
+  const applyTax = taxEnabled && taxRate > 0;
+  const taxAmount = applyTax ? +(discounted * (taxRate / 100)).toFixed(2) : 0;
+  const total = +(discounted + taxAmount).toFixed(2);
 
   const saleMut = useMutation({
     mutationFn: () =>
@@ -432,6 +445,12 @@ export function PosView() {
                       <span>−{formatCurrency(discountNum)}</span>
                     </div>
                   )}
+                  {applyTax && (
+                    <div className="flex justify-between text-violet-600">
+                      <span>Tax ({taxRate}%)</span>
+                      <span>+{formatCurrency(taxAmount)}</span>
+                    </div>
+                  )}
                   <Separator className="my-1.5" />
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-foreground">Total</span>
@@ -477,10 +496,10 @@ export function PosView() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm overflow-hidden rounded-2xl bg-background shadow-2xl"
+              className="printable print-receipt w-full max-w-sm overflow-hidden rounded-2xl bg-background shadow-2xl"
             >
               {/* Receipt header */}
-              <div className="bg-gradient-to-br from-emerald-600 to-teal-600 p-5 text-center text-white">
+              <div className="no-print bg-gradient-to-br from-emerald-600 to-teal-600 p-5 text-center text-white">
                 <CheckCircle2 className="mx-auto h-10 w-10" />
                 <p className="mt-2 text-lg font-bold">Sale Complete</p>
                 <p className="text-xs text-emerald-50">Shubham Super Shopee</p>
@@ -518,12 +537,25 @@ export function PosView() {
                       <span>−{formatCurrency(receipt.discount)}</span>
                     </div>
                   )}
+                  {receipt.taxAmount > 0 && (
+                    <div className="flex justify-between text-violet-600">
+                      <span>Tax ({receipt.taxRate}%)</span>
+                      <span>+{formatCurrency(receipt.taxAmount)}</span>
+                    </div>
+                  )}
                   <Separator className="my-1.5" />
                   <div className="flex items-center justify-between text-base font-bold">
                     <span>Total Paid</span>
                     <span className="text-primary">{formatCurrency(receipt.total)}</span>
                   </div>
                 </div>
+
+                {receiptFooter && (
+                  <p className="mt-3 text-center text-xs text-muted-foreground italic">"{receiptFooter}"</p>
+                )}
+                {gstNumber && (
+                  <p className="mt-1 text-center text-[10px] text-muted-foreground">GSTIN: {gstNumber}</p>
+                )}
 
                 <div className="mt-4 flex gap-2">
                   <Button variant="outline" className="flex-1 gap-2" onClick={() => window.print()}>

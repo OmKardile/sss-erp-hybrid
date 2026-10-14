@@ -144,6 +144,14 @@ export const api = {
     create: (data: { productId: string; newQty: number; reason?: string; notes?: string }) =>
       request<any>("/api/adjustments", { method: "POST", body: JSON.stringify(data) }),
   },
+  settings: {
+    get: () => request<Record<string, string>>("/api/settings"),
+    save: (entries: { key: string; value: string }[]) =>
+      request<{ success: boolean; updated: number }>("/api/settings", {
+        method: "PUT",
+        body: JSON.stringify(entries),
+      }),
+  },
   // Backup / restore
   backup: {
     export: () => request<any>("/api/backup"),

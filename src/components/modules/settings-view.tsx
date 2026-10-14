@@ -16,6 +16,10 @@ import {
   Info,
   HardDrive,
   RefreshCw,
+  Store,
+  Percent,
+  Receipt,
+  Save,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { PageHeader } from "@/components/shared/page-header";
@@ -25,6 +29,10 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 
 export function SettingsView() {
   const qc = useQueryClient();
@@ -170,6 +178,8 @@ export function SettingsView() {
           </div>
         </SectionCard>
 
+        <StoreConfigSection />
+
         <SectionCard title="Data Operations" description="Seed demo data or wipe the database.">
           <div className="space-y-3">
             <Card className="border-violet-500/20 bg-violet-500/5">
@@ -262,5 +272,141 @@ function InfoRow({ icon: Icon, label, value }: { icon: any; label: string; value
         <p className="truncate text-sm font-medium text-foreground">{value}</p>
       </div>
     </div>
+  );
+}
+
+function StoreConfigSection() {
+  const qc = useQueryClient();
+  const { data: settings, isLoading } = useQuery({
+    queryKey: ["settings"],
+    queryFn: () => api.settings.get(),
+  });
+  const [form, setForm] = useState<Record<string, string>>({});
+  const [loaded, setLoaded] = useState(false);
+
+  // Initialize form when settings load
+  if (settings && !loaded) {
+    setForm(settings);
+    setLoaded(true);
+  }
+
+  const saveMut = useMutation({
+    mutationFn: (entries: { key: string; value: string }[]) => api.settings.save(entries),
+    onSuccess: () => {
+      toast.success("Settings saved", { description: "Store configuration updated." });
+      qc.invalidateQueries({ queryKey: ["settings"] });
+    },
+    onError: (e) => toast.error("Save failed", { description: String(e) }),
+  });
+
+  const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
+
+  const save = () => {
+    const entries = Object.entries(form).map(([key, value]) => ({ key, value: String(value) }));
+    saveMut.mutate(entries);
+  };
+
+  if (isLoading || !loaded) {
+    return (
+      <SectionCard title="Store Configuration" description="Tax, GST & receipt settings">
+        <div className="h-32 animate-pulse rounded-xl bg-muted" />
+      </SectionCard>
+    );
+  }
+
+  const taxEnabled = form.taxEnabled === "true";
+
+  return (
+    <SectionCard
+      title="Store Configuration"
+      description="Tax rate, GST details & receipt customization"
+      action={
+        <Button onClick={save} disabled={saveMut.isPending} className="gap-2" size="sm">
+          <Save className="h-3.5 w-3.5" /> Save
+        </Button>
+      }
+    >
+      <div className="space-y-5">
+        {/* Store info */}
+        <div>
+          <div className="mb-3 flex items-center gap-2">
+            <Store className="h-4 w-4 text-emerald-600" />
+            <p className="text-sm font-semibold text-foreground">Store Information</p>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Store Name</Label>
+              <Input value={form.storeName || ""} onChange={(e) => update("storeName", e.target.value)} className="h-9" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Phone</Label>
+              <Input value={form.storePhone || ""} onChange={(e) => update("storePhone", e.target.value)} className="h-9" placeholder="9876543210" />
+            </div>
+            <div className="space-y-1 sm:col-span-2">
+              <Label className="text-xs text-muted-foreground">Address</Label>
+              <Input value={form.storeAddress || ""} onChange={(e) => update("storeAddress", e.target.value)} className="h-9" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">GST Number</Label>
+              <Input value={form.gstNumber || ""} onChange={(e) => update("gstNumber", e.target.value)} className="h-9" placeholder="27AAAAA0000A1Z5" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Currency Symbol</Label>
+              <Input value={form.currencySymbol || "₹"} onChange={(e) => update("currencySymbol", e.target.value)} className="h-9" />
+            </div>
+          </div>
+        </div>
+
+        {/* Tax config */}
+        <div className="rounded-xl border border-border/60 bg-muted/30 p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Percent className="h-4 w-4 text-violet-600" />
+              <p className="text-sm font-semibold text-foreground">Tax / GST</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Label className="text-xs text-muted-foreground">{taxEnabled ? "Enabled" : "Disabled"}</Label>
+              <Switch checked={taxEnabled} onCheckedChange={(c) => update("taxEnabled", c ? "true" : "false")} />
+            </div>
+          </div>
+          <div className={taxEnabled ? "" : "opacity-50 pointer-events-none"}>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">Tax Rate (%)</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={form.taxRate || "0"}
+                onChange={(e) => update("taxRate", e.target.value)}
+                className="h-9"
+                placeholder="e.g. 18 for 18% GST"
+              />
+            </div>
+            {taxEnabled && Number(form.taxRate) > 0 && (
+              <div className="mt-3 flex items-center gap-2 rounded-lg bg-violet-500/10 p-2.5 text-xs text-violet-700 dark:text-violet-400">
+                <Receipt className="h-3.5 w-3.5" />
+                Tax ({form.taxRate}%) will be auto-applied to all POS sales and shown on receipts.
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Receipt */}
+        <div>
+          <div className="mb-3 flex items-center gap-2">
+            <Receipt className="h-4 w-4 text-amber-600" />
+            <p className="text-sm font-semibold text-foreground">Receipt</p>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs text-muted-foreground">Receipt Footer Message</Label>
+            <Textarea
+              rows={2}
+              value={form.receiptFooter || ""}
+              onChange={(e) => update("receiptFooter", e.target.value)}
+              placeholder="Thank you for shopping with us!"
+            />
+          </div>
+        </div>
+      </div>
+    </SectionCard>
   );
 }

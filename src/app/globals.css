@@ -179,3 +179,45 @@
 .animate-pulse-soft {
   animation: pulse-soft 2s ease-in-out infinite;
 }
+
+/* Print styles — hide app chrome, show only .printable elements cleanly */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable, .printable * {
+    visibility: visible;
+  }
+  .printable {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-width: none !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  /* Receipt-specific: narrow thermal-style */
+  .print-receipt {
+    max-width: 80mm !important;
+    margin: 0 auto;
+    padding: 4mm !important;
+    font-size: 11px;
+  }
+  .print-receipt .receipt-items {
+    font-size: 10px;
+  }
+}
+
+/* Smooth focus ring for keyboard nav */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid oklch(0.55 0.13 162);
+  outline-offset: 2px;
+}
