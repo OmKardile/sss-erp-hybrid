@@ -1,9 +1,22 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+function inRange(date: Date, from: string | null, to: string | null): boolean {
+  const d = date.toISOString().split("T")[0];
+  if (from && d < from) return false;
+  if (to && d > to) return false;
+  return true;
+}
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  // Optional custom date range: ?from=2026-10-01&to=2026-10-15
+  const from = searchParams.get("from");
+  const to = searchParams.get("to");
+  const useCustomRange = !!(from || to);
+
   const now = new Date();
   const todayStr = now.toISOString().split("T")[0];
   const currentMonth = todayStr.substring(0, 7);
@@ -16,6 +29,23 @@ export async function GET() {
     db.udhar.findMany({ include: { payments: true } }),
     db.udharPayment.findMany(),
   ]);
+
+  // Range-scoped figures (used when a custom range is set)
+  const rangeIncome = useCustomRange
+    ? income.filter((i) => inRange(i.date, from, to)).reduce((s, i) => s + i.amount, 0)
+    : 0;
+  const rangeExpenses = useCustomRange
+    ? expenses.filter((e) => inRange(e.date, from, to)).reduce((s, e) => s + e.amount, 0)
+    : 0;
+  const rangePurchases = useCustomRange
+    ? purchases.filter((p) => inRange(p.purchaseDate, from, to)).reduce((s, p) => s + p.totalAmount, 0)
+    : 0;
+  const rangeProfit = rangeIncome - rangeExpenses - rangePurchases;
+  const rangeTxnCount = useCustomRange
+    ? income.filter((i) => inRange(i.date, from, to)).length +
+      expenses.filter((e) => inRange(e.date, from, to)).length +
+      purchases.filter((p) => inRange(p.purchaseDate, from, to)).length
+    : 0;
 
   const todayIncome = income
     .filter((i) => i.date.toISOString().split("T")[0] === todayStr)
@@ -58,6 +88,18 @@ export async function GET() {
     pendingUdhar,
     pendingUdharCount: pendingUdhars.length,
     totalProducts: products.length,
+    // Custom-range figures (zero when no range requested)
+    range: useCustomRange
+      ? {
+          from,
+          to,
+          income: rangeIncome,
+          expenses: rangeExpenses,
+          purchases: rangePurchases,
+          profit: rangeProfit,
+          txnCount: rangeTxnCount,
+        }
+      : null,
   };
 
   // ---- Charts ----

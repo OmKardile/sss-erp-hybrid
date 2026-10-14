@@ -31,6 +31,11 @@ export const api = {
       request<Product>(`/api/products/${id}`, { method: "PUT", body: JSON.stringify(data) }),
     remove: (id: string) =>
       request<{ success: boolean }>(`/api/products/${id}`, { method: "DELETE" }),
+    importCsv: (csv: string) =>
+      request<{ success: boolean; created: number; errors: any[]; total: number }>("/api/products/import", {
+        method: "POST",
+        body: JSON.stringify({ csv }),
+      }),
   },
   // Purchases
   purchases: {
@@ -99,8 +104,12 @@ export const api = {
     ledger: (id: string) => request<any>(`/api/suppliers/${id}/ledger`),
   },
   // Aggregate
-  dashboard: () =>
-    request<{ summary: any; charts: any }>("/api/dashboard"),
+  dashboard: (from?: string, to?: string) =>
+    request<{ summary: any; charts: any }>(
+      from || to
+        ? `/api/dashboard?from=${from || ""}&to=${to || ""}`
+        : "/api/dashboard"
+    ),
   overview: () => request<any>("/api/overview"),
   reports: () => request<any>("/api/reports"),
   seed: () => request<{ seeded: boolean; counts?: any; message?: string }>("/api/seed", { method: "POST" }),

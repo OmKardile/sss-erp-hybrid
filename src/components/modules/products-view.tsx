@@ -15,6 +15,7 @@ import {
   PackageCheck,
   Layers,
   ClipboardCheck,
+  FileUp,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Product, UnitType } from "@/lib/types";
@@ -52,6 +53,7 @@ import {
 import { StatCard } from "@/components/shared/stat-card";
 import { RestockCenter } from "./restock-center";
 import { InventoryAdjustment } from "./inventory-adjustment";
+import { ProductImport } from "./product-import";
 
 const UNIT_TYPES: UnitType[] = ["pcs", "kg", "gm", "box", "litre", "dozen"];
 const CATEGORIES = ["Groceries", "Dairy", "Snacks", "Beverages", "Household", "Personal Care", "Stationery", "Other"];
@@ -84,6 +86,7 @@ export function ProductsView() {
   const [form, setForm] = useState(emptyForm);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [adjustOpen, setAdjustOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   const createMut = useMutation({
     mutationFn: (data: any) => api.products.create(data),
@@ -183,6 +186,9 @@ export function ProductsView() {
         icon={Package}
         actions={
           <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setImportOpen(true)} variant="outline" className="gap-2 border-cyan-500/30 text-cyan-700 hover:bg-cyan-500/10 dark:text-cyan-400">
+              <FileUp className="h-4 w-4" /> Import CSV
+            </Button>
             <Button onClick={() => setAdjustOpen(true)} variant="outline" className="gap-2 border-teal-500/30 text-teal-700 hover:bg-teal-500/10 dark:text-teal-400">
               <ClipboardCheck className="h-4 w-4" /> Stock-take
             </Button>
@@ -489,6 +495,7 @@ export function ProductsView() {
       />
 
       <InventoryAdjustment open={adjustOpen} onClose={() => setAdjustOpen(false)} />
+      <ProductImport open={importOpen} onClose={() => setImportOpen(false)} />
     </div>
   );
 }

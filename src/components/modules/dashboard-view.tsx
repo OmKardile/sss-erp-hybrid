@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
@@ -42,17 +43,22 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNav } from "@/lib/nav";
 import { EmptyState } from "@/components/shared/empty-state";
+import { DateRangeSelector } from "@/components/shared/date-range-selector";
 import { RecentActivity } from "./recent-activity";
 import { TodaySalesWidget } from "./today-sales-widget";
 import { ExpiryWidget } from "./expiry-widget";
 import { SalesTargetWidget } from "./sales-target-widget";
+import { SmartAlertsWidget } from "./smart-alerts-widget";
 
 const PIE_COLORS = ["#10b981", "#14b8a6", "#f59e0b", "#f43f5e", "#8b5cf6", "#06b6d4", "#84cc16"];
 
 export function DashboardView() {
+  const [rangeFrom, setRangeFrom] = useState("");
+  const [rangeTo, setRangeTo] = useState("");
+  const useRange = !!(rangeFrom || rangeTo);
   const { data, isLoading } = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: () => api.dashboard(),
+    queryKey: ["dashboard", rangeFrom, rangeTo],
+    queryFn: () => api.dashboard(rangeFrom || undefined, rangeTo || undefined),
   });
   const setNav = useNav((s) => s.set);
 
@@ -63,6 +69,7 @@ export function DashboardView() {
   const { summary, charts } = data;
   const todayNet = summary.todayIncome - summary.todayExpenses;
   const profitTone = summary.monthlyProfit >= 0 ? "emerald" : "rose";
+  const range = summary.range;
 
   return (
     <div className="space-y-6">
@@ -125,6 +132,45 @@ export function DashboardView() {
               <BookOpen className="h-4 w-4" /> {summary.pendingUdharCount} pending udhar
             </Button>
           </div>
+        </div>
+
+        {/* Date-range selector (top-right of hero) */}
+        <div className="flex flex-col items-end gap-2">
+          <div className="rounded-xl bg-white/10 p-1 backdrop-blur">
+            <DateRangeSelector
+              from={rangeFrom}
+              to={rangeTo}
+              onChange={(f, t) => {
+                setRangeFrom(f);
+                setRangeTo(t);
+              }}
+              className="border-white/20 bg-white/10 text-white hover:bg-white/20"
+            />
+          </div>
+          {useRange && range && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl bg-white/10 px-4 py-3 text-white backdrop-blur"
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-50">
+                {range.from || "Start"} → {range.to || "Now"}
+              </p>
+              <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                <span className="text-emerald-50">Income</span>
+                <span className="text-right font-semibold">{formatCurrency(range.income, { compact: true })}</span>
+                <span className="text-emerald-50">Expenses</span>
+                <span className="text-right font-semibold">{formatCurrency(range.expenses, { compact: true })}</span>
+                <span className="text-emerald-50">Purchases</span>
+                <span className="text-right font-semibold">{formatCurrency(range.purchases, { compact: true })}</span>
+                <span className="text-emerald-50">Profit</span>
+                <span className={`text-right font-bold ${range.profit >= 0 ? "text-emerald-200" : "text-rose-200"}`}>
+                  {formatCurrency(range.profit, { compact: true })}
+                </span>
+              </div>
+              <p className="mt-1 text-[10px] text-emerald-50">{range.txnCount} transactions in range</p>
+            </motion.div>
+          )}
         </div>
       </motion.div>
 
@@ -195,6 +241,9 @@ export function DashboardView() {
           subtitle={`Inflow ${formatCurrency(charts.cashFlow.inflow, { compact: true })} · Outflow ${formatCurrency(charts.cashFlow.outflow, { compact: true })}`}
         />
       </div>
+
+      {/* Smart Alerts (prominent, after KPIs) */}
+      <SmartAlertsWidget />
 
       {/* Charts row 1 */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
