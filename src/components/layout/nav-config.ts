@@ -4,6 +4,7 @@ import {
   ShoppingCart,
   Package,
   ShoppingBag,
+  TrendingUp,
   CircleDollarSign,
   CreditCard,
   BookOpenCheck,
@@ -50,6 +51,15 @@ export const NAV_ITEMS: NavItem[] = [
     icon: Package,
     group: "Operations",
     description: "Manage catalogue and stock levels",
+  },
+  {
+    key: "sales",
+    label: "Sales Analytics",
+    short: "Sales",
+    icon: TrendingUp,
+    group: "Insights",
+    description: "Top products, daily trends & payment mix",
+    badge: "New",
   },
   {
     key: "purchases",

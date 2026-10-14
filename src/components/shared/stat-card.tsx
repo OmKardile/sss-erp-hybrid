@@ -84,7 +84,7 @@ export function StatCard({
                 {title}
               </p>
               <p className="mt-2 text-2xl font-bold tracking-tight text-foreground">{value}</p>
-              {subtitle && <p className="mt-1 truncate text-xs text-muted-foreground">{subtitle}</p>}
+              {subtitle && <p className="mt-1 line-clamp-2 text-xs leading-snug text-muted-foreground" title={subtitle}>{subtitle}</p>}
             </div>
             <div className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-xl", t.bg)}>
               <Icon className={cn("h-5 w-5", t.fg)} />

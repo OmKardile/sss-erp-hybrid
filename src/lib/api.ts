@@ -115,6 +115,10 @@ export const api = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+  salesList: (limit?: number) =>
+    request<any[]>(limit ? `/api/sales?limit=${limit}` : "/api/sales"),
+  salesAnalytics: () => request<any>("/api/sales/analytics"),
+  salesToday: () => request<any>("/api/sales/today"),
   // Backup / restore
   backup: {
     export: () => request<any>("/api/backup"),

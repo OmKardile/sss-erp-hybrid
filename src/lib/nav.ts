@@ -4,6 +4,7 @@ export type ModuleKey =
   | "dashboard"
   | "pos"
   | "products"
+  | "sales"
   | "purchases"
   | "income"
   | "expenses"

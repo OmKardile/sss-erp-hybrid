@@ -1,104 +1,109 @@
 # Shubham Super Shopee ERP — Worklog
 
 ---
-Task ID: 2 (webDevReview cron — Phase 2)
+Task ID: 3 (webDevReview cron — Phase 3)
 Agent: webDevReview (automated)
 Task: Assess project status, perform QA, fix bugs, add new features & polish styling.
 
 Work Log:
-- Reviewed Phase 1 worklog; project was at "fully functional, browser-verified" state with 10 modules.
-- Ran agent-browser QA across all modules. **Discovered a critical client-side crash**: the Purchases, Income, and Expenses views called `.toISOString()` directly on date fields returned as **strings** by the JSON API (Prisma DateTime → ISO string on serialization), causing `TypeError: ...toISOString is not a function` and rendering the Next.js error overlay.
-- Fixed the bug by adding a robust `isoOf()` helper to `src/lib/format.ts` (handles both string and Date inputs) and replacing all `.toISOString()` calls on data dates in `purchases-view.tsx`, `income-view.tsx`, `expenses-view.tsx`.
-- Verified all 11 modules load without errors after fix.
-- Built **3 new modules** and **2 new infrastructure features**:
-  1. **POS (Point of Sale)** — full quick-sale flow: product grid → cart with qty steppers → payment method (Cash/UPI/Card/Wallet) → discount → complete sale → stock auto-decrements + income entry created + printable receipt modal. Verified end-to-end (Parle-G stock 60→58, ₹515 income created).
-  2. **Command Palette (Cmd+K / Ctrl+K)** — searchable command palette with nav items + quick actions (toggle theme, refresh, seed, backup, new sale). Keyboard navigable (↑↓ + Enter).
-  3. **Settings & Backup** — full DB export to JSON, restore from file (with confirm), clear all data (with confirm), re-seed demo data, system info panel.
-  4. **Date-range filters** — reusable `DateRangeFilter` component (All time / Today / 7D / 30D / This month / This year) added to Income, Expenses, Purchases views.
-  5. **Recent Activity feed** — new dashboard section showing latest 10 transactions across income/expense/purchase/udhar with click-to-navigate.
-- Added "New" badge support to sidebar nav items (POS marked "New").
-- Added mobile home button + Cmd+K trigger button in topbar.
-- Fixed Framer Motion non-animatable color warning in POS total.
-- ESLint clean throughout; all API routes return 200.
+- Reviewed Phase 2 worklog; project had 12 modules, all stable.
+- Ran agent-browser QA across all 12 modules — no runtime/console errors on navigation. VLM assessment flagged text truncation (sidebar shop name cut to "Shubham Super Sho...", KPI card subtexts truncated).
+- Added `Sale` + `SaleItem` models to Prisma schema so POS sales persist as structured records (not just income entries).
+- Updated `/api/sales` POST to create Sale + SaleItem records transactionally alongside income + stock decrement. Added `/api/sales` GET (list) and two new endpoints:
+  - `/api/sales/analytics` — top products, daily trend (14d), payment-method breakdown, hourly distribution (today), top customers, recent sales, summary KPIs.
+  - `/api/sales/today` — today's sales total/count/units/items, payment breakdown, top products, recent.
+- Updated `/api/backup` (GET export / POST restore / DELETE clear) to include sales + saleItems (backup version bumped to v3).
+- Built **Sales Analytics module** (new, #13): 4 KPI cards (Today / Month / All-Time / Avg), daily sales trend area chart, top-selling products with animated bars, payment-method donut with legend, hourly distribution bar chart, top customers, recent sales table.
+- Built **POS barcode/SKU scan input**: prominent emerald-bordered scan bar above the product grid. Type a SKU (exact match) or product name (starts-with → includes) + Enter to add to cart. Verified: "SKU-K20EGQ" → Basmati Rice added; "Parle" → Parle-G added.
+- Built **Today's Sales widget** for the dashboard: live card showing today's POS total, item/unit count, payment-method chips, top 3 products, last sale time, and a CTA to view full analytics. Auto-refreshes every 30s. Dashboard bottom section restructured from 2-col to 3-col (mini-stats / today's sales / recent activity).
+- Fixed text truncation: sidebar shop name now wraps (`break-words`) instead of `truncate`; StatCard subtitles now `line-clamp-2` instead of `truncate`.
+- Discovered & fixed a **dev-server issue**: after `db:push` added the Sale model, the running dev server's cached `PrismaClient` instance lacked `.sale`. Added a staleness check in `src/lib/db.ts` that recreates the client if `sale` is missing. Also had to restart the dev server (the original boot process was killed and not supervised) — restarted via `setsid -f`.
+- Added "sales" to nav (Insights group, "New" badge). Nav now has 13 items across 5 groups.
+- Verified end-to-end: POS sale (Basmati + Colgate, ₹600) → Sales Analytics shows ₹600 all-time revenue, 1 sale, Basmati + Colgate in top products, Cash in payment breakdown, recent sales table.
 
 Stage Summary:
-- **Bug fixed**: date-serialization crash in 3 views (was a Phase 1 regression missed in QA).
-- **New modules**: POS, Settings & Backup (now 12 modules total).
-- **New features**: Command Palette (Cmd+K), date-range filters, recent activity feed, full backup/restore/clear API.
-- **New API routes**: `/api/sales` (transactional sale), `/api/backup` (GET export / POST restore / DELETE clear).
-- **VLM assessment**: Dashboard rated 6→visible charts confirmed; POS rated 7.5/10 with praise for clean modern layout, good hierarchy, professional green accent.
-- All 12 modules verified working via agent-browser with no console/runtime errors.
-- Files created: `pos-view.tsx`, `settings-view.tsx`, `command-palette.tsx`, `date-range-filter.tsx`, `recent-activity.tsx`, `api/sales/route.ts`, `api/backup/route.ts`.
+- **New module**: Sales Analytics (#13) — 4 KPIs, 3 charts (trend area, payment donut, hourly bars), top products, top customers, recent sales table.
+- **New feature**: POS barcode/SKU scan input with fuzzy name + exact SKU matching.
+- **New feature**: Today's Sales dashboard widget (live, auto-refreshing).
+- **New API routes**: `/api/sales/analytics`, `/api/sales/today`; updated `/api/sales` to persist Sale + SaleItem.
+- **Schema**: Added `Sale` + `SaleItem` models (Prisma).
+- **Bug fixed**: stale PrismaClient after schema change (db.ts staleness check).
+- **Styling fixed**: sidebar shop name truncation + StatCard subtitle truncation.
+- **Backup**: version bumped to v3, includes sales + saleItems.
+- All 13 modules verified working via agent-browser with no console/runtime errors.
+- ESLint clean; all API routes return 200.
+- VLM: dashboard rated 9/10 after truncation fixes.
+- Files created: `sales-view.tsx`, `today-sales-widget.tsx`, `api/sales/analytics/route.ts`, `api/sales/today/route.ts`.
 - No commits or pushes made (per instructions).
 
 ---
 
-## Current Project Status (Phase 2 complete)
-**Status: ✅ Stable & enhanced — 12 modules, 1 critical bug fixed, 5 new features added**
+## Current Project Status (Phase 3 complete)
+**Status: ✅ Stable & feature-rich — 13 modules, Sales Analytics + POS scan + Today's Sales widget added**
 
-The ERP is now a comprehensive retail operations suite. All modules load without errors, the POS sale flow works end-to-end (stock decrement + income + receipt), the Command Palette enables fast keyboard navigation, and the full database can be backed up/restored via the Settings module.
+The ERP now has full sales lifecycle: POS records structured sales (with line items) → Sales Analytics visualizes them → Today's Sales widget surfaces live daily totals on the dashboard. The POS scan input enables fast barcode/SKU-driven checkout.
 
 ## What Was Built (cumulative)
 
 ### Architecture
 - **Framework**: Next.js 16 App Router + TypeScript 5 + Turbopack
-- **Database**: Prisma ORM + SQLite (`db/custom.db`)
+- **Database**: Prisma ORM + SQLite (`db/custom.db`) — models: Product, Purchase, Income, Expense, Udhar, UdharPayment, Customer, Supplier, **Sale, SaleItem**, Setting
 - **State**: Zustand (nav + palette) + TanStack Query (server state)
-- **Styling**: Tailwind CSS 4 + shadcn/ui + custom emerald/teal/amber theme + Framer Motion animations
+- **Styling**: Tailwind CSS 4 + shadcn/ui + custom emerald/teal/amber theme + Framer Motion
 - **Charts**: Recharts
 - **Dark mode**: next-themes (class strategy)
-- **Toasts**: sonner
-
-### Database schema (`prisma/schema.prisma`)
-Models: `Product`, `Purchase`, `Income`, `Expense`, `Udhar`, `UdharPayment`, `Customer`, `Supplier`, `Setting`. Udhar→UdharPayment cascade-delete; udhar status auto-transitions PENDING→PARTIAL→PAID.
 
 ### API routes (`src/app/api/`)
 - `products`, `purchases`, `income`, `expenses`, `udhar` (+ payments), `customers`, `suppliers` — full CRUD
-- `sales` — **NEW**: transactional POS sale (decrement stock + create income + return receipt)
-- `backup` — **NEW**: GET export / POST restore / DELETE clear (full DB)
-- `dashboard`, `overview`, `reports` — aggregate analytics
-- `seed` — demo data loader
+- `sales` — POST (transactional sale: stock decrement + income + Sale/SaleItem) + GET (list)
+- `sales/analytics` — top products, daily trend, payment breakdown, hourly, top customers, summary
+- `sales/today` — today's sales summary for dashboard widget
+- `backup` — GET export / POST restore / DELETE clear (v3, includes sales)
+- `dashboard`, `overview`, `reports`, `seed`
 
-### Modules (12 total)
-1. **Dashboard** — hero, 8 KPI cards, 4 charts, mini-stats + **NEW Recent Activity feed**
-2. **Point of Sale** — **NEW**: product grid, cart, payment methods, receipt
-3. **Products & Inventory** — CRUD, search, low-stock, categories
-4. **Purchases** — supplier filter, auto-stock + **NEW date-range filter**
-5. **Income** — category filter + **NEW date-range filter**
-6. **Expenses** — category breakdown + **NEW date-range filter**
-7. **Udhar Ledger** — credit cards, payments, settle, history, overdue
-8. **Customers** / 9. **Suppliers** — directory cards with linked stats
-10. **Yearly Overview** — trends, roll-up, best month, top performers
-11. **Reports** — summary, low-stock, recent transactions, JSON/CSV download
-12. **Settings & Backup** — **NEW**: export/import/clear/seed + system info
+### Modules (13 total)
+1. Dashboard — hero, 8 KPI cards, 4 charts, mini-stats + **Today's Sales widget** + Recent Activity
+2. Point of Sale — **SKU/barcode scan input** + product grid + cart + payment + receipt
+3. Products & Inventory — CRUD, search, low-stock, categories
+4. Purchases — supplier filter, auto-stock, date-range filter
+5. Income — category filter, date-range filter
+6. Expenses — category breakdown, date-range filter
+7. Udhar Ledger — credit cards, payments, settle, history, overdue
+8. Customers / 9. Suppliers — directory cards with linked stats
+10. **Sales Analytics** — KPIs, daily trend, top products, payment mix, hourly, top customers, recent sales
+11. Yearly Overview — trends, roll-up, best month, top performers
+12. Reports — summary, low-stock, recent transactions, JSON/CSV download
+13. Settings & Backup — export/import/clear/seed + system info
 
 ### Cross-cutting features
-- **Command Palette (Cmd+K)** — searchable nav + actions
-- **Date-range filters** — reusable component on 3 transaction views
-- **Backup/restore** — full DB JSON export & import
-- Dark mode, responsive (mobile sheet nav), sticky footer, Framer Motion transitions
+- Command Palette (Cmd+K) — searchable nav + actions
+- Date-range filters on 3 transaction views
+- Backup/restore (full DB JSON, v3)
+- Dark mode, responsive, sticky footer, Framer Motion transitions
 
-## Verification Results (Agent Browser — Phase 2)
-- ✅ All 12 modules load with no console/runtime errors
-- ✅ POS: add to cart → complete sale → stock decremented (Parle-G 60→58) → income ₹515 created → receipt shown
-- ✅ Command Palette: Cmd+K opens, search filters, Enter/click navigates
-- ✅ Settings: export backup downloads JSON, restore/clear confirm dialogs work
-- ✅ Date filters: "This year" on Income shows 61 records
-- ✅ Dashboard Recent Activity renders latest transactions
-- ✅ All API routes return 200 (verified in dev.log)
+## Verification Results (Agent Browser — Phase 3)
+- ✅ All 13 modules load with no console/runtime errors
+- ✅ POS sale (Basmati + Colgate, ₹600) → Sales Analytics shows data correctly
+- ✅ POS SKU scan ("SKU-K20EGQ" → Basmati added) + name scan ("Parle" → Parle-G added)
+- ✅ Today's Sales widget renders on dashboard (3-col bottom section)
+- ✅ Sales Analytics: 4 KPIs, trend chart, top products, payment donut, hourly bars, top customers, recent sales
+- ✅ Sidebar shop name "Shubham Super Shopee" fully visible (no truncation)
+- ✅ StatCard subtexts readable (line-clamp-2)
+- ✅ All API routes return 200
 - ✅ ESLint clean
-- ✅ VLM: POS rated 7.5/10 (clean, modern, good hierarchy)
+- ✅ VLM: dashboard rated 9/10 after fixes
 
 ## Unresolved Issues / Risks
 - None blocking. All features functional.
-- Product images are placeholder icons (not real photos) — acceptable for ERP, could be enhanced later.
+- The dev server was manually restarted via `setsid -f` after the original boot process was killed; it is not supervised. If it dies again, restart with: `cd /home/z/my-project && setsid -f bash -c 'bun run dev > /home/z/my-project/dev.log 2>&1'`.
+- Historical income entries from Phase 2 POS testing don't have linked Sale records (Sale model didn't exist then); only new sales create Sale records. This is expected.
 
 ## Recommended Next-Phase Priorities
 1. Customer/supplier ledger statement pages (per-entity transaction history)
-2. Low-stock email/push notification stubs
+2. Low-stock restock dashboard with one-click purchase-order creation
 3. POS receipt thermal-printer format (58mm/80mm)
-4. Sales analytics view (top-selling products, daily sales totals, payment-method breakdown)
-5. Barcode/SKU scan input in POS
-6. Multi-currency / GST tax support
-7. User authentication (NextAuth) for multi-staff
-8. Print/PDF export for reports
+4. Print/PDF export for reports
+5. Multi-currency / GST tax support in POS
+6. User authentication (NextAuth) for multi-staff
+7. Sales target tracking (monthly goals vs actual)
+8. Expiry-date tracking dashboard for perishable inventory

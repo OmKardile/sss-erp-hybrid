@@ -21,6 +21,8 @@ import {
   CheckCircle2,
   Package,
   ArrowRight,
+  ScanLine,
+  Zap,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { api } from "@/lib/api";
@@ -64,6 +66,25 @@ export function PosView() {
   const [discount, setDiscount] = useState("");
   const [notes, setNotes] = useState("");
   const [receipt, setReceipt] = useState<any | null>(null);
+  const [scanInput, setScanInput] = useState("");
+
+  const scanProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = scanInput.trim().toLowerCase();
+    if (!q) return;
+    // Match by SKU (exact, case-insensitive) first, then name (starts with), then name (includes)
+    let match: Product | undefined =
+      products.find((p) => (p.sku || "").toLowerCase() === q) ||
+      products.find((p) => p.name.toLowerCase().startsWith(q)) ||
+      products.find((p) => p.name.toLowerCase().includes(q));
+    if (!match) {
+      toast.error("No product found", { description: `No match for "${scanInput}"` });
+      return;
+    }
+    addToCart(match);
+    toast.success(`Added: ${match.name}`, { description: formatCurrency(match.sellingPrice) });
+    setScanInput("");
+  };
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -169,6 +190,24 @@ export function PosView() {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_400px]">
         {/* Product picker */}
         <div className="space-y-4">
+          {/* Scan / quick-add bar */}
+          <form onSubmit={scanProduct} className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <ScanLine className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-600" />
+              <input
+                autoFocus
+                value={scanInput}
+                onChange={(e) => setScanInput(e.target.value)}
+                placeholder="Scan barcode / type SKU or product name + Enter…"
+                className="h-12 w-full rounded-xl border-2 border-emerald-500/30 bg-emerald-500/5 pl-9 pr-3 text-sm font-medium outline-none transition focus:border-emerald-500 focus:bg-background focus:ring-2 focus:ring-emerald-500/20"
+              />
+            </div>
+            <Button type="submit" size="lg" className="h-12 gap-2 bg-emerald-600 hover:bg-emerald-700">
+              <Zap className="h-4 w-4" />
+              <span className="hidden sm:inline">Add</span>
+            </Button>
+          </form>
+
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative flex-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

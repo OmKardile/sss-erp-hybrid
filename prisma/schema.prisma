@@ -98,6 +98,35 @@ model Supplier {
   createdAt DateTime @default(now())
 }
 
+// POS sales records (for sales analytics). Each Sale has many SaleItems.
+// Income entry is also created in parallel for the same total.
+model Sale {
+  id            String      @id @default(cuid())
+  customerName  String?
+  paymentMethod String      @default("Cash")
+  subtotal      Float
+  discount      Float       @default(0)
+  total         Float
+  itemCount     Int
+  notes         String?
+  date          DateTime    @default(now())
+  incomeId      String?
+  createdAt     DateTime    @default(now())
+  items         SaleItem[]
+}
+
+model SaleItem {
+  id        String   @id @default(cuid())
+  sale      Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  saleId    String
+  productId String?
+  name      String
+  price     Float
+  quantity  Float
+  lineTotal Float
+  createdAt DateTime @default(now())
+}
+
 model Setting {
   id    String @id @default("singleton")
   key   String @unique

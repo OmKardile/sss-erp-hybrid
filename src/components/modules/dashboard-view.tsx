@@ -43,6 +43,7 @@ import { Button } from "@/components/ui/button";
 import { useNav } from "@/lib/nav";
 import { EmptyState } from "@/components/shared/empty-state";
 import { RecentActivity } from "./recent-activity";
+import { TodaySalesWidget } from "./today-sales-widget";
 
 const PIE_COLORS = ["#10b981", "#14b8a6", "#f59e0b", "#f43f5e", "#8b5cf6", "#06b6d4", "#84cc16"];
 
@@ -125,7 +126,7 @@ export function DashboardView() {
         </div>
       </motion.div>
 
-      {/* KPI grid */}
+      {/* KPI grid + Today's Sales */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           index={0}
@@ -387,8 +388,8 @@ export function DashboardView() {
         </SectionCard>
       </div>
 
-      {/* Quick stats strip + Recent activity */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      {/* Quick stats strip + Today's Sales + Recent activity */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="grid grid-cols-2 gap-4">
           <MiniStat
             label="Cash Inflow"
@@ -419,6 +420,7 @@ export function DashboardView() {
             icon={Boxes}
           />
         </div>
+        <TodaySalesWidget />
         <RecentActivity />
       </div>
 

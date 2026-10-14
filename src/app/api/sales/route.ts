@@ -10,7 +10,7 @@ interface SaleItemInput {
   quantity: number;
 }
 
-// Records a sale: decrements product stock, creates an Income entry, and stores a Sale record.
+// Records a sale: decrements product stock, creates an Income entry, AND stores a Sale record with line items.
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     const subtotal = items.reduce((s, it) => s + it.price * it.quantity, 0);
     const total = Math.max(0, subtotal - discount);
 
-    // Transaction: decrement stock + create income
+    // Transaction: decrement stock + create income + create sale + sale items
     const result = await db.$transaction(async (tx) => {
       for (const it of items) {
         await tx.product.update({
@@ -58,7 +58,30 @@ export async function POST(req: NextRequest) {
           notes: `POS sale · ${paymentMethod} · ${items.length} item(s)${notes ? ` · ${notes}` : ""}`,
         },
       });
-      return { income, subtotal, total, discount };
+      const sale = await tx.sale.create({
+        data: {
+          customerName,
+          paymentMethod,
+          subtotal,
+          discount,
+          total,
+          itemCount: items.length,
+          notes,
+          date: saleDate,
+          incomeId: income.id,
+          items: {
+            create: items.map((it) => ({
+              productId: it.productId,
+              name: it.name,
+              price: it.price,
+              quantity: it.quantity,
+              lineTotal: it.price * it.quantity,
+            })),
+          },
+        },
+        include: { items: true },
+      });
+      return { income, sale, subtotal, total, discount };
     });
 
     return NextResponse.json(
@@ -73,6 +96,7 @@ export async function POST(req: NextRequest) {
           paymentMethod,
           date: saleDate.toISOString(),
           incomeId: result.income.id,
+          saleId: result.sale.id,
         },
       },
       { status: 201 }
@@ -83,4 +107,16 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
+}
+
+// GET — list recent sales (with optional ?limit=)
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const limit = Math.min(Number(searchParams.get("limit")) || 50, 200);
+  const sales = await db.sale.findMany({
+    include: { items: true },
+    orderBy: { date: "desc" },
+    take: limit,
+  });
+  return NextResponse.json(sales);
 }

@@ -16,11 +16,13 @@ import { SuppliersView } from "@/components/modules/suppliers-view";
 import { OverviewView } from "@/components/modules/overview-view";
 import { ReportsView } from "@/components/modules/reports-view";
 import { SettingsView } from "@/components/modules/settings-view";
+import { SalesView } from "@/components/modules/sales-view";
 
 const VIEWS = {
   dashboard: DashboardView,
   pos: PosView,
   products: ProductsView,
+  sales: SalesView,
   purchases: PurchasesView,
   income: IncomeView,
   expenses: ExpensesView,

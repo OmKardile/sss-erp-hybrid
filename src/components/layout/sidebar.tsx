@@ -29,7 +29,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-100">
               Retail ERP
             </p>
-            <h1 className="truncate text-base font-bold leading-tight">Shubham Super Shopee</h1>
+            <h1 className="text-[15px] font-bold leading-tight break-words">Shubham Super Shopee</h1>
           </div>
         </div>
         <div className="relative mt-3 flex items-center gap-1.5 rounded-lg bg-white/10 px-2 py-1 text-[11px] font-medium text-emerald-50 backdrop-blur">
