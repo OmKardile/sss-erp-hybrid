@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
+  ShoppingCart,
   Package,
   ShoppingBag,
   CircleDollarSign,
@@ -10,6 +11,7 @@ import {
   Truck,
   BarChart3,
   FileText,
+  Settings,
 } from "lucide-react";
 import type { ModuleKey } from "@/lib/nav";
 
@@ -18,8 +20,9 @@ export interface NavItem {
   label: string;
   short: string;
   icon: LucideIcon;
-  group: "Operations" | "Finance" | "Directory" | "Insights";
+  group: "Operations" | "Finance" | "Directory" | "Insights" | "System";
   description: string;
+  badge?: string;
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -30,6 +33,15 @@ export const NAV_ITEMS: NavItem[] = [
     icon: LayoutDashboard,
     group: "Operations",
     description: "KPIs, charts & recent activity",
+  },
+  {
+    key: "pos",
+    label: "Point of Sale",
+    short: "POS",
+    icon: ShoppingCart,
+    group: "Operations",
+    description: "Quick sale, stock decrement & receipt",
+    badge: "New",
   },
   {
     key: "products",
@@ -103,6 +115,14 @@ export const NAV_ITEMS: NavItem[] = [
     group: "Insights",
     description: "Generate & download business reports",
   },
+  {
+    key: "settings",
+    label: "Settings & Backup",
+    short: "Config",
+    icon: Settings,
+    group: "System",
+    description: "Backup, restore & data management",
+  },
 ];
 
-export const NAV_GROUPS: NavItem["group"][] = ["Operations", "Finance", "Directory", "Insights"];
+export const NAV_GROUPS: NavItem["group"][] = ["Operations", "Finance", "Directory", "Insights", "System"];

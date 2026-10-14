@@ -6,12 +6,13 @@ import { toast } from "sonner";
 import { ShoppingBag, Plus, Trash2, Search, Truck, Calendar, IndianRupee } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Purchase } from "@/lib/types";
-import { formatCurrency, formatDate, todayISO } from "@/lib/format";
+import { formatCurrency, formatDate, todayISO, isoOf } from "@/lib/format";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { StatCard } from "@/components/shared/stat-card";
+import { DateRangeFilter, inPreset, type DatePreset } from "@/components/shared/date-range-filter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,6 +51,7 @@ export function PurchasesView() {
 
   const [search, setSearch] = useState("");
   const [supplierFilter, setSupplierFilter] = useState("ALL");
+  const [datePreset, setDatePreset] = useState<DatePreset>("ALL");
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -90,7 +92,7 @@ export function PurchasesView() {
     const total = purchases.reduce((s, p) => s + p.totalAmount, 0);
     const month = new Date().toISOString().substring(0, 7);
     const monthly = purchases
-      .filter((p) => p.purchaseDate.toISOString().startsWith(month))
+      .filter((p) => isoOf(p.purchaseDate).startsWith(month))
       .reduce((s, p) => s + p.totalAmount, 0);
     const uniqSuppliers = new Set(purchases.map((p) => p.supplierName)).size;
     return { total, monthly, count: purchases.length, uniqSuppliers };
@@ -110,9 +112,10 @@ export function PurchasesView() {
         p.productName.toLowerCase().includes(search.toLowerCase()) ||
         p.supplierName.toLowerCase().includes(search.toLowerCase());
       const matchSup = supplierFilter === "ALL" || p.supplierName === supplierFilter;
-      return matchSearch && matchSup;
+      const matchDate = inPreset(p.purchaseDate, datePreset);
+      return matchSearch && matchSup && matchDate;
     });
-  }, [purchases, search, supplierFilter]);
+  }, [purchases, search, supplierFilter, datePreset]);
 
   const total = (Number(form.quantity) || 0) * (Number(form.unitPrice) || 0);
 
@@ -171,6 +174,7 @@ export function PurchasesView() {
                 ))}
               </SelectContent>
             </Select>
+            <DateRangeFilter value={datePreset} onChange={setDatePreset} />
           </div>
         }
         contentClassName="p-0"

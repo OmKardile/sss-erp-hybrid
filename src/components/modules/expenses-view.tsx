@@ -6,12 +6,13 @@ import { toast } from "sonner";
 import { CreditCard, Plus, Trash2, Search, IndianRupee, Calendar, TrendingDown, Layers } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Expense } from "@/lib/types";
-import { formatCurrency, formatDate, todayISO } from "@/lib/format";
+import { formatCurrency, formatDate, todayISO, isoOf } from "@/lib/format";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { StatCard } from "@/components/shared/stat-card";
+import { DateRangeFilter, inPreset, type DatePreset } from "@/components/shared/date-range-filter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,6 +49,7 @@ export function ExpensesView() {
 
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState("ALL");
+  const [datePreset, setDatePreset] = useState<DatePreset>("ALL");
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -83,9 +85,9 @@ export function ExpensesView() {
   const stats = useMemo(() => {
     const total = expenses.reduce((s, e) => s + e.amount, 0);
     const month = new Date().toISOString().substring(0, 7);
-    const monthly = expenses.filter((e) => e.date.toISOString().startsWith(month)).reduce((s, e) => s + e.amount, 0);
+    const monthly = expenses.filter((e) => isoOf(e.date).startsWith(month)).reduce((s, e) => s + e.amount, 0);
     const today = todayISO();
-    const todayTotal = expenses.filter((e) => e.date.toISOString().split("T")[0] === today).reduce((s, e) => s + e.amount, 0);
+    const todayTotal = expenses.filter((e) => isoOf(e.date).split("T")[0] === today).reduce((s, e) => s + e.amount, 0);
     const avg = expenses.length ? total / expenses.length : 0;
     return { total, monthly, todayTotal, avg, count: expenses.length };
   }, [expenses]);
@@ -100,9 +102,10 @@ export function ExpensesView() {
     return expenses.filter((e) => {
       const matchSearch = !search || e.category.toLowerCase().includes(search.toLowerCase()) || (e.notes || "").toLowerCase().includes(search.toLowerCase());
       const matchCat = catFilter === "ALL" || e.category === catFilter;
-      return matchSearch && matchCat;
+      const matchDate = inPreset(e.date, datePreset);
+      return matchSearch && matchCat && matchDate;
     });
-  }, [expenses, search, catFilter]);
+  }, [expenses, search, catFilter, datePreset]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,6 +157,7 @@ export function ExpensesView() {
                   ))}
                 </SelectContent>
               </Select>
+              <DateRangeFilter value={datePreset} onChange={setDatePreset} />
             </div>
           }
           contentClassName="p-0"

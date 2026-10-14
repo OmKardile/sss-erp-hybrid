@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Menu, Moon, Sun, Database, RefreshCw } from "lucide-react";
+import { Menu, Moon, Sun, Database, RefreshCw, Command as CommandIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNav } from "@/lib/nav";
 import { NAV_ITEMS } from "./nav-config";
@@ -15,6 +15,8 @@ export function Topbar() {
   const [mounted, setMounted] = useState(false);
   const active = useNav((s) => s.active);
   const setMobile = useNav((s) => s.setMobileNav);
+  const setNav = useNav((s) => s.set);
+  const togglePalette = useNav((s) => s.togglePalette);
   const qc = useQueryClient();
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -55,6 +57,14 @@ export function Topbar() {
           <Menu className="h-5 w-5" />
         </Button>
 
+        <button
+          onClick={() => setNav("dashboard")}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 text-white shadow-sm transition hover:scale-105 lg:hidden"
+          aria-label="Home"
+        >
+          <span className="text-sm font-bold">S</span>
+        </button>
+
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -71,6 +81,20 @@ export function Topbar() {
         </div>
 
         <div className="flex items-center gap-1.5">
+          {/* Command palette trigger */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={togglePalette}
+            className="hidden gap-2 md:flex"
+            aria-label="Open command palette"
+          >
+            <CommandIcon className="h-3.5 w-3.5" />
+            <kbd className="rounded border border-border bg-muted px-1 py-0.5 text-[10px] font-medium text-muted-foreground">
+              ⌘K
+            </kbd>
+          </Button>
+
           <Button
             variant="outline"
             size="sm"

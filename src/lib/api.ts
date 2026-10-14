@@ -102,4 +102,28 @@ export const api = {
   overview: () => request<any>("/api/overview"),
   reports: () => request<any>("/api/reports"),
   seed: () => request<{ seeded: boolean; counts?: any; message?: string }>("/api/seed", { method: "POST" }),
+  // POS sale
+  sale: (data: {
+    items: { productId: string; name: string; price: number; quantity: number }[];
+    customerName?: string;
+    paymentMethod?: string;
+    date?: string;
+    discount?: number;
+    notes?: string;
+  }) =>
+    request<{ success: boolean; receipt: any }>("/api/sales", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  // Backup / restore
+  backup: {
+    export: () => request<any>("/api/backup"),
+    restore: (data: any) =>
+      request<{ success: boolean; message: string }>("/api/backup", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    clear: () =>
+      request<{ success: boolean; message: string }>("/api/backup", { method: "DELETE" }),
+  },
 };

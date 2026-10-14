@@ -79,6 +79,11 @@ export function Sidebar({ onNavigate }: SidebarProps) {
                         )}
                       />
                       <span className="flex-1 truncate">{item.label}</span>
+                      {item.badge && (
+                        <span className="rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
+                          {item.badge}
+                        </span>
+                      )}
                     </button>
                   );
                 })}

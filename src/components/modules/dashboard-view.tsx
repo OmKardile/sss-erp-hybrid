@@ -42,6 +42,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNav } from "@/lib/nav";
 import { EmptyState } from "@/components/shared/empty-state";
+import { RecentActivity } from "./recent-activity";
 
 const PIE_COLORS = ["#10b981", "#14b8a6", "#f59e0b", "#f43f5e", "#8b5cf6", "#06b6d4", "#84cc16"];
 
@@ -386,36 +387,39 @@ export function DashboardView() {
         </SectionCard>
       </div>
 
-      {/* Quick stats strip */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <MiniStat
-          label="Cash Inflow"
-          value={formatCurrency(charts.cashFlow.inflow, { compact: true })}
-          tone="emerald"
-          icon={ArrowUpRight}
-        />
-        <MiniStat
-          label="Cash Outflow"
-          value={formatCurrency(charts.cashFlow.outflow, { compact: true })}
-          tone="rose"
-          icon={ArrowDownRight}
-        />
-        <MiniStat
-          label="Avg. Daily Income (30d)"
-          value={formatCurrency(
-            charts.last30DaysIncome.reduce((s: number, d: any) => s + d.total, 0) /
-              Math.max(1, charts.last30DaysIncome.length),
-            { compact: true }
-          )}
-          tone="teal"
-          icon={IndianRupee}
-        />
-        <MiniStat
-          label="Inventory Units"
-          value={`${summary.inventoryCount}`}
-          tone="amber"
-          icon={Boxes}
-        />
+      {/* Quick stats strip + Recent activity */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="grid grid-cols-2 gap-4">
+          <MiniStat
+            label="Cash Inflow"
+            value={formatCurrency(charts.cashFlow.inflow, { compact: true })}
+            tone="emerald"
+            icon={ArrowUpRight}
+          />
+          <MiniStat
+            label="Cash Outflow"
+            value={formatCurrency(charts.cashFlow.outflow, { compact: true })}
+            tone="rose"
+            icon={ArrowDownRight}
+          />
+          <MiniStat
+            label="Avg. Daily Income (30d)"
+            value={formatCurrency(
+              charts.last30DaysIncome.reduce((s: number, d: any) => s + d.total, 0) /
+                Math.max(1, charts.last30DaysIncome.length),
+              { compact: true }
+            )}
+            tone="teal"
+            icon={IndianRupee}
+          />
+          <MiniStat
+            label="Inventory Units"
+            value={`${summary.inventoryCount}`}
+            tone="amber"
+            icon={Boxes}
+          />
+        </div>
+        <RecentActivity />
       </div>
 
       {summary.totalProducts === 0 && (

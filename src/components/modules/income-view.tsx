@@ -6,12 +6,13 @@ import { toast } from "sonner";
 import { CircleDollarSign, Plus, Trash2, Search, IndianRupee, Calendar, TrendingUp, Layers } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Income } from "@/lib/types";
-import { formatCurrency, formatDate, todayISO, monthLabel } from "@/lib/format";
+import { formatCurrency, formatDate, todayISO, monthLabel, isoOf } from "@/lib/format";
 import { PageHeader } from "@/components/shared/page-header";
 import { SectionCard } from "@/components/shared/section-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { StatCard } from "@/components/shared/stat-card";
+import { DateRangeFilter, inPreset, type DatePreset } from "@/components/shared/date-range-filter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,6 +49,7 @@ export function IncomeView() {
 
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState("ALL");
+  const [datePreset, setDatePreset] = useState<DatePreset>("ALL");
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -84,9 +86,9 @@ export function IncomeView() {
   const stats = useMemo(() => {
     const total = income.reduce((s, i) => s + i.amount, 0);
     const month = new Date().toISOString().substring(0, 7);
-    const monthly = income.filter((i) => i.date.toISOString().startsWith(month)).reduce((s, i) => s + i.amount, 0);
+    const monthly = income.filter((i) => isoOf(i.date).startsWith(month)).reduce((s, i) => s + i.amount, 0);
     const today = todayISO();
-    const todayTotal = income.filter((i) => i.date.toISOString().split("T")[0] === today).reduce((s, i) => s + i.amount, 0);
+    const todayTotal = income.filter((i) => isoOf(i.date).split("T")[0] === today).reduce((s, i) => s + i.amount, 0);
     const avg = income.length ? total / income.length : 0;
     return { total, monthly, todayTotal, avg, count: income.length };
   }, [income]);
@@ -95,9 +97,10 @@ export function IncomeView() {
     return income.filter((i) => {
       const matchSearch = !search || i.source.toLowerCase().includes(search.toLowerCase()) || (i.notes || "").toLowerCase().includes(search.toLowerCase());
       const matchCat = catFilter === "ALL" || i.category === catFilter;
-      return matchSearch && matchCat;
+      const matchDate = inPreset(i.date, datePreset);
+      return matchSearch && matchCat && matchDate;
     });
-  }, [income, search, catFilter]);
+  }, [income, search, catFilter, datePreset]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,6 +152,7 @@ export function IncomeView() {
                 ))}
               </SelectContent>
             </Select>
+            <DateRangeFilter value={datePreset} onChange={setDatePreset} />
           </div>
         }
         contentClassName="p-0"

@@ -1,5 +1,17 @@
 // Formatting helpers for the ERP
 
+/** Returns an ISO 8601 string regardless of whether input is a Date or a string.
+ *  Handles API JSON responses where dates arrive as strings. */
+export function isoOf(date: string | Date | null | undefined): string {
+  if (!date) return "";
+  if (typeof date === "string") return date;
+  try {
+    return date.toISOString();
+  } catch {
+    return "";
+  }
+}
+
 export function formatCurrency(value: number, opts?: { compact?: boolean }): string {
   const num = Number.isFinite(value) ? value : 0;
   if (opts?.compact && Math.abs(num) >= 100000) {

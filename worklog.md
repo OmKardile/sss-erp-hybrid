@@ -1,82 +1,104 @@
 # Shubham Super Shopee ERP — Worklog
 
-## Project Status Assessment
-**Status: ✅ Phase 1 complete — fully functional, browser-verified**
+---
+Task ID: 2 (webDevReview cron — Phase 2)
+Agent: webDevReview (automated)
+Task: Assess project status, perform QA, fix bugs, add new features & polish styling.
 
-The original `sss-erp-hybrid` repo (React + Vite + localStorage, single-shop retail ERP for "Shubham Super Shopee") was cloned to `/tmp/sss-erp-hybrid`, studied, and **completely redesigned** as a production Next.js 16 application with a real Prisma/SQLite database, a polished shadcn/ui interface, and expanded feature set. The app runs on `http://localhost:3000` and all core flows have been verified end-to-end with Agent Browser.
+Work Log:
+- Reviewed Phase 1 worklog; project was at "fully functional, browser-verified" state with 10 modules.
+- Ran agent-browser QA across all modules. **Discovered a critical client-side crash**: the Purchases, Income, and Expenses views called `.toISOString()` directly on date fields returned as **strings** by the JSON API (Prisma DateTime → ISO string on serialization), causing `TypeError: ...toISOString is not a function` and rendering the Next.js error overlay.
+- Fixed the bug by adding a robust `isoOf()` helper to `src/lib/format.ts` (handles both string and Date inputs) and replacing all `.toISOString()` calls on data dates in `purchases-view.tsx`, `income-view.tsx`, `expenses-view.tsx`.
+- Verified all 11 modules load without errors after fix.
+- Built **3 new modules** and **2 new infrastructure features**:
+  1. **POS (Point of Sale)** — full quick-sale flow: product grid → cart with qty steppers → payment method (Cash/UPI/Card/Wallet) → discount → complete sale → stock auto-decrements + income entry created + printable receipt modal. Verified end-to-end (Parle-G stock 60→58, ₹515 income created).
+  2. **Command Palette (Cmd+K / Ctrl+K)** — searchable command palette with nav items + quick actions (toggle theme, refresh, seed, backup, new sale). Keyboard navigable (↑↓ + Enter).
+  3. **Settings & Backup** — full DB export to JSON, restore from file (with confirm), clear all data (with confirm), re-seed demo data, system info panel.
+  4. **Date-range filters** — reusable `DateRangeFilter` component (All time / Today / 7D / 30D / This month / This year) added to Income, Expenses, Purchases views.
+  5. **Recent Activity feed** — new dashboard section showing latest 10 transactions across income/expense/purchase/udhar with click-to-navigate.
+- Added "New" badge support to sidebar nav items (POS marked "New").
+- Added mobile home button + Cmd+K trigger button in topbar.
+- Fixed Framer Motion non-animatable color warning in POS total.
+- ESLint clean throughout; all API routes return 200.
 
-## What Was Built
+Stage Summary:
+- **Bug fixed**: date-serialization crash in 3 views (was a Phase 1 regression missed in QA).
+- **New modules**: POS, Settings & Backup (now 12 modules total).
+- **New features**: Command Palette (Cmd+K), date-range filters, recent activity feed, full backup/restore/clear API.
+- **New API routes**: `/api/sales` (transactional sale), `/api/backup` (GET export / POST restore / DELETE clear).
+- **VLM assessment**: Dashboard rated 6→visible charts confirmed; POS rated 7.5/10 with praise for clean modern layout, good hierarchy, professional green accent.
+- All 12 modules verified working via agent-browser with no console/runtime errors.
+- Files created: `pos-view.tsx`, `settings-view.tsx`, `command-palette.tsx`, `date-range-filter.tsx`, `recent-activity.tsx`, `api/sales/route.ts`, `api/backup/route.ts`.
+- No commits or pushes made (per instructions).
+
+---
+
+## Current Project Status (Phase 2 complete)
+**Status: ✅ Stable & enhanced — 12 modules, 1 critical bug fixed, 5 new features added**
+
+The ERP is now a comprehensive retail operations suite. All modules load without errors, the POS sale flow works end-to-end (stock decrement + income + receipt), the Command Palette enables fast keyboard navigation, and the full database can be backed up/restored via the Settings module.
+
+## What Was Built (cumulative)
 
 ### Architecture
 - **Framework**: Next.js 16 App Router + TypeScript 5 + Turbopack
 - **Database**: Prisma ORM + SQLite (`db/custom.db`)
-- **State**: Zustand (nav) + TanStack Query (server state)
+- **State**: Zustand (nav + palette) + TanStack Query (server state)
 - **Styling**: Tailwind CSS 4 + shadcn/ui + custom emerald/teal/amber theme + Framer Motion animations
 - **Charts**: Recharts
 - **Dark mode**: next-themes (class strategy)
 - **Toasts**: sonner
 
 ### Database schema (`prisma/schema.prisma`)
-Models: `Product`, `Purchase`, `Income`, `Expense`, `Udhar`, `UdharPayment`, `Customer`, `Supplier`, `Setting`. Udhar→UdharPayment is a cascade-delete relation; udhar status auto-transitions PENDING→PARTIAL→PAID based on payment totals.
+Models: `Product`, `Purchase`, `Income`, `Expense`, `Udhar`, `UdharPayment`, `Customer`, `Supplier`, `Setting`. Udhar→UdharPayment cascade-delete; udhar status auto-transitions PENDING→PARTIAL→PAID.
 
 ### API routes (`src/app/api/`)
-- `products` — GET/POST + `[id]` PUT/DELETE
-- `purchases` — GET/POST (auto-increments matching product stock) + `[id]` DELETE
-- `income` — GET/POST + `[id]` DELETE
-- `expenses` — GET/POST + `[id]` DELETE
-- `udhar` — GET/POST + `[id]` PATCH (settle/reopen) / DELETE + `[id]/payments` POST/DELETE (transactional status update)
-- `customers` / `suppliers` — full CRUD
-- `dashboard` — aggregate summary (12 KPIs) + 5 chart datasets
-- `overview` — monthly/yearly roll-ups, category breakdowns, top suppliers/customers, udhar summary
-- `reports` — full snapshot for JSON/CSV export
-- `seed` — POST loads realistic demo data (12 products, 60 income, 35 expenses, 28 purchases, 8 udhar, 7 customers, 5 suppliers)
+- `products`, `purchases`, `income`, `expenses`, `udhar` (+ payments), `customers`, `suppliers` — full CRUD
+- `sales` — **NEW**: transactional POS sale (decrement stock + create income + return receipt)
+- `backup` — **NEW**: GET export / POST restore / DELETE clear (full DB)
+- `dashboard`, `overview`, `reports` — aggregate analytics
+- `seed` — demo data loader
 
-### Frontend (`src/app/page.tsx` + modules)
-Single `/` route with client-side tab switching via Zustand. App shell = collapsible sidebar (grouped: Operations / Finance / Directory / Insights) + sticky topbar (Refresh, Load Demo, dark toggle) + sticky footer.
+### Modules (12 total)
+1. **Dashboard** — hero, 8 KPI cards, 4 charts, mini-stats + **NEW Recent Activity feed**
+2. **Point of Sale** — **NEW**: product grid, cart, payment methods, receipt
+3. **Products & Inventory** — CRUD, search, low-stock, categories
+4. **Purchases** — supplier filter, auto-stock + **NEW date-range filter**
+5. **Income** — category filter + **NEW date-range filter**
+6. **Expenses** — category breakdown + **NEW date-range filter**
+7. **Udhar Ledger** — credit cards, payments, settle, history, overdue
+8. **Customers** / 9. **Suppliers** — directory cards with linked stats
+10. **Yearly Overview** — trends, roll-up, best month, top performers
+11. **Reports** — summary, low-stock, recent transactions, JSON/CSV download
+12. **Settings & Backup** — **NEW**: export/import/clear/seed + system info
 
-**10 modules:**
-1. **Dashboard** — hero banner, 8 KPI stat cards, monthly bar chart, expense pie, 30-day income area chart, top-inventory horizontal bar, cash-flow mini-stats
-2. **Products & Inventory** — searchable/filterable table, low-stock badges, margin %, add/edit dialog, delete confirm
-3. **Purchases** — table with supplier filter, add dialog with auto-total + auto-stock increment
-4. **Income** — table with category filter, add dialog, source/category/amount tracking
-5. **Expenses** — table + category breakdown bars, add dialog
-6. **Udhar Ledger** — card grid with progress bars, record-payment dialog, mark-settled, payment-history dialog, overdue detection
-7. **Customers** — card grid with avatar initials, linked credit stats, add/edit
-8. **Suppliers** — card grid with linked purchase totals, add/edit
-9. **Yearly Overview** — monthly profit line chart, yearly roll-up table, best-month highlight, category pies/bars, top suppliers/customers with animated bars
-10. **Reports** — summary banner, low-stock alerts, recent transactions, JSON/CSV download
+### Cross-cutting features
+- **Command Palette (Cmd+K)** — searchable nav + actions
+- **Date-range filters** — reusable component on 3 transaction views
+- **Backup/restore** — full DB JSON export & import
+- Dark mode, responsive (mobile sheet nav), sticky footer, Framer Motion transitions
 
-### Design highlights
-- Custom emerald/teal primary + amber/rose/violet accents (no indigo/blue)
-- Light + dark themes
-- Framer Motion page transitions, staggered card entrances, animated nav indicator
-- Sticky footer that pushes down on overflow
-- Fully responsive (mobile hamburger nav with sheet, desktop fixed sidebar)
-- Custom scrollbars, gradient hero, grid texture, glow effects on stat cards
-
-## Verification Results (Agent Browser)
-- ✅ Page loads with correct title, no console errors, no runtime errors
-- ✅ Dashboard renders hero, 8 KPI cards, 4 charts, mini-stats
-- ✅ Products module shows 12 seeded products with low-stock badges (Maggi "2 pcs Low")
-- ✅ Add Product dialog opens, accepts input, creates record, shows success toast, appears in table
-- ✅ Udhar module shows credit cards with Record Payment / Mark Settled / payment history buttons
-- ✅ Overview module renders all 7 sections (trends, yearly roll-up, best month, categories, top suppliers/customers)
-- ✅ Reports module renders summary, low-stock, recent transactions, JSON/CSV buttons
-- ✅ Dark mode toggle works
-- ✅ Mobile (390×844): hamburger menu opens sheet with all 10 nav items
-- ✅ Footer present and sticky
+## Verification Results (Agent Browser — Phase 2)
+- ✅ All 12 modules load with no console/runtime errors
+- ✅ POS: add to cart → complete sale → stock decremented (Parle-G 60→58) → income ₹515 created → receipt shown
+- ✅ Command Palette: Cmd+K opens, search filters, Enter/click navigates
+- ✅ Settings: export backup downloads JSON, restore/clear confirm dialogs work
+- ✅ Date filters: "This year" on Income shows 61 records
+- ✅ Dashboard Recent Activity renders latest transactions
 - ✅ All API routes return 200 (verified in dev.log)
+- ✅ ESLint clean
+- ✅ VLM: POS rated 7.5/10 (clean, modern, good hierarchy)
 
 ## Unresolved Issues / Risks
-- None blocking. App is fully functional with seeded demo data.
-- Demo data is loaded via the "Load Demo" button (only seeds when DB is empty).
+- None blocking. All features functional.
+- Product images are placeholder icons (not real photos) — acceptable for ERP, could be enhanced later.
 
-## Recommended Next-Phase Priorities (for webDevReview cron)
-1. Add date-range filters to Purchases/Income/Expenses/Reports (currently all-time)
-2. Add print/PDF export for reports (beyond JSON/CSV)
-3. Add a POS / quick-sale flow that creates income + decrements product stock in one transaction
-4. Add low-stock email/push notification stubs
-5. Add customer/supplier ledger statement pages
-6. Add keyboard shortcuts (e.g. `/` to focus search, `g d` to go to dashboard)
-7. Add data backup/restore (export/import full DB JSON)
-8. Add more granular chart interactions (click-to-drill-down)
+## Recommended Next-Phase Priorities
+1. Customer/supplier ledger statement pages (per-entity transaction history)
+2. Low-stock email/push notification stubs
+3. POS receipt thermal-printer format (58mm/80mm)
+4. Sales analytics view (top-selling products, daily sales totals, payment-method breakdown)
+5. Barcode/SKU scan input in POS
+6. Multi-currency / GST tax support
+7. User authentication (NextAuth) for multi-staff
+8. Print/PDF export for reports

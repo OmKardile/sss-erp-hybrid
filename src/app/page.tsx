@@ -2,8 +2,10 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { AppShell } from "@/components/layout/app-shell";
+import { CommandPalette } from "@/components/layout/command-palette";
 import { useNav } from "@/lib/nav";
 import { DashboardView } from "@/components/modules/dashboard-view";
+import { PosView } from "@/components/modules/pos-view";
 import { ProductsView } from "@/components/modules/products-view";
 import { PurchasesView } from "@/components/modules/purchases-view";
 import { IncomeView } from "@/components/modules/income-view";
@@ -13,9 +15,11 @@ import { CustomersView } from "@/components/modules/customers-view";
 import { SuppliersView } from "@/components/modules/suppliers-view";
 import { OverviewView } from "@/components/modules/overview-view";
 import { ReportsView } from "@/components/modules/reports-view";
+import { SettingsView } from "@/components/modules/settings-view";
 
 const VIEWS = {
   dashboard: DashboardView,
+  pos: PosView,
   products: ProductsView,
   purchases: PurchasesView,
   income: IncomeView,
@@ -25,6 +29,7 @@ const VIEWS = {
   suppliers: SuppliersView,
   overview: OverviewView,
   reports: ReportsView,
+  settings: SettingsView,
 } as const;
 
 export default function Home() {
@@ -44,6 +49,7 @@ export default function Home() {
           <View />
         </motion.div>
       </AnimatePresence>
+      <CommandPalette />
     </AppShell>
   );
 }
