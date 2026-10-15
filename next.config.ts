@@ -1,8 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
-  /* config options here */
+  /* Vercel handles Next.js natively — no standalone output needed */
   typescript: {
     ignoreBuildErrors: true,
   },

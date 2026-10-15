@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Menu, Moon, Sun, Database, RefreshCw, Command as CommandIcon, Search } from "lucide-react";
+import { Menu, Moon, Sun, Database, RefreshCw, Command as CommandIcon, Search, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNav } from "@/lib/nav";
 import { NAV_ITEMS } from "./nav-config";
@@ -141,6 +141,18 @@ export function Topbar() {
             ) : (
               <Moon className="h-5 w-5" />
             )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={async () => {
+              await fetch("/api/auth/logout", { method: "POST" });
+              window.location.href = "/login";
+            }}
+            aria-label="Logout"
+            className="text-muted-foreground hover:text-destructive"
+          >
+            <LogOut className="h-4 w-4" />
           </Button>
         </div>
       </div>
