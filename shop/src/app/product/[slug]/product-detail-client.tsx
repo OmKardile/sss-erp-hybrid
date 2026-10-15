@@ -3,10 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import {
-  Package,
   ChevronLeft,
-  Minus,
-  Plus,
   Check,
   Loader2,
   ShoppingCart,
@@ -14,6 +11,7 @@ import {
   ShieldCheck,
   Star,
   ArrowRight,
+  Package,
 } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { StarRating } from "@/components/star-rating";
@@ -21,6 +19,7 @@ import { QuantityStepper } from "@/components/quantity-stepper";
 import { Toast } from "@/components/toast";
 import { Button } from "@/components/ui-button";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
+import { getCategoryColor, getCategoryEmoji } from "@/lib/config";
 import type { ProductDetail, ProductListItem } from "@/lib/types";
 
 interface Props {
@@ -44,6 +43,9 @@ export function ProductDetailClient({ product, related }: Props) {
             100,
         )
       : 0;
+
+  const gradient = getCategoryColor(product.category);
+  const emoji = getCategoryEmoji(product.category);
 
   async function addToCart() {
     if (status === "loading" || outOfStock) return;
@@ -121,28 +123,37 @@ export function ProductDetailClient({ product, related }: Props) {
       </nav>
 
       <div className="grid gap-6 lg:grid-cols-2 lg:gap-10">
-        {/* Image */}
-        <div className="relative aspect-square overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-emerald-50 to-teal-50">
+        {/* Image / colorful gradient with emoji */}
+        <div className="relative aspect-square overflow-hidden rounded-3xl bg-gradient-to-br shadow-md sm:aspect-[4/3] lg:aspect-square">
+          <div className={cn("absolute inset-0 bg-gradient-to-br", gradient)} />
           {product.image ? (
             <img
               src={product.image}
               alt={product.name}
-              className="h-full w-full object-cover"
+              className="relative h-full w-full object-cover mix-blend-multiply"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center">
-              <Package className="h-24 w-24 text-emerald-300" />
+            <div className="relative flex h-full w-full items-center justify-center">
+              <span className="select-none text-[10rem] drop-shadow-lg animate-float-y sm:text-[12rem]">
+                {emoji}
+              </span>
             </div>
           )}
+
+          {/* Decorative blobs */}
+          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-white/15 blur-3xl" />
+
+          {/* Badges */}
           <div className="absolute left-4 top-4 flex flex-col gap-1.5">
             {discount > 0 && (
-              <span className="rounded-full bg-rose-500 px-2.5 py-1 text-xs font-bold text-white shadow">
+              <span className="rounded-full bg-rose-500 px-2.5 py-1 text-xs font-bold text-white shadow-md">
                 -{discount}% OFF
               </span>
             )}
             {product.isFeatured && (
-              <span className="rounded-full bg-amber-400 px-2.5 py-1 text-xs font-bold text-amber-950 shadow">
-                Featured
+              <span className="rounded-full bg-amber-400 px-2.5 py-1 text-xs font-bold text-amber-950 shadow-md">
+                ⭐ Featured
               </span>
             )}
           </div>
@@ -152,8 +163,8 @@ export function ProductDetailClient({ product, related }: Props) {
         <div className="flex flex-col">
           <div className="flex flex-wrap items-center gap-2">
             {product.category && (
-              <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
-                {product.category}
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                {getCategoryEmoji(product.category)} {product.category}
               </span>
             )}
             {product.brand && (
@@ -186,13 +197,13 @@ export function ProductDetailClient({ product, related }: Props) {
             </div>
           ) : (
             <p className="mt-2 text-xs text-slate-500">
-              No reviews yet — be the first to review!
+              No reviews yet — be the first to review! ✨
             </p>
           )}
 
           {/* Price */}
-          <div className="mt-4 flex items-end gap-3">
-            <span className="text-3xl font-bold text-slate-900">
+          <div className="mt-4 flex flex-wrap items-end gap-3 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 p-4">
+            <span className="text-3xl font-extrabold text-slate-900 sm:text-4xl">
               {formatCurrency(product.price)}
             </span>
             {discount > 0 && product.compareAtPrice && (
@@ -201,7 +212,7 @@ export function ProductDetailClient({ product, related }: Props) {
               </span>
             )}
             {discount > 0 && (
-              <span className="mb-1 rounded-full bg-rose-50 px-2 py-0.5 text-xs font-bold text-rose-600">
+              <span className="mb-1 rounded-full bg-rose-500 px-2 py-0.5 text-xs font-bold text-white">
                 Save {formatCurrency(product.compareAtPrice! - product.price)}
               </span>
             )}
@@ -219,13 +230,13 @@ export function ProductDetailClient({ product, related }: Props) {
               </span>
             ) : product.stock <= 10 ? (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
-                <span className="h-2 w-2 rounded-full bg-amber-500" />
-                Only {product.stock} left — hurry!
+                <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" />
+                Only {product.stock} left — hurry! 🔥
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
                 <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                In stock
+                In stock ✅
               </span>
             )}
           </div>
@@ -243,7 +254,7 @@ export function ProductDetailClient({ product, related }: Props) {
               disabled={outOfStock || status === "loading"}
               variant="outline"
               size="lg"
-              className="flex-1 min-w-[150px]"
+              className="flex-1 min-w-[150px] border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
             >
               {status === "loading" ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -303,7 +314,7 @@ export function ProductDetailClient({ product, related }: Props) {
       <section id="reviews" className="mt-12">
         <div className="flex items-end justify-between">
           <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">
-            Reviews
+            Reviews ⭐
           </h2>
           <span className="text-sm text-slate-500">
             {product.reviewCount} review{product.reviewCount === 1 ? "" : "s"}
@@ -322,14 +333,18 @@ export function ProductDetailClient({ product, related }: Props) {
               {product.reviewCount === 1 ? "" : "s"}
             </p>
 
-            <ReviewForm productSlug={product.slug} onAdded={() => window.location.reload()} />
+            <ReviewForm
+              productSlug={product.slug}
+              onAdded={() => window.location.reload()}
+            />
           </div>
 
           {/* Review list */}
           <div className="lg:col-span-2">
             {product.reviews.length === 0 ? (
-              <div className="flex h-48 items-center justify-center rounded-2xl border border-dashed border-slate-200 text-sm text-slate-500">
-                No reviews yet
+              <div className="flex h-48 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-emerald-100 bg-emerald-50/40 text-center">
+                <span className="text-4xl">📝</span>
+                <p className="text-sm text-slate-500">No reviews yet</p>
               </div>
             ) : (
               <ul className="space-y-3">
@@ -340,7 +355,7 @@ export function ProductDetailClient({ product, related }: Props) {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-700">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-sm font-semibold text-white">
                           {r.customerName.charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -368,8 +383,8 @@ export function ProductDetailClient({ product, related }: Props) {
       {/* Related */}
       {related.length > 0 && (
         <section className="mt-12">
-          <h2 className="mb-5 text-xl font-bold text-slate-900 sm:text-2xl">
-            You may also like
+          <h2 className="mb-5 flex items-center gap-2 text-xl font-bold text-slate-900 sm:text-2xl">
+            💚 You might also like
           </h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {related.map((p) => (
@@ -432,15 +447,18 @@ function ReviewForm({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="mt-4 inline-flex h-10 w-full items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-4 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100"
+        className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 active:scale-95"
       >
-        Write a review
+        ✍️ Write a review
       </button>
     );
   }
 
   return (
-    <form onSubmit={submit} className="mt-4 space-y-3 border-t border-slate-100 pt-4">
+    <form
+      onSubmit={submit}
+      className="mt-4 space-y-3 border-t border-slate-100 pt-4"
+    >
       <input
         type="text"
         placeholder="Your name"
@@ -486,11 +504,7 @@ function ReviewForm({
           Cancel
         </Button>
         <Button type="submit" size="sm" disabled={loading} className="flex-1">
-          {loading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            "Submit"
-          )}
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Submit"}
         </Button>
       </div>
     </form>

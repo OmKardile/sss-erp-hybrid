@@ -1,7 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 
-// Singleton Prisma client using SHOP_DATABASE_URL (configured in schema.prisma).
-// Avoids exhausting DB connections during Next.js hot reloads.
 const globalForPrisma = globalThis as unknown as {
   prismaShop: PrismaClient | undefined;
 };
@@ -9,9 +7,8 @@ const globalForPrisma = globalThis as unknown as {
 export const db =
   globalForPrisma.prismaShop ??
   new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+    log: ["error"],
   });
 
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prismaShop = db;
-}
+// Always cache the client to prevent pool exhaustion
+globalForPrisma.prismaShop = db;

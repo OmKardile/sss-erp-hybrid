@@ -2,43 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import {
-  Package,
-  Plus,
-  Check,
-  Loader2,
-  Apple,
-  Milk,
-  Cookie,
-  Beef,
-  Coffee,
-  Sparkles,
-  Home,
-  ShoppingCart,
-} from "lucide-react";
+import { Plus, Check, Loader2 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
+import { getCategoryColor, getCategoryEmoji } from "@/lib/config";
 import type { ProductListItem } from "@/lib/types";
-
-const CATEGORY_STYLES: Record<string, { bg: string; icon: any }> = {
-  "Fruits & Vegetables": { bg: "bg-gradient-to-br from-green-400 to-emerald-500", icon: Apple },
-  Dairy: { bg: "bg-gradient-to-br from-blue-400 to-cyan-500", icon: Milk },
-  Snacks: { bg: "bg-gradient-to-br from-amber-400 to-orange-500", icon: Cookie },
-  Groceries: { bg: "bg-gradient-to-br from-emerald-400 to-teal-500", icon: ShoppingCart },
-  "Personal Care": { bg: "bg-gradient-to-br from-pink-400 to-rose-500", icon: Sparkles },
-  Household: { bg: "bg-gradient-to-br from-violet-400 to-purple-500", icon: Home },
-  Bakery: { bg: "bg-gradient-to-br from-orange-400 to-amber-500", icon: Cookie },
-  Beverages: { bg: "bg-gradient-to-br from-cyan-400 to-blue-500", icon: Coffee },
-};
-
-function getCategoryBg(category?: string | null): string {
-  if (!category) return "bg-gradient-to-br from-slate-300 to-slate-400";
-  return CATEGORY_STYLES[category]?.bg || "bg-gradient-to-br from-emerald-400 to-teal-500";
-}
-
-function CategoryIcon({ category }: { category?: string | null }) {
-  const Icon = (category && CATEGORY_STYLES[category]?.icon) || Package;
-  return <Icon className="h-10 w-10 text-white/40" />;
-}
 
 interface ProductCardProps {
   product: ProductListItem;
@@ -69,7 +36,7 @@ export function ProductCard({ product }: ProductCardProps) {
       if (res.ok) {
         setStatus("added");
         window.dispatchEvent(new Event("sss:cart-changed"));
-        setTimeout(() => setStatus("idle"), 1500);
+        setTimeout(() => setStatus("idle"), 1400);
       } else {
         setStatus("idle");
       }
@@ -78,45 +45,56 @@ export function ProductCard({ product }: ProductCardProps) {
     }
   }
 
+  const gradient = getCategoryColor(product.category);
+  const emoji = getCategoryEmoji(product.category);
+
   return (
     <Link
       href={`/product/${product.slug}`}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md tap-scale"
     >
-      {/* Image / placeholder */}
-      <div className={cn("relative aspect-square w-full overflow-hidden", getCategoryBg(product.category))}>
+      {/* Image / gradient placeholder with emoji */}
+      <div
+        className={cn(
+          "relative aspect-square w-full overflow-hidden bg-gradient-to-br",
+          gradient,
+        )}
+      >
         {product.image ? (
           <img
             src={product.image}
             alt={product.name}
-            className="h-full w-full object-cover transition group-hover:scale-105"
+            className="h-full w-full object-cover transition duration-300 group-hover:scale-110"
           />
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-2">
-            <CategoryIcon category={product.category} />
-            <span className="text-3xl font-black text-white/30">
-              {product.name.charAt(0).toUpperCase()}
+          <div className="flex h-full w-full items-center justify-center">
+            <span className="select-none text-5xl drop-shadow-md transition duration-300 group-hover:scale-110 sm:text-6xl">
+              {emoji}
             </span>
           </div>
         )}
 
-        {/* Badges */}
-        <div className="absolute left-3 top-3 flex flex-col gap-1.5">
-          {discount > 0 && (
-            <span className="rounded-full bg-rose-500 px-2 py-0.5 text-[10px] font-bold text-white shadow">
-              -{discount}%
-            </span>
-          )}
-          {product.isFeatured && (
-            <span className="rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-amber-950 shadow">
-              Featured
-            </span>
-          )}
-        </div>
+        {/* Decorative blurred blob */}
+        <div className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-white/20 blur-2xl" />
 
+        {/* Discount badge (top-left, red) */}
+        {discount > 0 && (
+          <span className="absolute left-2 top-2 rounded-full bg-rose-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-md">
+            -{discount}%
+          </span>
+        )}
+
+        {/* Featured ribbon (top-right, amber) */}
+        {product.isFeatured && (
+          <span className="absolute right-2 top-2 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-amber-950 shadow-md">
+            ⭐
+          </span>
+        )}
+
+        {/* Out of stock overlay */}
         {outOfStock && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-[1px]">
-            <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-900/55 backdrop-blur-[2px]">
+            <span className="rounded-full bg-white px-3 py-1 text-[11px] font-bold text-slate-900 shadow">
               Out of stock
             </span>
           </div>
@@ -124,29 +102,27 @@ export function ProductCard({ product }: ProductCardProps) {
       </div>
 
       {/* Body */}
-      <div className="flex flex-1 flex-col gap-2 p-3">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-slate-900">
-              {product.name}
-            </p>
-            {product.brand && (
-              <p className="truncate text-xs text-slate-500">{product.brand}</p>
-            )}
-          </div>
-          {product.category && (
-            <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
-              {product.category}
-            </span>
-          )}
-        </div>
+      <div className="flex flex-1 flex-col gap-1 p-2.5 sm:p-3">
+        {/* Brand */}
+        {product.brand && (
+          <p className="truncate text-[10px] font-medium uppercase tracking-wide text-slate-400">
+            {product.brand}
+          </p>
+        )}
 
-        <p className="text-[11px] text-slate-400">{product.unitType}</p>
+        {/* Name */}
+        <p className="line-clamp-1 text-sm font-semibold text-slate-900">
+          {product.name}
+        </p>
 
+        {/* Unit */}
+        <p className="text-[11px] text-slate-500">{product.unitType}</p>
+
+        {/* Price + ADD */}
         <div className="mt-auto flex items-end justify-between gap-2 pt-2">
-          <div className="flex flex-col">
-            {product.compareAtPrice && discount > 0 && (
-              <span className="text-[11px] text-slate-400 line-through">
+          <div className="flex flex-col leading-tight">
+            {discount > 0 && product.compareAtPrice && (
+              <span className="text-[10px] text-slate-400 line-through">
                 {formatCurrency(product.compareAtPrice)}
               </span>
             )}
@@ -161,23 +137,23 @@ export function ProductCard({ product }: ProductCardProps) {
             disabled={outOfStock}
             aria-label={`Add ${product.name} to cart`}
             className={cn(
-              "inline-flex h-9 items-center justify-center gap-1 rounded-full px-3 text-xs font-semibold transition",
+              "inline-flex h-8 items-center justify-center gap-1 rounded-full px-3 text-xs font-bold uppercase tracking-wide transition active:scale-90",
               outOfStock
                 ? "cursor-not-allowed bg-slate-100 text-slate-400"
                 : status === "added"
                   ? "bg-emerald-600 text-white"
-                  : "bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95",
+                  : "bg-emerald-600 text-white shadow-sm hover:bg-emerald-700",
             )}
           >
             {status === "loading" ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : status === "added" ? (
               <>
-                <Check className="h-4 w-4" /> Added
+                <Check className="h-3.5 w-3.5" /> Added
               </>
             ) : (
               <>
-                <Plus className="h-4 w-4" /> Add
+                <Plus className="h-3.5 w-3.5" /> Add
               </>
             )}
           </button>

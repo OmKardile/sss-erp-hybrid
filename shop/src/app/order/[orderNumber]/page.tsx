@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { db } from "@/lib/db";
-import { averageRating, formatDate, formatCurrency, estimatedDeliveryDate } from "@/lib/utils";
-import { STORE_CONFIG } from "@/lib/config";
+import { formatDate } from "@/lib/utils";
 import { OrderConfirmationClient } from "./order-confirmation-client";
 
 export const dynamic = "force-dynamic";
@@ -25,6 +23,7 @@ export default async function OrderConfirmationPage({
   }
 
   const serialized = {
+    id: order.id,
     orderNumber: order.orderNumber,
     customerName: order.customerName,
     customerPhone: order.customerPhone,
