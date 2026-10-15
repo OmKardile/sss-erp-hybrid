@@ -10,9 +10,9 @@ generator client {
 }
 
 datasource db {
-  // DEV: "sqlite" | PRODUCTION (Supabase): "postgresql"
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Product {
