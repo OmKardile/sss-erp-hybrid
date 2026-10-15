@@ -1,11 +1,16 @@
 // Shubham Super Shopee ERP - Prisma schema
 // Single-shop retail ERP: Inventory, Purchases, Income, Expenses, Udhar (credit), Customers, Suppliers
+//
+// FOR SUPABASE DEPLOYMENT:
+//   Change provider from "sqlite" to "postgresql" below, then run:
+//   npx prisma db push && npx prisma generate
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
+  // DEV: "sqlite" | PRODUCTION (Supabase): "postgresql"
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
