@@ -1,0 +1,43 @@
+{
+  "name": "sss-ecommerce",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3002",
+    "build": "next build",
+    "start": "next start -p 3002",
+    "lint": "eslint .",
+    "postinstall": "prisma generate",
+    "db:push": "prisma db push --accept-data-loss",
+    "db:generate": "prisma generate"
+  },
+  "dependencies": {
+    "next": "^16.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@prisma/client": "^6.11.1",
+    "prisma": "^6.11.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.3.1",
+    "lucide-react": "^0.525.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9",
+    "@tailwindcss/postcss": "^4",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "^16.1.1",
+    "eslint-plugin-react": "^7",
+    "eslint-plugin-react-hooks": "^5",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "typescript-eslint": "^8"
+  },
+  "prisma": {
+    "schema": "prisma/schema.prisma"
+  },
+  "trustedDependencies": [
+    "unrs-resolver"
+  ]
+}

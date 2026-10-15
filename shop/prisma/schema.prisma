@@ -1,0 +1,101 @@
+// Shubham Super Shopee — E-Commerce Storefront Schema
+// Separate database from ERP. Products are synced from ERP via sync API.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("SHOP_DATABASE_URL")
+  directUrl = env("SHOP_DIRECT_URL")
+}
+
+// Synced from ERP Product table. The ERP pushes updates here.
+model ShopProduct {
+  id            String   @id @default(cuid())
+  erpProductId  String   @unique // matches ERP Product.id
+  name          String
+  brand         String?
+  category      String?
+  slug          String   @unique
+  description   String?
+  price         Float
+  compareAtPrice Float?  // original price for showing discount
+  unitType      String   @default("pcs")
+  stock         Int      @default(0)
+  isActive      Boolean  @default(true)
+  isFeatured    Boolean  @default(false)
+  image         String?  // URL or base64
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
+  reviews       Review[]
+}
+
+// Shopping cart (session-based, no login required)
+model CartItem {
+  id        String   @id @default(cuid())
+  sessionId String
+  productId String
+  product   ShopProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int
+  createdAt DateTime @default(now())
+
+  @@unique([sessionId, productId])
+}
+
+// Customer orders
+model Order {
+  id            String   @id @default(cuid())
+  orderNumber   String   @unique
+  customerName  String
+  customerPhone String
+  customerEmail String?
+  customerAddress String
+  city          String?
+  pincode       String?
+  items         OrderItem[]
+  subtotal      Float
+  deliveryFee   Float    @default(0)
+  total         Float
+  paymentMethod String   @default("COD") // COD | UPI
+  paymentStatus String   @default("PENDING") // PENDING | PAID | FAILED
+  orderStatus   String   @default("NEW") // NEW | CONFIRMED | SHIPPED | DELIVERED | CANCELLED
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  productId String?
+  product   ShopProduct? @relation(fields: [productId], references: [id])
+  name      String
+  price     Float
+  quantity  Int
+  lineTotal Float
+  createdAt DateTime @default(now())
+}
+
+// Product reviews
+model Review {
+  id           String   @id @default(cuid())
+  product      ShopProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId    String
+  customerName String
+  rating       Int      // 1-5
+  comment      String?
+  createdAt    DateTime @default(now())
+}
+
+// Store settings (key-value)
+model ShopSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}

@@ -20,6 +20,8 @@ import {
   Percent,
   Receipt,
   Save,
+  ShoppingBag,
+  CheckCircle2,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { PageHeader } from "@/components/shared/page-header";
@@ -180,6 +182,8 @@ export function SettingsView() {
         </SectionCard>
 
         <StoreConfigSection />
+
+        <StorefrontSyncSection />
 
         <NotificationsPanelSection />
 
@@ -420,5 +424,61 @@ function NotificationsPanelSection() {
       <h3 className="mb-3 text-sm font-semibold text-foreground">Notifications & Alerts</h3>
       <NotificationsPanel />
     </div>
+  );
+}
+
+function StorefrontSyncSection() {
+  const qc = useQueryClient();
+  const [result, setResult] = useState<any>(null);
+  const syncMut = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/sync-shop", { method: "POST" });
+      if (!res.ok) throw new Error("Sync failed");
+      return res.json();
+    },
+    onSuccess: (data) => {
+      setResult(data);
+      toast.success(`${data.synced} products synced to storefront`);
+      qc.invalidateQueries();
+    },
+    onError: (e) => toast.error("Sync failed", { description: String(e) }),
+  });
+
+  return (
+    <SectionCard title="Storefront Sync" description="Push ERP products to the e-commerce storefront">
+      <Card className="border-cyan-500/20 bg-cyan-500/5">
+        <CardContent className="flex items-center justify-between gap-3 p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-600">
+              <ShoppingBag className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Sync Products to Storefront</p>
+              <p className="text-xs text-muted-foreground">
+                Pushes all in-stock ERP products to the customer-facing e-commerce site.
+              </p>
+            </div>
+          </div>
+          <Button
+            onClick={() => syncMut.mutate()}
+            disabled={syncMut.isPending}
+            className="gap-2 border-cyan-500/30 bg-cyan-600 text-white hover:bg-cyan-700"
+          >
+            <RefreshCw className={`h-4 w-4 ${syncMut.isPending ? "animate-spin" : ""}`} />
+            {syncMut.isPending ? "Syncing…" : "Sync Now"}
+          </Button>
+        </CardContent>
+      </Card>
+      {result && (
+        <div className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-500/10 p-3 text-sm text-emerald-700 dark:text-emerald-400">
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          <span>
+            <span className="font-semibold">{result.synced} products</span> synced to storefront.
+            {result.result?.created > 0 && ` ${result.result.created} new,`}
+            {result.result?.updated > 0 && ` ${result.result.updated} updated.`}
+          </span>
+        </div>
+      )}
+    </SectionCard>
   );
 }
