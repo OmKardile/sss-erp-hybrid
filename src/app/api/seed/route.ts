@@ -1,20 +1,44 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-// Seeds the database with realistic demo data if empty.
-export async function POST() {
-  const counts = await Promise.all([
-    db.product.count(),
-    db.purchase.count(),
-    db.income.count(),
-    db.expense.count(),
-    db.udhar.count(),
-  ]);
-  const isEmpty = counts.every((c) => c === 0);
-  if (!isEmpty) {
-    return NextResponse.json({ seeded: false, message: "Database already has data." });
+// Seeds the database with realistic demo data.
+// If ?force=true is passed, wipes all existing data first (for "Load Demo" button).
+export async function POST(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const force = searchParams.get("force") === "true";
+
+  if (force) {
+    // Wipe all data before seeding
+    await db.$transaction(async (tx) => {
+      await tx.adjustment.deleteMany();
+      await tx.target.deleteMany();
+      await tx.saleItem.deleteMany();
+      await tx.sale.deleteMany();
+      await tx.udharPayment.deleteMany();
+      await tx.udhar.deleteMany();
+      await tx.purchase.deleteMany();
+      await tx.income.deleteMany();
+      await tx.expense.deleteMany();
+      await tx.product.deleteMany();
+      await tx.customer.deleteMany();
+      await tx.supplier.deleteMany();
+      await tx.setting.deleteMany();
+    });
+  } else {
+    // Check if DB already has data (non-force mode)
+    const counts = await Promise.all([
+      db.product.count(),
+      db.purchase.count(),
+      db.income.count(),
+      db.expense.count(),
+      db.udhar.count(),
+    ]);
+    const isEmpty = counts.every((c) => c === 0);
+    if (!isEmpty) {
+      return NextResponse.json({ seeded: false, message: "Database already has data. Use force=true to wipe & re-seed." });
+    }
   }
 
   const now = new Date();

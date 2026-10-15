@@ -221,3 +221,45 @@ textarea:focus-visible {
   outline: 2px solid oklch(0.55 0.13 162);
   outline-offset: 2px;
 }
+
+/* Capacitor / Mobile safe area support */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.safe-area-pt {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.safe-area-px {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Prevent text size adjustment on orientation change (iOS) */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Prevent tap highlight on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling for mobile */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better touch targets on mobile (min 44px) */
+@media (max-width: 768px) {
+  button,
+  a[role="button"],
+  [tabindex]:not([tabindex="-1"]) {
+    min-height: 40px;
+  }
+}
+
+/* Prevent overscroll bounce (Capacitor) */
+body {
+  overscroll-behavior: none;
+}

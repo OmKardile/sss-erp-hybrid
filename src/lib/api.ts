@@ -112,7 +112,11 @@ export const api = {
     ),
   overview: () => request<any>("/api/overview"),
   reports: () => request<any>("/api/reports"),
-  seed: () => request<{ seeded: boolean; counts?: any; message?: string }>("/api/seed", { method: "POST" }),
+  seed: (force?: boolean) =>
+    request<{ seeded: boolean; counts?: any; message?: string }>(
+      force ? "/api/seed?force=true" : "/api/seed",
+      { method: "POST" }
+    ),
   // POS sale
   sale: (data: {
     items: { productId: string; name: string; price: number; quantity: number }[];

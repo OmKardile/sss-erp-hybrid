@@ -42,6 +42,7 @@ export function SettingsView() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [clearOpen, setClearOpen] = useState(false);
   const [restoreOpen, setRestoreOpen] = useState(false);
+  const [seedConfirmOpen, setSeedConfirmOpen] = useState(false);
   const [pendingRestore, setPendingRestore] = useState<any>(null);
 
   const { data: reports } = useQuery({ queryKey: ["reports"], queryFn: () => api.reports() });
@@ -83,13 +84,15 @@ export function SettingsView() {
   });
 
   const seedMut = useMutation({
-    mutationFn: () => api.seed(),
+    mutationFn: () => api.seed(true), // force=true to wipe & re-seed
     onSuccess: (data) => {
       if (data.seeded) {
-        toast.success("Demo data loaded", { description: "Explore the ERP with sample records." });
+        toast.success("Demo data loaded", {
+          description: `Added ${data.counts.products} products, ${data.counts.income} income entries & more.`,
+        });
         qc.invalidateQueries();
       } else {
-        toast.info("Database already has data", { description: data.message });
+        toast.info("Could not seed", { description: data.message });
       }
     },
     onError: (e) => toast.error("Seed failed", { description: String(e) }),
@@ -187,38 +190,48 @@ export function SettingsView() {
 
         <NotificationsPanelSection />
 
-        <SectionCard title="Data Operations" description="Seed demo data or wipe the database.">
+        <SectionCard title="Data Operations" description="Load demo data or wipe the database.">
           <div className="space-y-3">
             <Card className="border-violet-500/20 bg-violet-500/5">
-              <CardContent className="flex items-center justify-between gap-3 p-4">
+              <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600">
                     <Sparkles className="h-5 w-5" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-foreground">Load Demo Data</p>
-                    <p className="text-xs text-muted-foreground">Populate sample products, sales & ledgers.</p>
+                    <p className="text-xs text-muted-foreground">Wipes all current data & populates fresh sample records (12 products, 60 income, 35 expenses, 28 purchases, 8 udhar, 7 customers, 5 suppliers).</p>
                   </div>
                 </div>
-                <Button variant="outline" onClick={() => seedMut.mutate()} disabled={seedMut.isPending} className="gap-2 border-violet-500/30 text-violet-700 hover:bg-violet-500/10 dark:text-violet-400">
-                  <RefreshCw className={`h-4 w-4 ${seedMut.isPending ? "animate-spin" : ""}`} /> Seed
+                <Button
+                  variant="outline"
+                  onClick={() => setSeedConfirmOpen(true)}
+                  disabled={seedMut.isPending}
+                  className="gap-2 border-violet-500/30 text-violet-700 hover:bg-violet-500/10 dark:text-violet-400 sm:shrink-0"
+                >
+                  <RefreshCw className={`h-4 w-4 ${seedMut.isPending ? "animate-spin" : ""}`} />
+                  {seedMut.isPending ? "Loading…" : "Load Demo"}
                 </Button>
               </CardContent>
             </Card>
 
             <Card className="border-rose-500/20 bg-rose-500/5">
-              <CardContent className="flex items-center justify-between gap-3 p-4">
+              <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-500/10 text-rose-600">
                     <Trash2 className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-foreground">Clear All Data</p>
-                    <p className="text-xs text-muted-foreground">Permanently wipe every record.</p>
+                    <p className="text-sm font-semibold text-foreground">Wash Demo Data</p>
+                    <p className="text-xs text-muted-foreground">Permanently wipe every record from the database. Consider exporting a backup first.</p>
                   </div>
                 </div>
-                <Button variant="outline" onClick={() => setClearOpen(true)} className="gap-2 border-rose-500/30 text-rose-600 hover:bg-rose-500/10">
-                  <Trash2 className="h-4 w-4" /> Clear
+                <Button
+                  variant="outline"
+                  onClick={() => setClearOpen(true)}
+                  className="gap-2 border-rose-500/30 text-rose-600 hover:bg-rose-500/10 sm:shrink-0"
+                >
+                  <Trash2 className="h-4 w-4" /> Wash Demo
                 </Button>
               </CardContent>
             </Card>
@@ -245,11 +258,20 @@ export function SettingsView() {
       </SectionCard>
 
       <ConfirmDialog
+        open={seedConfirmOpen}
+        onOpenChange={setSeedConfirmOpen}
+        title="Load demo data?"
+        description="This will WIPE all current data and replace it with fresh sample records (12 products, 60 income entries, 35 expenses, 28 purchases, 8 udhar, 7 customers, 5 suppliers). This action cannot be undone."
+        confirmText="Load Demo"
+        onConfirm={() => seedMut.mutate()}
+      />
+
+      <ConfirmDialog
         open={clearOpen}
         onOpenChange={setClearOpen}
-        title="Clear all data?"
+        title="Wash all data?"
         description="This permanently deletes every product, purchase, income, expense, udhar, customer and supplier record. This action cannot be undone. Consider exporting a backup first."
-        confirmText="Yes, clear everything"
+        confirmText="Yes, wash everything"
         onConfirm={() => clearMut.mutate()}
       />
 

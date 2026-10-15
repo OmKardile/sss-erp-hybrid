@@ -118,3 +118,16 @@ input[type="number"] {
     stroke-dashoffset: 0;
   }
 }
+
+/* Capacitor / Mobile safe area support */
+.safe-area-pb { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.safe-area-pt { padding-top: env(safe-area-inset-top, 0px); }
+.safe-area-px { padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-behavior: smooth; }
+* { -webkit-tap-highlight-color: transparent; }
+body { overscroll-behavior: none; }
+
+@media (max-width: 768px) {
+  button, a[role="button"], [tabindex]:not([tabindex="-1"]) { min-height: 40px; }
+}

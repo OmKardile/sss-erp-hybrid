@@ -28,6 +28,12 @@ export function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // Allow all API routes — they're called with cookies from the authenticated frontend.
+  // External API calls (like shop sync) use token-based auth, not cookie auth.
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.next();
+  }
+
   // Check auth cookie
   const authCookie = req.cookies.get("sss-erp-auth");
   const passkey = process.env.ERP_PASSKEY;
