@@ -132,3 +132,7 @@ The ERP syncs its product catalogue to the e-commerce DB (via API or scheduled j
 - **Render**: Good if you want everything on one platform, supports background workers
 
 Recommendation: Deploy ERP on **Render** (Web Service), E-Commerce on **Vercel** for best of both.
+
+---
+
+<sub>Designed & developed by [Omkar Kardile](https://omkardile.is-a.dev/)</sub>

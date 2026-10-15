@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/toaster";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     "Shop Management",
     "Shubham Super Shopee",
   ],
-  authors: [{ name: "Shubham Super Shopee" }],
+  authors: [{ name: "Omkar Kardile", url: "https://omkardile.is-a.dev/" }],
 };
 
 export default function RootLayout({
@@ -41,6 +42,7 @@ export default function RootLayout({
       >
         <Providers>{children}</Providers>
         <Toaster />
+        <SpeedInsights />
       </body>
     </html>
   );

@@ -3,6 +3,7 @@ import "./globals.css";
 import { STORE_CONFIG } from "@/lib/config";
 import { StoreHeader } from "@/components/store-header";
 import { StoreFooter } from "@/components/store-footer";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: `${STORE_CONFIG.name} — Fresh groceries delivered in Pune`,
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
     "Shubham Super Shopee",
     "delivery",
   ],
+  authors: [{ name: "Omkar Kardile", url: "https://omkardile.is-a.dev/" }],
 };
 
 export const viewport: Viewport = {
@@ -34,6 +36,7 @@ export default function RootLayout({
         <StoreHeader />
         <main className="flex-1 w-full">{children}</main>
         <StoreFooter />
+        <SpeedInsights />
       </body>
     </html>
   );

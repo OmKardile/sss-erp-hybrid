@@ -2,9 +2,43 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Package, Plus, Check, Loader2 } from "lucide-react";
+import {
+  Package,
+  Plus,
+  Check,
+  Loader2,
+  Apple,
+  Milk,
+  Cookie,
+  Beef,
+  Coffee,
+  Sparkles,
+  Home,
+  ShoppingCart,
+} from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import type { ProductListItem } from "@/lib/types";
+
+const CATEGORY_STYLES: Record<string, { bg: string; icon: any }> = {
+  "Fruits & Vegetables": { bg: "bg-gradient-to-br from-green-400 to-emerald-500", icon: Apple },
+  Dairy: { bg: "bg-gradient-to-br from-blue-400 to-cyan-500", icon: Milk },
+  Snacks: { bg: "bg-gradient-to-br from-amber-400 to-orange-500", icon: Cookie },
+  Groceries: { bg: "bg-gradient-to-br from-emerald-400 to-teal-500", icon: ShoppingCart },
+  "Personal Care": { bg: "bg-gradient-to-br from-pink-400 to-rose-500", icon: Sparkles },
+  Household: { bg: "bg-gradient-to-br from-violet-400 to-purple-500", icon: Home },
+  Bakery: { bg: "bg-gradient-to-br from-orange-400 to-amber-500", icon: Cookie },
+  Beverages: { bg: "bg-gradient-to-br from-cyan-400 to-blue-500", icon: Coffee },
+};
+
+function getCategoryBg(category?: string | null): string {
+  if (!category) return "bg-gradient-to-br from-slate-300 to-slate-400";
+  return CATEGORY_STYLES[category]?.bg || "bg-gradient-to-br from-emerald-400 to-teal-500";
+}
+
+function CategoryIcon({ category }: { category?: string | null }) {
+  const Icon = (category && CATEGORY_STYLES[category]?.icon) || Package;
+  return <Icon className="h-10 w-10 text-white/40" />;
+}
 
 interface ProductCardProps {
   product: ProductListItem;
@@ -50,7 +84,7 @@ export function ProductCard({ product }: ProductCardProps) {
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md"
     >
       {/* Image / placeholder */}
-      <div className="relative aspect-square w-full overflow-hidden bg-gradient-to-br from-emerald-50 to-teal-50">
+      <div className={cn("relative aspect-square w-full overflow-hidden", getCategoryBg(product.category))}>
         {product.image ? (
           <img
             src={product.image}
@@ -58,8 +92,11 @@ export function ProductCard({ product }: ProductCardProps) {
             className="h-full w-full object-cover transition group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <Package className="h-14 w-14 text-emerald-300" />
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2">
+            <CategoryIcon category={product.category} />
+            <span className="text-3xl font-black text-white/30">
+              {product.name.charAt(0).toUpperCase()}
+            </span>
           </div>
         )}
 

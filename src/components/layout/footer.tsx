@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Store, Github } from "lucide-react";
+import { Heart, Store } from "lucide-react";
 
 export function Footer() {
   return (
@@ -16,11 +16,15 @@ export function Footer() {
         </div>
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            Crafted with <Heart className="h-3.5 w-3.5 fill-rose-500 text-rose-500" /> for single-shop retailers
-          </span>
-          <span className="hidden items-center gap-1.5 sm:flex">
-            <Github className="h-3.5 w-3.5" />
-            v2.0 Redesign
+            Crafted with <Heart className="h-3.5 w-3.5 fill-rose-500 text-rose-500" /> for Bro · Designed &amp; developed by{" "}
+            <a
+              href="https://omkardile.is-a.dev/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-foreground/80 underline-offset-2 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2"
+            >
+              Omkar Kardile
+            </a>
           </span>
         </div>
       </div>

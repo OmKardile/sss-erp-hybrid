@@ -78,7 +78,17 @@ export function StoreFooter() {
           <p>
             © {year} {STORE_CONFIG.name}. All rights reserved.
           </p>
-          <p>Made with care in Pune, India 🇮🇳</p>
+          <p className="flex items-center gap-1.5">
+            Crafted with <span className="text-rose-500">&#9829;</span> for Bro · Designed &amp; developed by{" "}
+            <a
+              href="https://omkardile.is-a.dev/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-slate-700 underline-offset-2 hover:text-slate-900 hover:underline focus-visible:outline-2 focus-visible:outline-emerald-500 focus-visible:outline-offset-2"
+            >
+              Omkar Kardile
+            </a>
+          </p>
         </div>
       </div>
     </footer>

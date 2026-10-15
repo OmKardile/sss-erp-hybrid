@@ -2,6 +2,10 @@
   "name": "sss-ecommerce",
   "version": "1.0.0",
   "private": true,
+  "author": {
+    "name": "Omkar Kardile",
+    "url": "https://omkardile.is-a.dev/"
+  },
   "scripts": {
     "dev": "next dev -p 3002",
     "build": "next build",
@@ -12,14 +16,15 @@
     "db:generate": "prisma generate"
   },
   "dependencies": {
+    "@prisma/client": "^6.11.1",
+    "@vercel/speed-insights": "^2.0.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.525.0",
     "next": "^16.1.1",
+    "prisma": "^6.11.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@prisma/client": "^6.11.1",
-    "prisma": "^6.11.1",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^3.3.1",
-    "lucide-react": "^0.525.0"
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^9",

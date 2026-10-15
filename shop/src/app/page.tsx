@@ -112,6 +112,13 @@ export default function HomePage() {
     <div className="w-full">
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600 text-white">
+        <div className="absolute inset-0 opacity-15">
+          <img
+            src="/products/groceries-hero.png"
+            alt=""
+            className="h-full w-full object-cover"
+          />
+        </div>
         <div className="absolute inset-0 opacity-20">
           <div className="absolute -left-20 -top-20 h-72 w-72 rounded-full bg-white blur-3xl" />
           <div className="absolute right-0 top-10 h-72 w-72 rounded-full bg-teal-200 blur-3xl" />
