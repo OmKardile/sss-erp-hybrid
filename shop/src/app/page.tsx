@@ -4,14 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Truck,
-  ShieldCheck,
-  Search,
   Loader2,
-  Zap,
-  CreditCard,
   ChevronRight,
   PackageSearch,
-  Store,
+  Clock,
+  BadgeCheck,
 } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import {
@@ -119,77 +116,142 @@ export default function HomePage() {
 
   return (
     <div className="w-full">
-      {/* HERO — real store photography with emerald overlay */}
-      <section className="relative overflow-hidden bg-slate-900 text-white">
-        {/* Real photo background */}
+      {/* HERO — compact mobile composition: photo + legibility scrim,
+          display headline, one trust line. Search lives in the header. */}
+      <section className="relative overflow-hidden bg-stone-950 text-white">
         <img
           src="/products/hero.jpg"
-          alt="Grocery store shelves stocked with fresh products"
+          alt="Fresh produce shelves at Shubham Super Shopee"
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/90 via-emerald-900/75 to-teal-900/50" />
+        {/* Functional scrim for text legibility over a real photo */}
+        <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/45 to-stone-950/10" />
 
-        <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 lg:py-20">
-          <div className="max-w-xl">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1 text-xs font-bold text-amber-950 shadow-sm">
-              <Zap className="h-3.5 w-3.5 fill-amber-950" /> 10-minute delivery in Pune
-            </span>
-            <h1 className="mt-3 text-3xl font-extrabold leading-tight drop-shadow-sm sm:text-4xl lg:text-5xl">
-              Fresh groceries in{" "}
-              <span className="text-amber-300">10 minutes</span>
-            </h1>
-            <p className="mt-2 max-w-md text-sm text-emerald-50 sm:text-base">
-              {STORE_CONFIG.name} — your trusted local grocery store. Quality
-              products, fair prices, lightning-fast delivery.
-            </p>
+        <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+          <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300">
+            <Clock className="h-3.5 w-3.5" aria-hidden />
+            {STORE_CONFIG.name} · Pune
+          </p>
+          <h1 className="font-display mt-2 max-w-md text-[2rem] font-semibold leading-[1.1] sm:text-4xl lg:text-5xl">
+            Fresh groceries,
+            <br />
+            delivered fast.
+          </h1>
+          <p className="mt-2 max-w-sm text-sm text-stone-200 sm:text-base">
+            Your trusted local store — quality products, fair prices, COD &amp;
+            UPI accepted.
+          </p>
+        </div>
+      </section>
 
-            {/* Inline search */}
-            <div className="mt-4 flex max-w-md items-center gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-600" />
-                <input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Try 'milk', 'atta', 'biscuits'…"
-                  className="h-11 w-full rounded-xl border border-white/20 bg-white/95 pl-10 pr-4 text-sm text-slate-900 outline-none focus:ring-4 focus:ring-amber-300/40"
-                />
-              </div>
-              <a
-                href="#shop"
-                className="inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-amber-400 px-4 text-sm font-bold text-amber-950 shadow-sm transition hover:bg-amber-300"
+      {/* CATEGORY PHOTO RAIL — horizontal scroll, thumb-friendly.
+          Mobile-first: a rail, not a squeezed desktop grid. */}
+      <section
+        id="categories"
+        className="mx-auto max-w-7xl scroll-mt-28 px-4 pt-6 sm:px-6 lg:px-8"
+      >
+        <div className="mb-3 flex items-end justify-between">
+          <h2 className="font-display text-xl font-semibold text-stone-900 sm:text-2xl">
+            Shop by category
+          </h2>
+        </div>
+        <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 no-scrollbar sm:mx-0 sm:px-0">
+          {TILE_CATEGORIES.map((cat) => {
+            const img = CATEGORY_IMAGE[cat] ?? "/products/cat-groceries.jpg";
+            return (
+              <Link
+                key={cat}
+                href={`/?category=${encodeURIComponent(cat)}`}
+                onClick={() => setActiveCat(cat)}
+                className="group flex w-[84px] shrink-0 flex-col items-center gap-2 sm:w-24"
               >
-                Shop
-              </a>
-            </div>
+                <span className="block h-[84px] w-[84px] overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 sm:h-24 sm:w-24">
+                  <img
+                    src={img}
+                    alt={cat}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover"
+                  />
+                </span>
+                <span className="line-clamp-2 text-center text-[11px] font-medium leading-tight text-stone-700">
+                  {cat}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* PROMO — flat block, single accent, no gradient */}
+      <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-emerald-800 px-5 py-4 text-white">
+          <div>
+            <p className="font-display text-base font-semibold sm:text-lg">
+              Free delivery above ₹{FREE_DELIVERY_THRESHOLD}
+            </p>
+            <p className="mt-0.5 text-xs text-emerald-100">
+              Stock up your kitchen — we bring it to your door.
+            </p>
           </div>
+          <a
+            href="#shop"
+            className="inline-flex h-10 items-center gap-1 rounded-xl bg-white px-4 text-xs font-bold text-emerald-900"
+          >
+            Order now <ChevronRight className="h-3.5 w-3.5" aria-hidden />
+          </a>
         </div>
       </section>
 
-      {/* QUICK INFO PILLS */}
-      <section className="border-b border-slate-100 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 py-3 sm:px-6 lg:px-8">
-          <Pill color="emerald" icon={<Zap className="h-3.5 w-3.5" />} label="2hr Delivery" />
-          <Pill color="rose" icon={<CreditCard className="h-3.5 w-3.5" />} label="COD & UPI" />
-          <Pill color="amber" icon={<ShieldCheck className="h-3.5 w-3.5" />} label="Quality Assured" />
-          <Pill color="teal" icon={<Truck className="h-3.5 w-3.5" />} label={`Free delivery ₹${FREE_DELIVERY_THRESHOLD}+`} />
-        </div>
-      </section>
+      {/* FEATURED — horizontal rail */}
+      {featured.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
+          <div className="mb-3 flex items-end justify-between">
+            <div>
+              <h2 className="font-display text-xl font-semibold text-stone-900 sm:text-2xl">
+                Featured picks
+              </h2>
+              <p className="mt-0.5 text-xs text-stone-500">
+                Best-sellers from our shelves
+              </p>
+            </div>
+            <Link
+              href="#shop"
+              className="inline-flex h-10 items-center text-sm font-semibold text-emerald-700"
+            >
+              View all
+            </Link>
+          </div>
+          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 no-scrollbar sm:mx-0 sm:px-0">
+            {featured.map((p) => (
+              <div key={p.id} className="w-40 shrink-0 sm:w-48">
+                <ProductCard product={p} />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
-      {/* STICKY CATEGORY CHIPS — sticks below the header */}
-      <section className="sticky top-[108px] z-30 border-b border-slate-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 sm:top-16">
-        <div className="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-4 py-2.5 no-scrollbar sm:px-6 lg:px-8">
+      {/* STICKY CATEGORY CHIPS — mini-nav, sticks below the single-row header */}
+      <section className="sticky top-14 z-30 mt-8 border-y border-stone-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85 sm:top-16">
+        <div
+          className="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-4 py-2.5 no-scrollbar sm:px-6 lg:px-8"
+          role="tablist"
+          aria-label="Filter products by category"
+        >
           {categories.map((c) => {
             const isActive = activeCat === c;
             return (
               <button
                 key={c}
+                role="tab"
+                aria-selected={isActive}
                 onClick={() => setActiveCat(c)}
                 className={
-                  "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-semibold transition " +
+                  "inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-xl px-4 text-xs font-semibold " +
                   (isActive
-                    ? "bg-emerald-600 text-white shadow-sm"
-                    : "bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700")
+                    ? "bg-emerald-800 text-white"
+                    : "bg-stone-100 text-stone-700")
                 }
               >
                 {c}
@@ -199,115 +261,26 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CATEGORY TILES — real photography */}
-      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-900 sm:text-xl">
-            Shop by category
-          </h2>
-          <span className="text-xs text-slate-500">Tap to browse</span>
-        </div>
-        <div className="grid grid-cols-4 gap-3 sm:grid-cols-8 sm:gap-4">
-          {TILE_CATEGORIES.map((cat) => {
-            const img = CATEGORY_IMAGE[cat] ?? "/products/cat-groceries.jpg";
-            return (
-              <Link
-                key={cat}
-                href={`/?category=${encodeURIComponent(cat)}`}
-                onClick={() => setActiveCat(cat)}
-                className="group flex flex-col items-center gap-2"
-              >
-                <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm transition group-hover:border-emerald-300 group-hover:shadow-md sm:h-20 sm:w-20">
-                  <img
-                    src={img}
-                    alt={cat}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                  />
-                </div>
-                <span className="line-clamp-1 text-center text-[10px] font-medium text-slate-700 sm:text-xs">
-                  {cat}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* PROMO BANNER */}
-      <section className="mx-auto max-w-7xl px-4 pb-2 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 px-5 py-4 text-white shadow-md sm:px-6">
-          <div className="relative flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <p className="text-sm font-extrabold sm:text-base">
-                Free delivery on orders above ₹{FREE_DELIVERY_THRESHOLD}!
-              </p>
-              <p className="text-[11px] text-white/90 sm:text-xs">
-                Stock up your kitchen — we&apos;ll bring it to your door for free.
-              </p>
-            </div>
-            <a
-              href="#shop"
-              className="inline-flex h-9 items-center gap-1 rounded-full bg-white/95 px-4 text-xs font-bold text-orange-600 shadow-sm transition hover:bg-white"
-            >
-              Order now <ChevronRight className="h-3.5 w-3.5" />
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* FEATURED — horizontal scroll */}
-      {featured.length > 0 && (
-        <section id="featured" className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
-          <div className="mb-3 flex items-end justify-between">
-            <div>
-              <h2 className="text-lg font-bold text-slate-900 sm:text-xl">
-                Featured picks
-              </h2>
-              <p className="text-xs text-slate-500">
-                Hand-picked best-sellers from our shelves
-              </p>
-            </div>
-            <Link
-              href="#shop"
-              className="hidden text-sm font-medium text-emerald-700 hover:underline sm:inline"
-            >
-              View all
-            </Link>
-            </div>
-          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 no-scrollbar sm:mx-0 sm:px-0">
-            {featured.map((p) => (
-              <div
-                key={p.id}
-                className="w-40 shrink-0 sm:w-48 md:w-52"
-              >
-                <ProductCard product={p} />
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
       {/* PRODUCT GRID */}
       <section
         id="shop"
-        className="mx-auto max-w-7xl px-4 pb-12 pt-6 sm:px-6 lg:px-8"
+        className="mx-auto max-w-7xl scroll-mt-28 px-4 pb-12 pt-6 sm:px-6 lg:px-8"
       >
         <div className="mb-4 flex items-end justify-between">
           <div>
-            <h2 className="text-lg font-bold text-slate-900 sm:text-xl">
+            <h2 className="font-display text-xl font-semibold text-stone-900 sm:text-2xl">
               {activeCat === "All" ? "All products" : activeCat}
             </h2>
-            <p className="text-xs text-slate-500">
+            <p className="mt-0.5 text-xs text-stone-500">
               {filtered.length} item{filtered.length === 1 ? "" : "s"}
-              {query && ` matching "${query}"`}
+              {query && ` matching “${query}”`}
             </p>
           </div>
         </div>
 
         {loading ? (
-          <div className="flex h-64 flex-col items-center justify-center gap-3 text-slate-500">
-            <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+          <div className="flex h-64 flex-col items-center justify-center gap-3 text-stone-500">
+            <Loader2 className="h-7 w-7 animate-spin text-emerald-600" aria-hidden />
             <p className="text-sm">Loading fresh products…</p>
           </div>
         ) : error ? (
@@ -336,62 +309,37 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* INFO STRIP */}
-      <section className="border-t border-slate-100 bg-gradient-to-b from-slate-50 to-white">
-        <div className="mx-auto grid max-w-7xl gap-3 px-4 py-8 sm:grid-cols-3 sm:px-6 lg:px-8">
-          <InfoCard
-            title="Fast delivery in Pune"
-            text="Get your order in as little as 2 hours. Free delivery on orders above ₹500."
-          />
-          <InfoCard
-            title="Quality you can trust"
-            text="Every product is hand-checked for freshness before it leaves our store."
-          />
-          <InfoCard
-            title="Local Pune store"
-            text="Serving our community since years. COD & UPI payments accepted."
-          />
+      {/* STORE PROMISE — one full-bleed photo, one takeaway.
+          Replaces the old 3-up icon+heading+paragraph cards. */}
+      <section className="relative overflow-hidden bg-stone-950 text-white">
+        <img
+          src="/products/cat-fruits-vegetables.jpg"
+          alt="Fresh fruits and vegetables at the store"
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-stone-950/70" />
+        <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+          <h2 className="font-display max-w-lg text-2xl font-semibold leading-tight sm:text-3xl">
+            Hand-checked freshness, from our shelves to your door.
+          </h2>
+          <ul className="mt-5 space-y-2.5 text-sm text-stone-200">
+            <li className="flex items-center gap-2.5">
+              <BadgeCheck className="h-4 w-4 shrink-0 text-emerald-300" aria-hidden />
+              Every item checked before it leaves the store
+            </li>
+            <li className="flex items-center gap-2.5">
+              <Truck className="h-4 w-4 shrink-0 text-emerald-300" aria-hidden />
+              Delivery across Pune in as little as 2 hours
+            </li>
+            <li className="flex items-center gap-2.5">
+              <Clock className="h-4 w-4 shrink-0 text-emerald-300" aria-hidden />
+              Open daily, 7 AM – 10 PM
+            </li>
+          </ul>
         </div>
       </section>
-    </div>
-  );
-}
-
-function Pill({
-  color,
-  icon,
-  label,
-}: {
-  color: "emerald" | "rose" | "amber" | "teal";
-  icon: React.ReactNode;
-  label: string;
-}) {
-  const colorMap = {
-    emerald: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    rose: "bg-rose-50 text-rose-700 border-rose-200",
-    amber: "bg-amber-50 text-amber-700 border-amber-200",
-    teal: "bg-teal-50 text-teal-700 border-teal-200",
-  };
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${colorMap[color]}`}
-    >
-      {icon}
-      {label}
-    </span>
-  );
-}
-
-function InfoCard({ title, text }: { title: string; text: string }) {
-  return (
-    <div className="flex items-start gap-3 rounded-2xl bg-white p-4 shadow-sm">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-        <Store className="h-5 w-5" />
-      </div>
-      <div>
-        <p className="text-sm font-semibold text-slate-900">{title}</p>
-        <p className="mt-0.5 text-xs text-slate-500">{text}</p>
-      </div>
     </div>
   );
 }
@@ -408,16 +356,18 @@ function EmptyState({
   onAction?: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-emerald-100 bg-emerald-50/40 px-6 py-16 text-center">
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm">
-        <PackageSearch className="h-8 w-8 text-emerald-500" />
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-6 py-16 text-center">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white">
+        <PackageSearch className="h-7 w-7 text-stone-400" aria-hidden />
       </div>
-      <h3 className="mt-4 text-lg font-bold text-slate-900">{title}</h3>
-      <p className="mt-1 text-sm text-slate-500">{message}</p>
+      <h3 className="font-display mt-4 text-lg font-semibold text-stone-900">
+        {title}
+      </h3>
+      <p className="mt-1 text-sm text-stone-500">{message}</p>
       {actionLabel && onAction && (
         <button
           onClick={onAction}
-          className="mt-5 inline-flex h-10 items-center justify-center rounded-full bg-emerald-600 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+          className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-emerald-800 px-5 text-sm font-semibold text-white"
         >
           {actionLabel}
         </button>

@@ -11,6 +11,12 @@ interface ProductCardProps {
   product: ProductListItem;
 }
 
+/**
+ * Quick-commerce product card — scannable in one glance:
+ * photo → name → unit → price → add. Consistent square photo ratio.
+ * The add control is a wide 40px-tall button (44px with card padding),
+ * thumb-reachable inside the card's lower-right corner.
+ */
 export function ProductCard({ product }: ProductCardProps) {
   const [status, setStatus] = useState<"idle" | "loading" | "added">("idle");
   const [imgError, setImgError] = useState(false);
@@ -54,68 +60,57 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <Link
       href={`/product/${product.slug}`}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-emerald-300 hover:shadow-md"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white"
     >
-      {/* Real product photo */}
-      <div className="relative aspect-square w-full overflow-hidden bg-slate-50">
+      {/* Real product photo — consistent square ratio, no zoom gimmicks */}
+      <div className="relative aspect-square w-full overflow-hidden bg-stone-50">
         <img
           src={image}
           alt={product.name}
           loading="lazy"
+          decoding="async"
           onError={() => setImgError(true)}
-          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+          className="h-full w-full object-cover"
         />
 
-        {/* Discount badge (top-left, red) */}
+        {/* Discount badge — functional (retail convention) */}
         {discount > 0 && (
-          <span className="absolute left-2 top-2 rounded-full bg-rose-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-md">
-            -{discount}%
-          </span>
-        )}
-
-        {/* Featured badge (top-right, amber) */}
-        {product.isFeatured && (
-          <span className="absolute right-2 top-2 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-amber-950 shadow-md">
-            Featured
+          <span className="absolute left-2 top-2 rounded-md bg-rose-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+            {discount}% off
           </span>
         )}
 
         {/* Out of stock overlay */}
         {outOfStock && (
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-900/55 backdrop-blur-[2px]">
-            <span className="rounded-full bg-white px-3 py-1 text-[11px] font-bold text-slate-900 shadow">
+          <div className="absolute inset-0 flex items-center justify-center bg-stone-900/55">
+            <span className="rounded-lg bg-white px-3 py-1 text-[11px] font-bold text-stone-900">
               Out of stock
             </span>
           </div>
         )}
       </div>
 
-      {/* Body */}
-      <div className="flex flex-1 flex-col gap-1 p-2.5 sm:p-3">
-        {/* Brand */}
+      {/* Body — one line each: name, unit */}
+      <div className="flex flex-1 flex-col gap-0.5 p-2.5 sm:p-3">
         {product.brand && (
-          <p className="truncate text-[10px] font-medium uppercase tracking-wide text-slate-400">
+          <p className="truncate text-[10px] font-medium uppercase tracking-wide text-stone-400">
             {product.brand}
           </p>
         )}
-
-        {/* Name */}
-        <p className="line-clamp-1 text-sm font-semibold text-slate-900">
+        <p className="line-clamp-2 min-h-[2.5rem] text-[13px] font-semibold leading-tight text-stone-900 sm:text-sm">
           {product.name}
         </p>
+        <p className="text-[11px] text-stone-500">{product.unitType}</p>
 
-        {/* Unit */}
-        <p className="text-[11px] text-slate-500">{product.unitType}</p>
-
-        {/* Price + ADD */}
-        <div className="mt-auto flex items-end justify-between gap-2 pt-2">
+        {/* Price + wide add button */}
+        <div className="mt-auto flex items-center justify-between gap-2 pt-2">
           <div className="flex flex-col leading-tight">
             {discount > 0 && product.compareAtPrice && (
-              <span className="text-[10px] text-slate-400 line-through">
+              <span className="text-[10px] text-stone-400 line-through">
                 {formatCurrency(product.compareAtPrice)}
               </span>
             )}
-            <span className="text-base font-bold text-slate-900">
+            <span className="font-display text-[15px] font-semibold text-stone-900 sm:text-base">
               {formatCurrency(product.price)}
             </span>
           </div>
@@ -126,23 +121,23 @@ export function ProductCard({ product }: ProductCardProps) {
             disabled={outOfStock}
             aria-label={`Add ${product.name} to cart`}
             className={cn(
-              "inline-flex h-8 items-center justify-center gap-1 rounded-full px-3 text-xs font-bold uppercase tracking-wide transition",
+              "inline-flex h-10 min-w-[72px] items-center justify-center gap-1 rounded-xl px-3 text-xs font-bold transition-colors",
               outOfStock
-                ? "cursor-not-allowed bg-slate-100 text-slate-400"
+                ? "cursor-not-allowed bg-stone-100 text-stone-400"
                 : status === "added"
-                  ? "bg-emerald-600 text-white"
-                  : "bg-emerald-600 text-white shadow-sm hover:bg-emerald-700",
+                  ? "bg-emerald-700 text-white"
+                  : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100",
             )}
           >
             {status === "loading" ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
             ) : status === "added" ? (
               <>
-                <Check className="h-3.5 w-3.5" /> Added
+                <Check className="h-4 w-4" aria-hidden /> Added
               </>
             ) : (
               <>
-                <Plus className="h-3.5 w-3.5" /> Add
+                <Plus className="h-4 w-4" aria-hidden /> Add
               </>
             )}
           </button>

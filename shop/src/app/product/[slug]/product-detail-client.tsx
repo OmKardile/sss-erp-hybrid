@@ -131,20 +131,11 @@ export function ProductDetailClient({ product, related }: Props) {
             className="relative h-full w-full object-cover"
           />
 
-          {/* Decorative blobs */}
-          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/20 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-white/15 blur-3xl" />
-
           {/* Badges */}
           <div className="absolute left-4 top-4 flex flex-col gap-1.5">
             {discount > 0 && (
-              <span className="rounded-full bg-rose-500 px-2.5 py-1 text-xs font-bold text-white shadow-md">
+              <span className="rounded-md bg-rose-600 px-2 py-1 text-xs font-bold text-white">
                 -{discount}% OFF
-              </span>
-            )}
-            {product.isFeatured && (
-              <span className="rounded-full bg-amber-400 px-2.5 py-1 text-xs font-bold text-amber-950 shadow-md">
-                Featured
               </span>
             )}
           </div>
@@ -168,7 +159,7 @@ export function ProductDetailClient({ product, related }: Props) {
             </span>
           </div>
 
-          <h1 className="mt-3 text-2xl font-bold text-slate-900 sm:text-3xl">
+          <h1 className="font-display mt-3 text-2xl font-semibold leading-tight text-stone-900 sm:text-3xl">
             {product.name}
           </h1>
 
@@ -193,17 +184,17 @@ export function ProductDetailClient({ product, related }: Props) {
           )}
 
           {/* Price */}
-          <div className="mt-4 flex flex-wrap items-end gap-3 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 p-4">
-            <span className="text-3xl font-extrabold text-slate-900 sm:text-4xl">
+          <div className="mt-4 flex flex-wrap items-end gap-3 rounded-2xl bg-emerald-50 p-4">
+            <span className="font-display text-3xl font-semibold text-stone-900 sm:text-4xl">
               {formatCurrency(product.price)}
             </span>
             {discount > 0 && product.compareAtPrice && (
-              <span className="text-base text-slate-400 line-through">
+              <span className="text-base text-stone-400 line-through">
                 {formatCurrency(product.compareAtPrice)}
               </span>
             )}
             {discount > 0 && (
-              <span className="mb-1 rounded-full bg-rose-500 px-2 py-0.5 text-xs font-bold text-white">
+              <span className="mb-1 rounded-full bg-rose-600 px-2 py-0.5 text-xs font-bold text-white">
                 Save {formatCurrency(product.compareAtPrice! - product.price)}
               </span>
             )}
@@ -220,8 +211,8 @@ export function ProductDetailClient({ product, related }: Props) {
                 Out of stock
               </span>
             ) : product.stock <= 10 ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
-                <span className="h-2 w-2 rounded-full bg-amber-500" />
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">
+                <span className="h-2 w-2 rounded-full bg-rose-500" />
                 Only {product.stock} left — order soon
               </span>
             ) : (
@@ -304,7 +295,7 @@ export function ProductDetailClient({ product, related }: Props) {
       {/* Reviews */}
       <section id="reviews" className="mt-12">
         <div className="flex items-end justify-between">
-          <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">
+          <h2 className="font-display text-xl font-semibold text-stone-900 sm:text-2xl">
             Reviews
           </h2>
           <span className="text-sm text-slate-500">
@@ -346,7 +337,7 @@ export function ProductDetailClient({ product, related }: Props) {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 text-sm font-semibold text-white">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-700 text-sm font-semibold text-white">
                           {r.customerName.charAt(0).toUpperCase()}
                         </div>
                         <div>

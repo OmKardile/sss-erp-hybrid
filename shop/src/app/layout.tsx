@@ -1,10 +1,20 @@
 import type { Metadata, Viewport } from "next";
+import { Fraunces } from "next/font/google";
 import "./globals.css";
 import { STORE_CONFIG } from "@/lib/config";
 import { StoreHeader } from "@/components/store-header";
 import { StoreFooter } from "@/components/store-footer";
+import { MobileNav } from "@/components/mobile-nav";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Home, Package, ShoppingCart } from "lucide-react";
+
+// Expressive display face — used for headlines & editorial moments.
+// Self-hosted by next/font (no runtime requests to Google).
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-fraunces",
+  axes: ["opsz"],
+});
 
 export const metadata: Metadata = {
   title: `${STORE_CONFIG.name} — Fresh groceries delivered in Pune`,
@@ -23,7 +33,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#059669",
+  themeColor: "#065f46",
 };
 
 export default function RootLayout({
@@ -32,24 +42,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-[100dvh] flex flex-col bg-white text-slate-900">
+    <html lang="en" className={fraunces.variable}>
+      <body className="min-h-[100dvh] flex flex-col bg-white text-stone-900">
         <StoreHeader />
         <main className="flex-1 w-full pb-20 lg:pb-0">{children}</main>
         <StoreFooter />
+        <MobileNav />
         <SpeedInsights />
-        {/* Mobile bottom nav */}
-        <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-slate-200 bg-white/95 backdrop-blur-lg lg:hidden safe-area-pb">
-          <a href="/" className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium text-slate-600">
-            <Home className="h-5 w-5" /> Home
-          </a>
-          <a href="/?category=Groceries" className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium text-slate-600">
-            <Package className="h-5 w-5" /> Shop
-          </a>
-          <a href="/cart" className="relative flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium text-slate-600">
-            <ShoppingCart className="h-5 w-5" /> Cart
-          </a>
-        </nav>
       </body>
     </html>
   );

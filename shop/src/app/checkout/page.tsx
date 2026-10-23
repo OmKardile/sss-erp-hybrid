@@ -166,7 +166,7 @@ export default function CheckoutPage() {
           </p>
           <Link
             href="/"
-            className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-emerald-600 px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95"
+            className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-emerald-800 px-6 text-sm font-semibold text-white hover:bg-emerald-900"
           >
             Browse Products
           </Link>
@@ -177,7 +177,7 @@ export default function CheckoutPage() {
           <div className="space-y-6 lg:col-span-2">
             {/* Delivery details */}
             <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-3 text-white">
+              <div className="flex items-center gap-2 bg-emerald-800 px-5 py-3 text-white">
                 <MapPin className="h-4 w-4" />
                 <h2 className="text-sm font-bold">Delivery Details</h2>
               </div>
@@ -251,7 +251,7 @@ export default function CheckoutPage() {
 
             {/* Payment */}
             <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-3 text-white">
+              <div className="flex items-center gap-2 bg-emerald-800 px-5 py-3 text-white">
                 <Banknote className="h-4 w-4" />
                 <h2 className="text-sm font-bold">Payment Method</h2>
               </div>
@@ -276,7 +276,7 @@ export default function CheckoutPage() {
                         "flex h-10 w-10 items-center justify-center rounded-full text-xl",
                         paymentMethod === "COD"
                           ? "bg-emerald-600 text-white"
-                          : "bg-amber-100 text-amber-700",
+                          : "bg-stone-100 text-stone-600",
                       )}
                     >
                       <Banknote className="h-5 w-5" />
@@ -308,7 +308,7 @@ export default function CheckoutPage() {
                         "flex h-10 w-10 items-center justify-center rounded-full text-xl",
                         paymentMethod === "UPI"
                           ? "bg-emerald-600 text-white"
-                          : "bg-blue-100 text-blue-700",
+                          : "bg-stone-100 text-stone-600",
                       )}
                     >
                       <Smartphone className="h-5 w-5" />
@@ -327,8 +327,8 @@ export default function CheckoutPage() {
                 </div>
 
                 {paymentMethod === "UPI" && (
-                  <div className="mt-4 flex flex-col items-center gap-4 rounded-2xl bg-gradient-to-br from-blue-50 to-cyan-50 p-5 sm:flex-row">
-                    <div className="flex h-32 w-32 shrink-0 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-blue-200 bg-white">
+                  <div className="mt-4 flex flex-col items-center gap-4 rounded-2xl bg-stone-50 p-5 sm:flex-row">
+                    <div className="flex h-32 w-32 shrink-0 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-stone-300 bg-white">
                       <QrCode className="h-16 w-16 text-slate-700" />
                       <p className="mt-1 text-[10px] text-slate-400">
                         Scan to pay
@@ -359,7 +359,7 @@ export default function CheckoutPage() {
           {/* Summary */}
           <aside className="lg:sticky lg:top-20 lg:self-start">
             <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <div className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-3 text-white">
+              <div className="flex items-center gap-2 bg-emerald-800 px-5 py-3 text-white">
                 <Truck className="h-4 w-4" />
                 <h2 className="text-sm font-bold">Order Summary</h2>
               </div>
@@ -430,7 +430,7 @@ export default function CheckoutPage() {
                   onClick={placeOrder}
                   disabled={placing}
                   size="lg"
-                  className="mt-4 w-full bg-gradient-to-r from-emerald-600 to-teal-600 shadow-md hover:shadow-lg"
+                  className="mt-4 w-full bg-emerald-800 hover:bg-emerald-900"
                 >
                   {placing ? (
                     <>

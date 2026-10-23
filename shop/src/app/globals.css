@@ -2,8 +2,13 @@
 
 /* ----------------------------------------------------------------
    Shubham Super Shopee — storefront theme
-   Emerald / teal color scheme, clean white background.
-   Static, photography-first design — no decorative animations.
+   Mobile-first editorial system (2026-10-23 redesign):
+   - Type: Fraunces (display) + system sans (body), big scale contrast
+   - Color: warm white / charcoal / slate neutrals + ONE accent (emerald).
+     Rose is functional only (discount / out-of-stock, retail convention).
+   - 8pt spacing rhythm, 44px minimum touch targets on mobile.
+   - Static, photography-first — no decorative animations, no gradients
+     except functional photo legibility scrims.
    ---------------------------------------------------------------- */
 
 @theme {
@@ -17,24 +22,18 @@
   --color-brand-700: #047857;
   --color-brand-800: #065f46;
   --color-brand-900: #064e3b;
-
-  --color-teal-50: #f0fdfa;
-  --color-teal-100: #ccfbf1;
-  --color-teal-500: #14b8a6;
-  --color-teal-600: #0d9488;
-  --color-teal-700: #0f766e;
 }
 
 :root {
   --background: #ffffff;
-  --foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --border: #e2e8f0;
+  --foreground: #1c1917;
+  --muted: #f5f5f4;
+  --muted-foreground: #57534e;
+  --border: #e7e5e4;
   --card: #ffffff;
-  --card-foreground: #0f172a;
-  --ring: #10b981;
-  --brand: #059669;
+  --card-foreground: #1c1917;
+  --ring: #059669;
+  --brand: #047857;
   --brand-foreground: #ffffff;
 }
 
@@ -54,6 +53,24 @@ body {
   font-family:
     ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  /* comfortable mobile reading size */
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Display face — section headlines, hero, editorial moments.
+   References the next/font variable set on <html> in layout.tsx. */
+.font-display {
+  font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+}
+
+/* Global visible focus (accessibility — WCAG 2.4.7) */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* Custom scrollbar for the cart / review lists */
@@ -65,11 +82,11 @@ body {
   background: transparent;
 }
 .scroll-soft::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
+  background-color: #d6d3d1;
   border-radius: 9999px;
 }
 .scroll-soft::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8;
+  background-color: #a8a29e;
 }
 
 /* Hide number input spinners */
@@ -82,7 +99,7 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-/* Hide horizontal scrollbar but keep functionality (for chips row) */
+/* Hide horizontal scrollbar but keep functionality (for rails) */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -98,8 +115,21 @@ input[type="number"] {
 
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-behavior: smooth; }
 * { -webkit-tap-highlight-color: transparent; }
-body { overscroll-behavior: none; }
+body { overscroll-behavior-y: none; }
 
+/* Mobile: enforce comfortable touch targets on interactive controls */
 @media (max-width: 768px) {
-  button, a[role="button"], [tabindex]:not([tabindex="-1"]) { min-height: 40px; }
+  button:not(:disabled),
+  a[role="button"],
+  [tabindex]:not([tabindex="-1"]) {
+    min-height: 44px;
+  }
+  /* inputs inside forms still need their natural height */
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"],
+  input[type="number"],
+  input[type="search"] {
+    min-height: 44px;
+  }
 }

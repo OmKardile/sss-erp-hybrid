@@ -1,81 +1,60 @@
-import { Phone, MapPin, Clock, Truck, ShieldCheck, Zap, Heart, Store } from "lucide-react";
+import { Phone, MapPin, Clock, Truck, ShieldCheck, Heart, Store } from "lucide-react";
 import { STORE_CONFIG } from "@/lib/config";
 
 export function StoreFooter() {
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-auto w-full bg-slate-900 text-slate-300">
-      {/* Top colorful strip */}
-      <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-400 text-white">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-8 gap-y-2 px-4 py-3 text-xs font-semibold sm:px-6 lg:px-8">
-          <span className="inline-flex items-center gap-1.5">
-            <Zap className="h-3.5 w-3.5" /> 10-min quick commerce
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <Truck className="h-3.5 w-3.5" /> Free delivery above ₹500
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <ShieldCheck className="h-3.5 w-3.5" /> Quality assured
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5" /> Open 7 AM – 10 PM
-          </span>
-        </div>
-      </div>
-
+    <footer className="mt-auto w-full bg-stone-900 text-stone-300">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white">
-                <Store className="h-5 w-5" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-700 text-white">
+                <Store className="h-5 w-5" aria-hidden />
               </div>
               <div>
-                <p className="text-sm font-bold text-white">
+                <p className="font-display text-sm font-semibold text-white">
                   {STORE_CONFIG.name}
                 </p>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[11px] text-stone-400">
                   Your local grocery store
                 </p>
               </div>
             </div>
-            <p className="mt-4 text-sm text-slate-400">
+            <p className="mt-4 text-sm leading-relaxed text-stone-400">
               Fresh groceries, dairy and household essentials delivered to your
               doorstep across Pune. Order online — pay by COD or UPI.
             </p>
-            {/* Contact shortcuts */}
-            <div className="mt-4 flex gap-2">
-              <a
-                href={`tel:${STORE_CONFIG.phone.replace(/\s+/g, "")}`}
-                aria-label="Call us"
-                className="flex h-9 items-center gap-2 rounded-full bg-slate-800 px-4 text-xs font-semibold text-slate-200 transition hover:bg-emerald-600 hover:text-white"
-              >
-                <Phone className="h-3.5 w-3.5" /> Call us
-              </a>
-            </div>
+            <a
+              href={`tel:${STORE_CONFIG.phone.replace(/\s+/g, "")}`}
+              aria-label="Call us"
+              className="mt-4 inline-flex h-11 items-center gap-2 rounded-xl border border-stone-700 px-4 text-xs font-semibold text-stone-200"
+            >
+              <Phone className="h-3.5 w-3.5" aria-hidden /> Call us
+            </a>
           </div>
 
           {/* Contact */}
           <div>
             <p className="text-sm font-semibold text-white">Contact</p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-400">
+            <ul className="mt-3 space-y-2.5 text-sm text-stone-400">
               <li className="flex items-start gap-2">
-                <Phone className="mt-0.5 h-4 w-4 text-emerald-400" />
+                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" aria-hidden />
                 <a
                   href={`tel:${STORE_CONFIG.phone.replace(/\s+/g, "")}`}
-                  className="hover:text-emerald-400"
+                  className="hover:text-emerald-300"
                 >
                   {STORE_CONFIG.phone}
                 </a>
               </li>
               <li className="flex items-start gap-2">
-                <MapPin className="mt-0.5 h-4 w-4 text-amber-400" />
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" aria-hidden />
                 <span>{STORE_CONFIG.address}</span>
               </li>
               <li className="flex items-start gap-2">
-                <Clock className="mt-0.5 h-4 w-4 text-rose-400" />
-                <span>Open daily • 7:00 AM – 10:00 PM</span>
+                <Clock className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" aria-hidden />
+                <span>Open daily · 7:00 AM – 10:00 PM</span>
               </li>
             </ul>
           </div>
@@ -83,37 +62,40 @@ export function StoreFooter() {
           {/* Shop */}
           <div>
             <p className="text-sm font-semibold text-white">Shop</p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-400">
+            <ul className="mt-3 space-y-2.5 text-sm text-stone-400">
               <li>
-                <a href="/" className="hover:text-emerald-400">
+                <a href="/" className="hover:text-emerald-300">
                   All Products
                 </a>
               </li>
               <li>
                 <a
                   href="/?category=Groceries"
-                  className="hover:text-emerald-400"
+                  className="hover:text-emerald-300"
                 >
                   Groceries
                 </a>
               </li>
               <li>
-                <a href="/?category=Dairy" className="hover:text-emerald-400">
+                <a href="/?category=Dairy" className="hover:text-emerald-300">
                   Dairy
                 </a>
               </li>
               <li>
-                <a href="/?category=Snacks" className="hover:text-emerald-400">
+                <a href="/?category=Snacks" className="hover:text-emerald-300">
                   Snacks
                 </a>
               </li>
               <li>
-                <a href="/?category=Fruits%20%26%20Vegetables" className="hover:text-emerald-400">
+                <a
+                  href="/?category=Fruits%20%26%20Vegetables"
+                  className="hover:text-emerald-300"
+                >
                   Fruits &amp; Vegetables
                 </a>
               </li>
               <li>
-                <a href="/cart" className="hover:text-emerald-400">
+                <a href="/cart" className="hover:text-emerald-300">
                   My Cart
                 </a>
               </li>
@@ -123,20 +105,30 @@ export function StoreFooter() {
           {/* Help */}
           <div>
             <p className="text-sm font-semibold text-white">Help &amp; Info</p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-400">
-              <li>Free delivery on orders above ₹500</li>
-              <li>Easy returns within 24 hours</li>
-              <li>COD &amp; UPI accepted</li>
-              <li>Delivery in 2 hours across Pune</li>
+            <ul className="mt-3 space-y-2.5 text-sm text-stone-400">
+              <li className="flex items-start gap-2">
+                <Truck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" aria-hidden />
+                <span>Free delivery above ₹500</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" aria-hidden />
+                <span>Easy returns within 24 hours</span>
+              </li>
+              <li>
+                <span>COD &amp; UPI accepted</span>
+              </li>
+              <li>
+                <span>Delivery in 2 hours across Pune</span>
+              </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col items-start justify-between gap-3 border-t border-slate-800 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center">
+        <div className="mt-8 flex flex-col items-start justify-between gap-3 border-t border-stone-800 pt-6 text-xs text-stone-500 sm:flex-row sm:items-center">
           <p>© {year} {STORE_CONFIG.name}. All rights reserved.</p>
           <p className="flex items-center gap-1.5">
             Crafted with{" "}
-            <Heart className="h-3.5 w-3.5 fill-rose-500 text-rose-500" /> for Bro
+            <Heart className="h-3.5 w-3.5 fill-rose-500 text-rose-500" aria-hidden /> for Bro
             · Designed &amp; developed by{" "}
             <a
               href="https://omkardile.is-a.dev/"
