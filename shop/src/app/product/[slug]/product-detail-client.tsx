@@ -123,8 +123,9 @@ export function ProductDetailClient({ product, related }: Props) {
       </nav>
 
       <div className="grid gap-6 lg:grid-cols-2 lg:gap-10">
-        {/* Real product photo */}
-        <div className="relative aspect-square overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-md sm:aspect-[4/3] lg:aspect-square">
+        {/* Real product photo — 4/3 on mobile keeps the buy box above the
+            sticky CTA's pin line at first paint; square on desktop */}
+        <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-md lg:aspect-square">
           <img
             src={image}
             alt={product.name}
@@ -223,8 +224,9 @@ export function ProductDetailClient({ product, related }: Props) {
             )}
           </div>
 
-          {/* Quantity + actions */}
-          <div className="mt-6 flex flex-wrap items-center gap-3">
+          {/* Quantity + actions — sticks above the bottom nav on mobile so
+              the primary CTA is never hidden behind it (cart-page pattern) */}
+          <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-30 mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-stone-200 bg-white/95 p-2 shadow-[0_4px_16px_rgba(0,0,0,0.08)] backdrop-blur lg:static lg:z-auto lg:mt-6 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-none">
             <QuantityStepper
               value={qty}
               min={1}
@@ -254,7 +256,7 @@ export function ProductDetailClient({ product, related }: Props) {
               onClick={buyNow}
               disabled={outOfStock || status === "loading"}
               size="lg"
-              className="flex-1 min-w-[150px]"
+              className="min-w-[150px] flex-1"
             >
               Buy Now <ArrowRight className="h-4 w-4" />
             </Button>

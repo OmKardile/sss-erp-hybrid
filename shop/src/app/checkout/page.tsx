@@ -132,7 +132,7 @@ export default function CheckoutPage() {
   const total = subtotal + deliveryFee;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 pb-44 pt-6 sm:px-6 lg:px-8 lg:pb-16">
       <Toast
         open={toast.open}
         message={toast.msg}
@@ -172,6 +172,7 @@ export default function CheckoutPage() {
           </Link>
         </div>
       ) : (
+        <>
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Form */}
           <div className="space-y-6 lg:col-span-2">
@@ -430,7 +431,7 @@ export default function CheckoutPage() {
                   onClick={placeOrder}
                   disabled={placing}
                   size="lg"
-                  className="mt-4 w-full bg-emerald-800 hover:bg-emerald-900"
+                  className="mt-4 hidden w-full bg-emerald-800 hover:bg-emerald-900 lg:inline-flex"
                 >
                   {placing ? (
                     <>
@@ -449,6 +450,34 @@ export default function CheckoutPage() {
             </div>
           </aside>
         </div>
+
+        {/* Sticky mobile place-order bar — sits above the bottom nav
+            (same pattern as the cart page) */}
+        <div className="fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] left-0 right-0 z-30 border-t border-stone-200 bg-white/95 px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] backdrop-blur lg:hidden">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+            <div>
+              <p className="text-[11px] text-stone-500">Total</p>
+              <p className="font-display text-lg font-semibold text-stone-900">
+                {formatCurrency(total)}
+              </p>
+            </div>
+            <Button
+              onClick={placeOrder}
+              disabled={placing}
+              size="lg"
+              className="h-12 flex-1 bg-emerald-800 hover:bg-emerald-900"
+            >
+              {placing ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Placing order…
+                </>
+              ) : (
+                <>Place Order</>
+              )}
+            </Button>
+          </div>
+        </div>
+        </>
       )}
     </div>
   );

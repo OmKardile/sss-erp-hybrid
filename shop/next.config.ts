@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // Dev-only floating indicator — hidden so the sandbox preview looks clean
+  devIndicators: false,
 };
 
 export default nextConfig;
