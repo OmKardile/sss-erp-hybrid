@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Plus, Check, Loader2 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
-import { getCategoryColor, getCategoryEmoji } from "@/lib/config";
+import { resolveProductImage } from "@/lib/config";
 import type { ProductListItem } from "@/lib/types";
 
 interface ProductCardProps {
@@ -13,6 +13,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const [status, setStatus] = useState<"idle" | "loading" | "added">("idle");
+  const [imgError, setImgError] = useState(false);
   const outOfStock = product.stock <= 0;
   const discount =
     product.compareAtPrice && product.compareAtPrice > product.price
@@ -45,37 +46,25 @@ export function ProductCard({ product }: ProductCardProps) {
     }
   }
 
-  const gradient = getCategoryColor(product.category);
-  const emoji = getCategoryEmoji(product.category);
+  const image = resolveProductImage(
+    imgError ? null : product.image,
+    product.category,
+  );
 
   return (
     <Link
       href={`/product/${product.slug}`}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md tap-scale"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-emerald-300 hover:shadow-md"
     >
-      {/* Image / gradient placeholder with emoji */}
-      <div
-        className={cn(
-          "relative aspect-square w-full overflow-hidden bg-gradient-to-br",
-          gradient,
-        )}
-      >
-        {product.image ? (
-          <img
-            src={product.image}
-            alt={product.name}
-            className="h-full w-full object-cover transition duration-300 group-hover:scale-110"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <span className="select-none text-5xl drop-shadow-md transition duration-300 group-hover:scale-110 sm:text-6xl">
-              {emoji}
-            </span>
-          </div>
-        )}
-
-        {/* Decorative blurred blob */}
-        <div className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-white/20 blur-2xl" />
+      {/* Real product photo */}
+      <div className="relative aspect-square w-full overflow-hidden bg-slate-50">
+        <img
+          src={image}
+          alt={product.name}
+          loading="lazy"
+          onError={() => setImgError(true)}
+          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+        />
 
         {/* Discount badge (top-left, red) */}
         {discount > 0 && (
@@ -84,10 +73,10 @@ export function ProductCard({ product }: ProductCardProps) {
           </span>
         )}
 
-        {/* Featured ribbon (top-right, amber) */}
+        {/* Featured badge (top-right, amber) */}
         {product.isFeatured && (
           <span className="absolute right-2 top-2 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-amber-950 shadow-md">
-            ⭐
+            Featured
           </span>
         )}
 
@@ -137,7 +126,7 @@ export function ProductCard({ product }: ProductCardProps) {
             disabled={outOfStock}
             aria-label={`Add ${product.name} to cart`}
             className={cn(
-              "inline-flex h-8 items-center justify-center gap-1 rounded-full px-3 text-xs font-bold uppercase tracking-wide transition active:scale-90",
+              "inline-flex h-8 items-center justify-center gap-1 rounded-full px-3 text-xs font-bold uppercase tracking-wide transition",
               outOfStock
                 ? "cursor-not-allowed bg-slate-100 text-slate-400"
                 : status === "added"

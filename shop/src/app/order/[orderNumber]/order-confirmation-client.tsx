@@ -6,6 +6,8 @@ import {
   CheckCircle2,
   MapPin,
   Phone,
+  PhoneCall,
+  Home,
   Package,
   Truck,
   Banknote,
@@ -14,7 +16,7 @@ import {
   Check,
   Clock,
   ArrowRight,
-  PartyPopper,
+  ShoppingCart,
 } from "lucide-react";
 import { Button } from "@/components/ui-button";
 import { formatCurrency, estimatedDeliveryDate } from "@/lib/utils";
@@ -45,47 +47,18 @@ export function OrderConfirmationClient({ order }: Props) {
 
   return (
     <div className="relative mx-auto max-w-3xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
-      {/* Confetti background */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-64 overflow-hidden">
-        {[
-          { e: "🎉", x: "5%", y: "20%", d: "0s" },
-          { e: "✨", x: "12%", y: "60%", d: "0.3s" },
-          { e: "🥳", x: "85%", y: "15%", d: "0.1s" },
-          { e: "🎊", x: "92%", y: "55%", d: "0.4s" },
-          { e: "⭐", x: "30%", y: "10%", d: "0.6s" },
-          { e: "💫", x: "70%", y: "70%", d: "0.2s" },
-        ].map((c, i) => (
-          <span
-            key={i}
-            className="absolute text-3xl animate-float-y"
-            style={{
-              left: c.x,
-              top: c.y,
-              animationDelay: c.d,
-              animationDuration: "2.5s",
-            }}
-          >
-            {c.e}
-          </span>
-        ))}
-      </div>
-
       {/* Success header */}
       <div className="relative flex flex-col items-center text-center">
-        <div className="relative flex h-24 w-24 items-center justify-center">
-          <span className="absolute inset-0 rounded-full bg-emerald-200/60 animate-ping-slow" />
-          <span className="absolute inset-2 rounded-full bg-emerald-100" />
-          <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg animate-bounce-in">
-            <CheckCircle2 className="h-11 w-11" strokeWidth={2.5} />
-          </div>
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg">
+          <CheckCircle2 className="h-11 w-11" strokeWidth={2.5} />
         </div>
 
-        <h1 className="mt-5 flex items-center gap-2 text-3xl font-extrabold text-slate-900 sm:text-4xl">
-          Order Placed! <PartyPopper className="h-7 w-7 text-amber-500" />
+        <h1 className="mt-5 text-3xl font-extrabold text-slate-900 sm:text-4xl">
+          Order Placed!
         </h1>
         <p className="mt-2 text-sm text-slate-500">
           Thank you, {order.customerName.split(" ")[0]}. We&apos;ve received your
-          order and will call you shortly to confirm. 🎉
+          order and will call you shortly to confirm.
         </p>
 
         {/* Order number */}
@@ -116,7 +89,7 @@ export function OrderConfirmationClient({ order }: Props) {
           </div>
           <div className="flex-1 text-left">
             <p className="text-sm font-bold text-slate-900">
-              🚚 Estimated delivery: {estimatedDeliveryDate(2)}
+              Estimated delivery: {estimatedDeliveryDate(2)}
             </p>
             <p className="text-xs text-slate-600">
               Our team will call{" "}
@@ -125,13 +98,13 @@ export function OrderConfirmationClient({ order }: Props) {
             </p>
             {/* Mini tracker */}
             <div className="mt-3 flex items-center gap-1">
-              <TrackerStep label="Placed" emoji="✅" active />
+              <TrackerStep label="Placed" icon={<CheckCircle2 className="h-4 w-4" />} active />
               <div className="h-0.5 flex-1 bg-emerald-200" />
-              <TrackerStep label="Confirmed" emoji="📞" />
+              <TrackerStep label="Confirmed" icon={<PhoneCall className="h-4 w-4" />} />
               <div className="h-0.5 flex-1 bg-slate-200" />
-              <TrackerStep label="On the way" emoji="🛵" />
+              <TrackerStep label="On the way" icon={<Truck className="h-4 w-4" />} />
               <div className="h-0.5 flex-1 bg-slate-200" />
-              <TrackerStep label="Delivered" emoji="🏠" />
+              <TrackerStep label="Delivered" icon={<Home className="h-4 w-4" />} />
             </div>
           </div>
         </div>
@@ -142,7 +115,7 @@ export function OrderConfirmationClient({ order }: Props) {
         {/* Items */}
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:col-span-2">
           <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900">
-            <Package className="h-4 w-4 text-emerald-600" /> 📦 Items in your
+            <Package className="h-4 w-4 text-emerald-600" /> Items in your
             order
           </h2>
           <ul className="mt-3 divide-y divide-slate-100">
@@ -152,8 +125,8 @@ export function OrderConfirmationClient({ order }: Props) {
                 className="flex items-center justify-between py-3 text-sm"
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-100 to-teal-100 text-lg">
-                    🛒
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 text-emerald-600">
+                    <ShoppingCart className="h-5 w-5" />
                   </div>
                   <div className="min-w-0">
                     <p className="truncate font-medium text-slate-900">
@@ -198,7 +171,7 @@ export function OrderConfirmationClient({ order }: Props) {
         {/* Delivery address */}
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900">
-            <MapPin className="h-4 w-4 text-rose-500" /> 📍 Delivery address
+            <MapPin className="h-4 w-4 text-rose-500" /> Delivery address
           </h2>
           <p className="mt-3 text-sm font-medium text-slate-900">
             {order.customerName}
@@ -222,7 +195,7 @@ export function OrderConfirmationClient({ order }: Props) {
             ) : (
               <Banknote className="h-4 w-4 text-emerald-500" />
             )}{" "}
-            💳 Payment
+            Payment
           </h2>
           <p className="mt-3 text-sm font-medium text-slate-900">
             {order.paymentMethod === "UPI"
@@ -295,24 +268,24 @@ export function OrderConfirmationClient({ order }: Props) {
 
 function TrackerStep({
   label,
-  emoji,
+  icon,
   active,
 }: {
   label: string;
-  emoji: string;
+  icon: React.ReactNode;
   active?: boolean;
 }) {
   return (
     <div className="flex flex-col items-center gap-1">
       <div
         className={
-          "flex h-7 w-7 items-center justify-center rounded-full text-xs shadow-sm " +
+          "flex h-7 w-7 items-center justify-center rounded-full shadow-sm " +
           (active
-            ? "bg-emerald-500 ring-2 ring-emerald-200"
+            ? "bg-emerald-500 text-white ring-2 ring-emerald-200"
             : "bg-slate-200 text-slate-500")
         }
       >
-        {emoji}
+        {icon}
       </div>
       <span
         className={

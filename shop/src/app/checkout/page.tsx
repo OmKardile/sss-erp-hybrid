@@ -12,6 +12,8 @@ import {
   CheckCircle2,
   Truck,
   MapPin,
+  ShoppingCart,
+  Smartphone,
 } from "lucide-react";
 import { Button } from "@/components/ui-button";
 import { Toast } from "@/components/toast";
@@ -20,8 +22,7 @@ import {
   DELIVERY_FEE,
   FREE_DELIVERY_THRESHOLD,
   STORE_CONFIG,
-  getCategoryColor,
-  getCategoryEmoji,
+  resolveProductImage,
 } from "@/lib/config";
 import type { CartTotals, OrderView } from "@/lib/types";
 
@@ -142,7 +143,7 @@ export default function CheckoutPage() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="flex items-center gap-2 text-2xl font-extrabold text-slate-900 sm:text-3xl">
-          Checkout <span className="text-2xl">💳</span>
+          Checkout
         </h1>
         <Link
           href="/cart"
@@ -154,7 +155,9 @@ export default function CheckoutPage() {
 
       {items.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-emerald-100 bg-emerald-50/40 px-6 py-20 text-center">
-          <span className="text-6xl drop-shadow-sm">🛒</span>
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm">
+            <ShoppingCart className="h-8 w-8 text-emerald-500" />
+          </div>
           <h2 className="mt-4 text-lg font-bold text-slate-900">
             Your cart is empty
           </h2>
@@ -176,7 +179,7 @@ export default function CheckoutPage() {
             <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-3 text-white">
                 <MapPin className="h-4 w-4" />
-                <h2 className="text-sm font-bold">📍 Delivery Details</h2>
+                <h2 className="text-sm font-bold">Delivery Details</h2>
               </div>
               <div className="p-5 sm:p-6">
                 <p className="mb-4 text-xs text-slate-500">
@@ -250,7 +253,7 @@ export default function CheckoutPage() {
             <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-3 text-white">
                 <Banknote className="h-4 w-4" />
-                <h2 className="text-sm font-bold">💳 Payment Method</h2>
+                <h2 className="text-sm font-bold">Payment Method</h2>
               </div>
               <div className="p-5 sm:p-6">
                 <p className="mb-4 text-xs text-slate-500">
@@ -262,7 +265,7 @@ export default function CheckoutPage() {
                     type="button"
                     onClick={() => setPaymentMethod("COD")}
                     className={cn(
-                      "flex items-start gap-3 rounded-2xl border-2 p-4 text-left transition tap-scale",
+                      "flex items-start gap-3 rounded-2xl border-2 p-4 text-left transition",
                       paymentMethod === "COD"
                         ? "border-emerald-500 bg-emerald-50"
                         : "border-slate-200 hover:border-emerald-300",
@@ -276,12 +279,11 @@ export default function CheckoutPage() {
                           : "bg-amber-100 text-amber-700",
                       )}
                     >
-                      💵
+                      <Banknote className="h-5 w-5" />
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-slate-900">
-                        Cash on Delivery
-                      </p>
+                        Cash on Delivery</p>
                       <p className="text-xs text-slate-500">
                         Pay in cash when your order arrives.
                       </p>
@@ -295,7 +297,7 @@ export default function CheckoutPage() {
                     type="button"
                     onClick={() => setPaymentMethod("UPI")}
                     className={cn(
-                      "flex items-start gap-3 rounded-2xl border-2 p-4 text-left transition tap-scale",
+                      "flex items-start gap-3 rounded-2xl border-2 p-4 text-left transition",
                       paymentMethod === "UPI"
                         ? "border-emerald-500 bg-emerald-50"
                         : "border-slate-200 hover:border-emerald-300",
@@ -309,12 +311,11 @@ export default function CheckoutPage() {
                           : "bg-blue-100 text-blue-700",
                       )}
                     >
-                      📱
+                      <Smartphone className="h-5 w-5" />
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-slate-900">
-                        UPI Payment
-                      </p>
+                        UPI Payment</p>
                       <p className="text-xs text-slate-500">
                         Pay now using any UPI app.
                       </p>
@@ -360,34 +361,27 @@ export default function CheckoutPage() {
             <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-3 text-white">
                 <Truck className="h-4 w-4" />
-                <h2 className="text-sm font-bold">🧾 Order Summary</h2>
+                <h2 className="text-sm font-bold">Order Summary</h2>
               </div>
               <div className="p-5">
                 <ul className="max-h-64 space-y-2 overflow-y-auto pr-1 scroll-soft">
                   {items.map((ci) => {
-                    const gradient = getCategoryColor(ci.product.category);
-                    const emoji = getCategoryEmoji(ci.product.category);
+                    const thumb = resolveProductImage(
+                      ci.product.image,
+                      ci.product.category,
+                    );
                     return (
                       <li
                         key={ci.id}
                         className="flex items-start justify-between gap-2 text-sm"
                       >
                         <div className="flex min-w-0 items-start gap-2">
-                          <div
-                            className={cn(
-                              "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-base",
-                              gradient,
-                            )}
-                          >
-                            {ci.product.image ? (
-                              <img
-                                src={ci.product.image}
-                                alt={ci.product.name}
-                                className="h-full w-full rounded-lg object-cover"
-                              />
-                            ) : (
-                              <span>{emoji}</span>
-                            )}
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-100 bg-slate-50">
+                            <img
+                              src={thumb}
+                              alt={ci.product.name}
+                              className="h-full w-full object-cover"
+                            />
                           </div>
                           <div className="min-w-0">
                             <p className="truncate font-medium text-slate-900">
@@ -443,7 +437,7 @@ export default function CheckoutPage() {
                       <Loader2 className="h-4 w-4 animate-spin" /> Placing order…
                     </>
                   ) : (
-                    <>🎉 Place Order</>
+                    <>Place Order</>
                   )}
                 </Button>
 

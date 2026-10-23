@@ -9,14 +9,11 @@ import {
   ArrowRight,
   Truck,
   ShoppingBag,
+  ShoppingCart,
 } from "lucide-react";
 import { QuantityStepper } from "@/components/quantity-stepper";
 import { cn, formatCurrency } from "@/lib/utils";
-import {
-  FREE_DELIVERY_THRESHOLD,
-  getCategoryColor,
-  getCategoryEmoji,
-} from "@/lib/config";
+import { FREE_DELIVERY_THRESHOLD, resolveProductImage } from "@/lib/config";
 import type { CartTotals } from "@/lib/types";
 
 export default function CartPage() {
@@ -100,7 +97,7 @@ export default function CartPage() {
       {/* Colorful header */}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="flex items-center gap-2 text-2xl font-extrabold text-slate-900 sm:text-3xl">
-          Your Cart <span className="text-3xl">🛒</span>
+          Your Cart
           {items.length > 0 && (
             <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-700">
               {data?.itemCount ?? 0}
@@ -117,7 +114,9 @@ export default function CartPage() {
 
       {empty ? (
         <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-emerald-100 bg-emerald-50/40 px-6 py-20 text-center">
-          <span className="text-7xl drop-shadow-sm animate-float-y">🛒</span>
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-sm">
+            <ShoppingCart className="h-10 w-10 text-emerald-500" />
+          </div>
           <h2 className="mt-4 text-lg font-bold text-slate-900">
             Your cart is empty
           </h2>
@@ -137,7 +136,7 @@ export default function CartPage() {
           <div className="mb-5 rounded-2xl border border-emerald-100 bg-gradient-to-r from-emerald-50 to-teal-50 p-4">
             {remaining > 0 ? (
               <p className="text-sm font-semibold text-emerald-900">
-                🚚 Add{" "}
+                Add{" "}
                 <span className="text-emerald-700">
                   {formatCurrency(remaining)}
                 </span>{" "}
@@ -148,11 +147,10 @@ export default function CartPage() {
               </p>
             ) : (
               <p className="flex items-center gap-2 text-sm font-semibold text-emerald-900">
-                <Truck className="h-4 w-4" /> Yay! You&apos;ve unlocked{" "}
+                <Truck className="h-4 w-4" /> You&apos;ve unlocked{" "}
                 <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-xs font-bold text-white">
                   FREE DELIVERY
-                </span>{" "}
-                🎉
+                </span>
               </p>
             )}
             <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-emerald-100">
@@ -168,8 +166,10 @@ export default function CartPage() {
             <div className="lg:col-span-2">
               <ul className="space-y-3">
                 {items.map((ci) => {
-                  const gradient = getCategoryColor(ci.product.category);
-                  const emoji = getCategoryEmoji(ci.product.category);
+                  const thumb = resolveProductImage(
+                    ci.product.image,
+                    ci.product.category,
+                  );
                   return (
                     <li
                       key={ci.id}
@@ -177,22 +177,13 @@ export default function CartPage() {
                     >
                       <Link
                         href={`/product/${ci.product.slug}`}
-                        className={cn(
-                          "relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br",
-                          gradient,
-                        )}
+                        className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-100 bg-slate-50"
                       >
-                        {ci.product.image ? (
-                          <img
-                            src={ci.product.image}
-                            alt={ci.product.name}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <span className="text-3xl drop-shadow-sm">
-                            {emoji}
-                          </span>
-                        )}
+                        <img
+                          src={thumb}
+                          alt={ci.product.name}
+                          className="h-full w-full object-cover"
+                        />
                       </Link>
 
                       <div className="flex-1">
@@ -303,7 +294,7 @@ export default function CartPage() {
                 </Link>
 
                 <p className="mt-3 text-center text-[11px] text-slate-500">
-                  💳 Pay by COD or UPI • Free delivery above ₹
+                  Pay by COD or UPI • Free delivery above ₹
                   {FREE_DELIVERY_THRESHOLD}
                 </p>
               </div>

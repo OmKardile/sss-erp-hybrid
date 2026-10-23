@@ -1,4 +1,4 @@
-import { Phone, MapPin, Clock, Truck, ShieldCheck, Zap, Heart } from "lucide-react";
+import { Phone, MapPin, Clock, Truck, ShieldCheck, Zap, Heart, Store } from "lucide-react";
 import { STORE_CONFIG } from "@/lib/config";
 
 export function StoreFooter() {
@@ -29,7 +29,7 @@ export function StoreFooter() {
           <div>
             <div className="flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white">
-                🛒
+                <Store className="h-5 w-5" />
               </div>
               <div>
                 <p className="text-sm font-bold text-white">
@@ -44,23 +44,15 @@ export function StoreFooter() {
               Fresh groceries, dairy and household essentials delivered to your
               doorstep across Pune. Order online — pay by COD or UPI.
             </p>
-            {/* Social-style emoji icons */}
+            {/* Contact shortcuts */}
             <div className="mt-4 flex gap-2">
-              {[
-                { e: "📞", l: "Call" },
-                { e: "💬", l: "WhatsApp" },
-                { e: "📷", l: "Instagram" },
-                { e: "📘", l: "Facebook" },
-              ].map((s) => (
-                <a
-                  key={s.l}
-                  href="#"
-                  aria-label={s.l}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800 text-base transition hover:scale-110 hover:bg-emerald-600"
-                >
-                  {s.e}
-                </a>
-              ))}
+              <a
+                href={`tel:${STORE_CONFIG.phone.replace(/\s+/g, "")}`}
+                aria-label="Call us"
+                className="flex h-9 items-center gap-2 rounded-full bg-slate-800 px-4 text-xs font-semibold text-slate-200 transition hover:bg-emerald-600 hover:text-white"
+              >
+                <Phone className="h-3.5 w-3.5" /> Call us
+              </a>
             </div>
           </div>
 
@@ -94,7 +86,7 @@ export function StoreFooter() {
             <ul className="mt-3 space-y-2 text-sm text-slate-400">
               <li>
                 <a href="/" className="hover:text-emerald-400">
-                  🛍️ All Products
+                  All Products
                 </a>
               </li>
               <li>
@@ -102,22 +94,27 @@ export function StoreFooter() {
                   href="/?category=Groceries"
                   className="hover:text-emerald-400"
                 >
-                  🍚 Groceries
+                  Groceries
                 </a>
               </li>
               <li>
                 <a href="/?category=Dairy" className="hover:text-emerald-400">
-                  🥛 Dairy
+                  Dairy
                 </a>
               </li>
               <li>
                 <a href="/?category=Snacks" className="hover:text-emerald-400">
-                  🍪 Snacks
+                  Snacks
+                </a>
+              </li>
+              <li>
+                <a href="/?category=Fruits%20%26%20Vegetables" className="hover:text-emerald-400">
+                  Fruits &amp; Vegetables
                 </a>
               </li>
               <li>
                 <a href="/cart" className="hover:text-emerald-400">
-                  🛒 My Cart
+                  My Cart
                 </a>
               </li>
             </ul>
@@ -127,10 +124,10 @@ export function StoreFooter() {
           <div>
             <p className="text-sm font-semibold text-white">Help &amp; Info</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-400">
-              <li>🎁 Free delivery on orders above ₹500</li>
-              <li>↩️ Easy returns within 24 hours</li>
-              <li>💳 COD &amp; UPI accepted</li>
-              <li>🚚 Delivery in 2 hours across Pune</li>
+              <li>Free delivery on orders above ₹500</li>
+              <li>Easy returns within 24 hours</li>
+              <li>COD &amp; UPI accepted</li>
+              <li>Delivery in 2 hours across Pune</li>
             </ul>
           </div>
         </div>

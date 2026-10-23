@@ -44,7 +44,7 @@ export function StoreHeader() {
           <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/20 text-white shadow-inner backdrop-blur">
             <Store className="h-5 w-5" />
             <span className="absolute -right-1 -top-1 flex h-3 w-3">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-amber-300 opacity-80 animate-ping-slow" />
+              <span className="absolute inline-flex h-full w-full rounded-full bg-amber-300 opacity-80" />
               <span className="relative inline-flex h-3 w-3 rounded-full bg-amber-400" />
             </span>
           </div>
@@ -94,7 +94,7 @@ export function StoreHeader() {
           {count > 0 && (
             <span
               key={bump}
-              className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-amber-400 px-1 text-[10px] font-bold text-amber-950 shadow-md ring-2 ring-emerald-600 animate-badge-pop"
+              className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-amber-400 px-1 text-[10px] font-bold text-amber-950 shadow-md ring-2 ring-emerald-600"
             >
               {count > 99 ? "99+" : count}
             </span>

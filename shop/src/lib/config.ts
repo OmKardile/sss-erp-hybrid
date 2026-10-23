@@ -22,43 +22,44 @@ export const DEFAULT_CATEGORIES = [
   "Fruits & Vegetables",
 ];
 
-/** Emoji icons for each category — used on tiles and product cards. */
-export const CATEGORY_EMOJI: Record<string, string> = {
-  "Fruits & Vegetables": "🥬",
-  Dairy: "🥛",
-  Snacks: "🍪",
-  Groceries: "🍚",
-  "Personal Care": "🧴",
-  Household: "🧹",
-  Bakery: "🍞",
-  Beverages: "🥤",
+/**
+ * Real photography for each category — served from /public/products/.
+ * Used on category tiles and as the fallback image for products that
+ * don't have their own photo set.
+ */
+export const CATEGORY_IMAGE: Record<string, string> = {
+  "Fruits & Vegetables": "/products/cat-fruits-vegetables.jpg",
+  Dairy: "/products/cat-dairy.jpg",
+  Snacks: "/products/cat-snacks.jpg",
+  Groceries: "/products/cat-groceries.jpg",
+  "Personal Care": "/products/cat-personal-care.jpg",
+  Household: "/products/cat-household.jpg",
+  Bakery: "/products/cat-bakery.jpg",
+  Beverages: "/products/cat-beverages.jpg",
 };
 
-/** Gradient color classes per category — used for tiles and card backgrounds. */
-export const CATEGORY_COLORS: Record<string, string> = {
-  "Fruits & Vegetables": "from-green-400 to-emerald-500",
-  Dairy: "from-blue-400 to-cyan-500",
-  Snacks: "from-amber-400 to-orange-500",
-  Groceries: "from-emerald-400 to-teal-500",
-  "Personal Care": "from-pink-400 to-rose-500",
-  Household: "from-violet-400 to-purple-500",
-  Bakery: "from-orange-400 to-amber-500",
-  Beverages: "from-cyan-400 to-blue-500",
-};
+/** Generic fallback photo when the category is unknown. */
+export const DEFAULT_CATEGORY_IMAGE = "/products/cat-groceries.jpg";
 
-/** Fallback gradient when category is unknown. */
-export const DEFAULT_CATEGORY_COLOR = "from-emerald-400 to-teal-500";
-
-/** Get emoji for a category (falls back to 🛒). */
-export function getCategoryEmoji(category?: string | null): string {
-  if (!category) return "🛒";
-  return CATEGORY_EMOJI[category] ?? "🛒";
+/** Get the category photo (local path under /public/products). */
+export function getCategoryImage(category?: string | null): string {
+  if (!category) return DEFAULT_CATEGORY_IMAGE;
+  return CATEGORY_IMAGE[category] ?? DEFAULT_CATEGORY_IMAGE;
 }
 
-/** Get gradient classes for a category (falls back to emerald/teal). */
-export function getCategoryColor(category?: string | null): string {
-  if (!category) return DEFAULT_CATEGORY_COLOR;
-  return CATEGORY_COLORS[category] ?? DEFAULT_CATEGORY_COLOR;
+/**
+ * Resolve the best image for a product:
+ * 1. the product's own photo (set by seed / ERP sync / admin),
+ * 2. otherwise the category photo,
+ * 3. otherwise the generic grocery photo.
+ */
+export function resolveProductImage(
+  image?: string | null,
+  category?: string | null,
+): string {
+  const img = (image || "").trim();
+  if (img) return img;
+  return getCategoryImage(category);
 }
 
 /** Delivery fee rules. */

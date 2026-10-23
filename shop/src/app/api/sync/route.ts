@@ -59,6 +59,16 @@ export async function POST(req: NextRequest) {
           continue;
         }
 
+        const existing = await db.shopProduct.findUnique({
+          where: { erpProductId: p.erpProductId },
+        });
+
+        // Preserve the shop-side photo when the ERP product has none —
+        // the ERP catalogue has no images, and overwriting with null
+        // would wipe the storefront photography on every sync.
+        const incomingImage = p.image?.trim() ? p.image : null;
+        const image = incomingImage ?? existing?.image ?? null;
+
         const data = {
           erpProductId: p.erpProductId,
           name: p.name,
@@ -71,12 +81,8 @@ export async function POST(req: NextRequest) {
           stock: Number(p.stock ?? 0),
           isFeatured: !!p.isFeatured,
           isActive: p.isActive ?? true,
-          image: p.image ?? null,
+          image,
         };
-
-        const existing = await db.shopProduct.findUnique({
-          where: { erpProductId: p.erpProductId },
-        });
 
         if (existing) {
           // Keep slug stable to preserve URLs unless name changed

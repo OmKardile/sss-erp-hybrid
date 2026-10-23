@@ -21,6 +21,7 @@ const SAMPLE_PRODUCTS = [
     unitType: "5 kg",
     stock: 40,
     isFeatured: true,
+    image: "/products/atta.jpg",
   },
   {
     erpProductId: "seed_002",
@@ -32,6 +33,7 @@ const SAMPLE_PRODUCTS = [
     unitType: "500 ml",
     stock: 60,
     isFeatured: true,
+    image: "/products/milk-taaza.jpg",
   },
   {
     erpProductId: "seed_003",
@@ -43,6 +45,7 @@ const SAMPLE_PRODUCTS = [
     compareAtPrice: 40,
     unitType: "200 g",
     stock: 80,
+    image: "/products/marie-gold.jpg",
   },
   {
     erpProductId: "seed_004",
@@ -53,6 +56,7 @@ const SAMPLE_PRODUCTS = [
     price: 28,
     unitType: "1 kg",
     stock: 100,
+    image: "/products/tata-salt.jpg",
   },
   {
     erpProductId: "seed_005",
@@ -65,6 +69,7 @@ const SAMPLE_PRODUCTS = [
     compareAtPrice: 135,
     unitType: "1 kg",
     stock: 25,
+    image: "/products/surf-excel.jpg",
   },
   {
     erpProductId: "seed_006",
@@ -76,6 +81,7 @@ const SAMPLE_PRODUCTS = [
     unitType: "70 g",
     stock: 200,
     isFeatured: true,
+    image: "/products/maggi.jpg",
   },
   {
     erpProductId: "seed_007",
@@ -86,6 +92,7 @@ const SAMPLE_PRODUCTS = [
     price: 40,
     unitType: "750 ml",
     stock: 50,
+    image: "/products/coca-cola.jpg",
   },
   {
     erpProductId: "seed_008",
@@ -97,6 +104,7 @@ const SAMPLE_PRODUCTS = [
     compareAtPrice: 110,
     unitType: "250 g",
     stock: 30,
+    image: "/products/honey.jpg",
   },
   {
     erpProductId: "seed_009",
@@ -107,6 +115,7 @@ const SAMPLE_PRODUCTS = [
     price: 95,
     unitType: "200 g",
     stock: 45,
+    image: "/products/colgate.jpg",
   },
   {
     erpProductId: "seed_010",
@@ -117,6 +126,7 @@ const SAMPLE_PRODUCTS = [
     price: 40,
     unitType: "400 g",
     stock: 20,
+    image: "/products/bread.jpg",
   },
   {
     erpProductId: "seed_011",
@@ -128,6 +138,7 @@ const SAMPLE_PRODUCTS = [
     unitType: "1 dozen",
     stock: 35,
     isFeatured: true,
+    image: "/products/banana.jpg",
   },
   {
     erpProductId: "seed_012",
@@ -139,6 +150,7 @@ const SAMPLE_PRODUCTS = [
     compareAtPrice: 45,
     unitType: "1 kg",
     stock: 60,
+    image: "/products/onion.jpg",
   },
   {
     erpProductId: "seed_013",
@@ -149,6 +161,7 @@ const SAMPLE_PRODUCTS = [
     price: 30,
     unitType: "1 kg",
     stock: 50,
+    image: "/products/tomato.jpg",
   },
   {
     erpProductId: "seed_014",
@@ -159,6 +172,7 @@ const SAMPLE_PRODUCTS = [
     price: 35,
     unitType: "400 g",
     stock: 40,
+    image: "/products/curd.jpg",
   },
   {
     erpProductId: "seed_015",
@@ -169,6 +183,7 @@ const SAMPLE_PRODUCTS = [
     price: 20,
     unitType: "52 g",
     stock: 90,
+    image: "/products/lays.jpg",
   },
   {
     erpProductId: "seed_016",
@@ -180,6 +195,7 @@ const SAMPLE_PRODUCTS = [
     compareAtPrice: 165,
     unitType: "1 L",
     stock: 30,
+    image: "/products/sunflower-oil.jpg",
   },
 ];
 
