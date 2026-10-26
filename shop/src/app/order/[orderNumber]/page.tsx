@@ -34,6 +34,8 @@ export default async function OrderConfirmationPage({
     subtotal: order.subtotal,
     deliveryFee: order.deliveryFee,
     total: order.total,
+    couponCode: order.couponCode ?? null,
+    discountTotal: order.discountTotal ?? 0,
     paymentMethod: order.paymentMethod,
     paymentStatus: order.paymentStatus,
     orderStatus: order.orderStatus,

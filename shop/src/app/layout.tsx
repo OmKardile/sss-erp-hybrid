@@ -3,6 +3,7 @@ import { Fraunces } from "next/font/google";
 import "./globals.css";
 import { STORE_CONFIG } from "@/lib/config";
 import { StoreHeader } from "@/components/store-header";
+import { FestiveStrip } from "@/components/festive-strip";
 import { StoreFooter } from "@/components/store-footer";
 import { MobileNav } from "@/components/mobile-nav";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -45,6 +46,10 @@ export default function RootLayout({
     <html lang="en" className={fraunces.variable}>
       <body className="min-h-[100dvh] flex flex-col bg-white text-stone-900">
         <StoreHeader />
+        {/* Festive strip — visible on every page during a festival window.
+            Scrolls away naturally; header stays h-14 so sticky offsets
+            elsewhere (top-14/sm:top-16) are unaffected. */}
+        <FestiveStrip />
         <main className="flex-1 w-full pb-20 lg:pb-0">{children}</main>
         <StoreFooter />
         <MobileNav />

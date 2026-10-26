@@ -14,16 +14,21 @@ import {
   MapPin,
   ShoppingCart,
   Smartphone,
+  TicketPercent,
 } from "lucide-react";
 import { Button } from "@/components/ui-button";
 import { Toast } from "@/components/toast";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
-  DELIVERY_FEE,
-  FREE_DELIVERY_THRESHOLD,
   STORE_CONFIG,
   resolveProductImage,
 } from "@/lib/config";
+import {
+  availableCoupons,
+  validateCoupon,
+  computeTotals,
+  type CouponValidation,
+} from "@/lib/coupons";
 import type { CartTotals, OrderView } from "@/lib/types";
 
 export default function CheckoutPage() {
@@ -35,6 +40,12 @@ export default function CheckoutPage() {
     open: false,
     msg: "",
   });
+
+  // Coupon state — validated with the shared pure module; the API
+  // re-validates authoritatively when the order is placed.
+  const [couponInput, setCouponInput] = useState("");
+  const [coupon, setCoupon] = useState<CouponValidation | null>(null);
+  const [couponMsg, setCouponMsg] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     customerName: "",
@@ -83,6 +94,21 @@ export default function CheckoutPage() {
     return Object.keys(e).length === 0;
   }
 
+  function applyCoupon(code?: string) {
+    const input = (code ?? couponInput).trim().toUpperCase();
+    if (!input) return;
+    const result = validateCoupon(input, subtotal);
+    setCoupon(result.ok ? result : null);
+    setCouponMsg(result.ok ? `${input} applied — you save ${formatCurrency(result.discount)}${result.freeDelivery ? " + free delivery" : ""}` : result.reason || "Invalid coupon");
+    if (result.ok) setCouponInput(input);
+  }
+
+  function removeCoupon() {
+    setCoupon(null);
+    setCouponMsg(null);
+    setCouponInput("");
+  }
+
   async function placeOrder() {
     if (!cart || cart.items.length === 0) {
       setToast({ open: true, msg: "Your cart is empty" });
@@ -97,7 +123,11 @@ export default function CheckoutPage() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, paymentMethod }),
+        body: JSON.stringify({
+          ...form,
+          paymentMethod,
+          couponCode: coupon?.ok ? coupon.coupon?.code : null,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -127,9 +157,10 @@ export default function CheckoutPage() {
 
   const items = cart?.items ?? [];
   const subtotal = cart?.subtotal ?? 0;
-  const deliveryFee =
-    subtotal === 0 || subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
-  const total = subtotal + deliveryFee;
+  const totals = computeTotals(subtotal, coupon);
+  const total = totals.total;
+  const deliveryFee = totals.deliveryFee;
+  const coupons = availableCoupons();
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-44 pt-6 sm:px-6 lg:px-8 lg:pb-16">
@@ -176,6 +207,69 @@ export default function CheckoutPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Form */}
           <div className="space-y-6 lg:col-span-2">
+            {/* Coupon — festive + store offers */}
+            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div className="flex items-center gap-2 bg-emerald-800 px-5 py-3 text-white">
+                <TicketPercent className="h-4 w-4" aria-hidden />
+                <h2 className="text-sm font-bold">Coupon &amp; Offers</h2>
+              </div>
+              <div className="p-5 sm:p-6">
+                {coupon?.ok ? (
+                  <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+                    <div>
+                      <p className="text-sm font-bold text-emerald-900">
+                        {coupon.coupon?.code} applied
+                      </p>
+                      <p className="text-xs text-emerald-700">{couponMsg}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={removeCoupon}
+                      className="inline-flex h-9 items-center rounded-lg border border-emerald-300 bg-white px-3 text-xs font-semibold text-emerald-800"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponInput}
+                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                        placeholder="Enter coupon code"
+                        aria-label="Coupon code"
+                        className="h-11 flex-1 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold tracking-wide uppercase outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => applyCoupon()}
+                        className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-800 px-5 text-sm font-bold text-white"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                    {couponMsg && (
+                      <p className="mt-2 text-xs text-rose-600">{couponMsg}</p>
+                    )}
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {coupons.map((c) => (
+                        <button
+                          key={c.code}
+                          type="button"
+                          onClick={() => applyCoupon(c.code)}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-emerald-300 bg-emerald-50 px-3 py-1.5 text-[11px] font-semibold text-emerald-800"
+                        >
+                          <TicketPercent className="h-3 w-3" aria-hidden />
+                          {c.code} — {c.description}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </section>
+
             {/* Delivery details */}
             <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="flex items-center gap-2 bg-emerald-800 px-5 py-3 text-white">
@@ -406,6 +500,16 @@ export default function CheckoutPage() {
                     <dt className="text-slate-600">Subtotal</dt>
                     <dd className="font-semibold">{formatCurrency(subtotal)}</dd>
                   </div>
+                  {totals.discount > 0 && (
+                    <div className="flex justify-between">
+                      <dt className="text-slate-600">
+                        Coupon ({coupon?.coupon?.code})
+                      </dt>
+                      <dd className="font-semibold text-emerald-700">
+                        −{formatCurrency(totals.discount)}
+                      </dd>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <dt className="text-slate-600">Delivery fee</dt>
                     <dd className="font-semibold">

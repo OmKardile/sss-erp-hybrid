@@ -60,6 +60,8 @@ model Order {
   items         OrderItem[]
   subtotal      Float
   deliveryFee   Float    @default(0)
+  couponCode    String?  // coupon applied at checkout (nullable, additive)
+  discountTotal Float    @default(0) // rupee discount from the coupon
   total         Float
   paymentMethod String   @default("COD") // COD | UPI
   paymentStatus String   @default("PENDING") // PENDING | PAID | FAILED

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ChevronLeft,
   Check,
@@ -21,6 +21,7 @@ import { Toast } from "@/components/toast";
 import { Button } from "@/components/ui-button";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 import { resolveProductImage } from "@/lib/config";
+import { recordRecentlyViewed } from "@/lib/recently-viewed";
 import type { ProductDetail, ProductListItem } from "@/lib/types";
 
 interface Props {
@@ -35,6 +36,11 @@ export function ProductDetailClient({ product, related }: Props) {
     open: boolean;
     msg: string;
   }>({ open: false, msg: "" });
+
+  // Track browsing history for the home-page "Recently viewed" rail
+  useEffect(() => {
+    recordRecentlyViewed(product.slug);
+  }, [product.slug]);
 
   const outOfStock = product.stock <= 0;
   const discount =

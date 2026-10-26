@@ -11,12 +11,18 @@ import {
   BadgeCheck,
 } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
+import { DealOfDay } from "@/components/deal-of-day";
+import { RecentlyViewed } from "@/components/recently-viewed";
 import {
   DEFAULT_CATEGORIES,
   STORE_CONFIG,
   CATEGORY_IMAGE,
   FREE_DELIVERY_THRESHOLD,
 } from "@/lib/config";
+import { istDateStr } from "@/lib/festive";
+import { useActiveTheme } from "@/lib/use-active-theme";
+import { pickDailyDeal } from "@/lib/deal";
+import improvementState from "@/config/improvement-state.json";
 import type { ProductListItem } from "@/lib/types";
 
 // Categories that get a photo tile (excludes "All")
@@ -30,6 +36,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [seeded, setSeeded] = useState(false);
+  // Festive theme is date-derived and client-only (hydration-safe snapshot).
+  const theme = useActiveTheme();
 
   // Read query params on mount (search bar submits ?q=...)
   useEffect(() => {
@@ -114,14 +122,33 @@ export default function HomePage() {
     [products],
   );
 
+  // Deal of the Day — improver-pinned pick first, then the deterministic
+  // daily rotation over discounted, in-stock products.
+  const deal = useMemo(() => {
+    const pinned = (improvementState as any)?.deal?.slug as string | undefined;
+    if (pinned) {
+      const p = products.find(
+        (x) => x.slug === pinned && x.stock > 0,
+      );
+      if (p) return p;
+    }
+    return pickDailyDeal(products, istDateStr());
+  }, [products]);
+
   return (
     <div className="w-full">
       {/* HERO — compact mobile composition: photo + legibility scrim,
-          display headline, one trust line. Search lives in the header. */}
+          display headline, one trust line. Search lives in the header.
+          During a festival window the hero swaps to the festive photo +
+          festive copy (Blinkit/Zepto-style seasonal merchandising). */}
       <section className="relative overflow-hidden bg-stone-950 text-white">
         <img
-          src="/products/hero.jpg"
-          alt="Fresh produce shelves at Shubham Super Shopee"
+          src={theme?.heroImage || "/products/hero.jpg"}
+          alt={
+            theme
+              ? `${theme.festival} festive essentials at ${STORE_CONFIG.name}`
+              : "Fresh produce shelves at Shubham Super Shopee"
+          }
           className="absolute inset-0 h-full w-full object-cover"
         />
         {/* Functional scrim for text legibility over a real photo */}
@@ -130,16 +157,27 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
           <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300">
             <Clock className="h-3.5 w-3.5" aria-hidden />
-            {STORE_CONFIG.name} · Pune
+            {theme ? theme.kicker : `${STORE_CONFIG.name} · Pune`}
           </p>
           <h1 className="font-display mt-2 max-w-md text-[2rem] font-semibold leading-[1.1] sm:text-4xl lg:text-5xl">
-            Fresh groceries,
-            <br />
-            delivered fast.
+            {theme ? (
+              theme.headline.split("\n").map((line, i) => (
+                <span key={i} className="block">
+                  {line}
+                </span>
+              ))
+            ) : (
+              <>
+                Fresh groceries,
+                <br />
+                delivered fast.
+              </>
+            )}
           </h1>
           <p className="mt-2 max-w-sm text-sm text-stone-200 sm:text-base">
-            Your trusted local store — quality products, fair prices, COD &amp;
-            UPI accepted.
+            {theme
+              ? theme.subline
+              : "Your trusted local store — quality products, fair prices, COD & UPI accepted."}
           </p>
         </div>
       </section>
@@ -183,15 +221,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PROMO — flat block, single accent, no gradient */}
+      {/* DEAL OF THE DAY — wide scannable card, rotates daily IST */}
+      <DealOfDay deal={deal} />
+
+      {/* PROMO — flat block, single accent, no gradient.
+          During a festive window it carries the festival coupon. */}
       <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-emerald-800 px-5 py-4 text-white">
           <div>
             <p className="font-display text-base font-semibold sm:text-lg">
-              Free delivery above ₹{FREE_DELIVERY_THRESHOLD}
+              {theme?.coupon
+                ? `${theme.festival} offer — code ${theme.coupon.code}`
+                : `Free delivery above ₹${FREE_DELIVERY_THRESHOLD}`}
             </p>
             <p className="mt-0.5 text-xs text-emerald-100">
-              Stock up your kitchen — we bring it to your door.
+              {theme?.coupon
+                ? `${theme.coupon.text} · applies at checkout`
+                : "Stock up your kitchen — we bring it to your door."}
             </p>
           </div>
           <a
@@ -203,16 +249,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FEATURED — horizontal rail */}
+      {/* FEATURED — horizontal rail; festive title during a window */}
       {featured.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
           <div className="mb-3 flex items-end justify-between">
             <div>
               <h2 className="font-display text-xl font-semibold text-stone-900 sm:text-2xl">
-                Featured picks
+                {theme ? theme.sectionTitle : "Featured picks"}
               </h2>
               <p className="mt-0.5 text-xs text-stone-500">
-                Best-sellers from our shelves
+                {theme ? theme.sectionSub : "Best-sellers from our shelves"}
               </p>
             </div>
             <Link
@@ -231,6 +277,9 @@ export default function HomePage() {
           </div>
         </section>
       )}
+
+      {/* RECENTLY VIEWED — resurfaces browsing history (no account needed) */}
+      <RecentlyViewed products={products} />
 
       {/* STICKY CATEGORY CHIPS — mini-nav, sticks below the single-row header */}
       <section className="sticky top-14 z-30 mt-8 border-y border-stone-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85 sm:top-16">

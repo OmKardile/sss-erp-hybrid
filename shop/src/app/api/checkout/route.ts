@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { ensureCartSessionId } from "@/lib/session";
 import { generateOrderNumber } from "@/lib/utils";
-import { DELIVERY_FEE, FREE_DELIVERY_THRESHOLD } from "@/lib/config";
+import { validateCoupon, computeTotals } from "@/lib/coupons";
 import type { OrderView } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +20,8 @@ function mapOrder(o: any): OrderView {
     subtotal: o.subtotal,
     deliveryFee: o.deliveryFee,
     total: o.total,
+    couponCode: o.couponCode ?? null,
+    discountTotal: o.discountTotal ?? 0,
     paymentMethod: o.paymentMethod,
     paymentStatus: o.paymentStatus,
     orderStatus: o.orderStatus,
@@ -79,9 +81,23 @@ export async function POST(req: NextRequest) {
       (s, ci) => s + ci.product.price * ci.quantity,
       0,
     );
-    const deliveryFee =
-      subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
-    const total = subtotal + deliveryFee;
+
+    // Coupon — validated server-side (authoritative). The client shows the
+    // same numbers via the shared pure module, but we never trust them.
+    const couponCode = (body?.couponCode || "").trim().toUpperCase() || null;
+    const couponResult = couponCode
+      ? validateCoupon(couponCode, subtotal)
+      : null;
+    if (couponCode && !couponResult?.ok) {
+      return NextResponse.json(
+        { error: couponResult?.reason || "Invalid coupon" },
+        { status: 400 },
+      );
+    }
+    const totals = computeTotals(
+      subtotal,
+      couponResult?.ok ? couponResult : null,
+    );
 
     const orderNumber = generateOrderNumber();
 
@@ -95,8 +111,10 @@ export async function POST(req: NextRequest) {
         city,
         pincode,
         subtotal,
-        deliveryFee,
-        total,
+        deliveryFee: totals.deliveryFee,
+        total: totals.total,
+        couponCode: couponResult?.ok ? couponCode : null,
+        discountTotal: totals.discount,
         paymentMethod,
         paymentStatus: paymentMethod === "UPI" ? "PENDING" : "PENDING",
         orderStatus: "NEW",

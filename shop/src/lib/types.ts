@@ -57,6 +57,10 @@ export interface OrderView {
   subtotal: number;
   deliveryFee: number;
   total: number;
+  /** Coupon code applied at checkout (null when none). */
+  couponCode: string | null;
+  /** Rupee discount from the applied coupon. */
+  discountTotal: number;
   paymentMethod: string;
   paymentStatus: string;
   orderStatus: string;

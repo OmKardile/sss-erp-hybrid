@@ -18,6 +18,8 @@ function mapOrder(o: any): OrderView {
     subtotal: o.subtotal,
     deliveryFee: o.deliveryFee,
     total: o.total,
+    couponCode: o.couponCode ?? null,
+    discountTotal: o.discountTotal ?? 0,
     paymentMethod: o.paymentMethod,
     paymentStatus: o.paymentStatus,
     orderStatus: o.orderStatus,

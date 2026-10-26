@@ -17,6 +17,7 @@ import {
   Clock,
   ArrowRight,
   ShoppingCart,
+  StickyNote,
 } from "lucide-react";
 import { Button } from "@/components/ui-button";
 import { formatCurrency, estimatedDeliveryDate } from "@/lib/utils";
@@ -149,6 +150,16 @@ export function OrderConfirmationClient({ order }: Props) {
               <dt className="text-slate-600">Subtotal</dt>
               <dd className="font-semibold">{formatCurrency(order.subtotal)}</dd>
             </div>
+            {order.discountTotal > 0 && (
+              <div className="flex justify-between">
+                <dt className="text-slate-600">
+                  Coupon {order.couponCode ? `(${order.couponCode})` : ""}
+                </dt>
+                <dd className="font-semibold text-emerald-600">
+                  −{formatCurrency(order.discountTotal)}
+                </dd>
+              </div>
+            )}
             <div className="flex justify-between">
               <dt className="text-slate-600">Delivery fee</dt>
               <dd className="font-semibold">
@@ -166,6 +177,11 @@ export function OrderConfirmationClient({ order }: Props) {
               </dd>
             </div>
           </dl>
+          {order.discountTotal > 0 && (
+            <p className="mt-3 rounded-xl bg-emerald-50 px-4 py-2.5 text-center text-sm font-semibold text-emerald-800">
+              You saved {formatCurrency(order.discountTotal)} on this order
+            </p>
+          )}
         </div>
 
         {/* Delivery address */}
@@ -227,7 +243,10 @@ export function OrderConfirmationClient({ order }: Props) {
 
       {order.notes && (
         <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-sm font-bold text-slate-900">📝 Order notes</h2>
+          <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900">
+            <StickyNote className="h-4 w-4 text-emerald-600" aria-hidden /> Order
+            notes
+          </h2>
           <p className="mt-1 text-sm text-slate-600">{order.notes}</p>
         </div>
       )}
