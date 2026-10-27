@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   Trash2,
   ChevronLeft,
@@ -12,6 +13,8 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { QuantityStepper } from "@/components/quantity-stepper";
+import { AnimatedIcon } from "@/components/animated-icon";
+import { EASE_OUT } from "@/components/reveal";
 import { cn, formatCurrency } from "@/lib/utils";
 import { FREE_DELIVERY_THRESHOLD, resolveProductImage } from "@/lib/config";
 import type { CartTotals } from "@/lib/types";
@@ -20,6 +23,7 @@ export default function CartPage() {
   const [data, setData] = useState<CartTotals | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
+  const reduce = useReducedMotion();
 
   async function refresh() {
     try {
@@ -77,8 +81,30 @@ export default function CartPage() {
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center text-stone-500">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" aria-hidden />
+      <div
+        className="mx-auto max-w-7xl px-4 pb-44 pt-6 sm:px-6 lg:px-8 lg:pb-16"
+        aria-busy="true"
+        aria-label="Loading your cart"
+      >
+        <div className="mb-6 h-8 w-40 animate-pulse rounded-lg bg-stone-100 motion-reduce:animate-none" />
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="space-y-3 lg:col-span-2">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="flex gap-3 rounded-2xl border border-white/70 bg-white/65 p-3 shadow-[0_4px_20px_rgba(28,25,23,0.05)] backdrop-blur-md sm:p-4"
+              >
+                <div className="h-20 w-20 shrink-0 animate-pulse rounded-xl bg-stone-100 motion-reduce:animate-none" />
+                <div className="flex-1 space-y-2.5 py-1">
+                  <div className="h-3.5 w-3/4 animate-pulse rounded-full bg-stone-100 motion-reduce:animate-none" />
+                  <div className="h-2.5 w-1/3 animate-pulse rounded-full bg-stone-100 motion-reduce:animate-none" />
+                  <div className="h-3 w-1/4 animate-pulse rounded-full bg-stone-100 motion-reduce:animate-none" />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="hidden h-64 animate-pulse rounded-2xl border border-white/70 bg-white/65 motion-reduce:animate-none lg:block" />
+        </div>
       </div>
     );
   }
@@ -115,7 +141,13 @@ export default function CartPage() {
       {empty ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-6 py-20 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white">
-            <ShoppingCart className="h-8 w-8 text-stone-400" aria-hidden />
+            <AnimatedIcon
+              name="cart"
+              size={36}
+              trigger="loop"
+              speed={0.6}
+              fallback={ShoppingCart}
+            />
           </div>
           <h2 className="font-display mt-4 text-lg font-semibold text-stone-900">
             Your cart is empty
@@ -145,7 +177,7 @@ export default function CartPage() {
               </p>
             ) : (
               <p className="flex items-center gap-2 text-sm font-semibold text-emerald-900">
-                <Truck className="h-4 w-4" aria-hidden /> You&apos;ve unlocked
+                <AnimatedIcon name="truck" size={16} trigger="loop" speed={0.5} fallback={Truck} /> You&apos;ve unlocked
                 free delivery
               </p>
             )}
@@ -158,7 +190,7 @@ export default function CartPage() {
               aria-label="Free delivery progress"
             >
               <div
-                className="h-full rounded-full bg-emerald-600"
+                className="h-full rounded-full bg-emerald-600 transition-[width] duration-500 ease-out motion-reduce:transition-none"
                 style={{ width: `${progressPct}%` }}
               />
             </div>
@@ -168,15 +200,28 @@ export default function CartPage() {
             {/* Items */}
             <div className="lg:col-span-2">
               <ul className="space-y-3">
+                <AnimatePresence initial={false}>
                 {items.map((ci) => {
                   const thumb = resolveProductImage(
                     ci.product.image,
                     ci.product.category,
                   );
                   return (
-                    <li
+                    <motion.li
                       key={ci.id}
-                      className="flex flex-col gap-3 rounded-2xl border border-stone-200 bg-white p-3 sm:flex-row sm:items-center sm:p-4"
+                      initial={reduce ? false : { opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={
+                        reduce
+                          ? { opacity: 0 }
+                          : { opacity: 0, x: 32, scale: 0.98 }
+                      }
+                      transition={
+                        reduce
+                          ? { duration: 0.15 }
+                          : { duration: 0.32, ease: EASE_OUT }
+                      }
+                      className="flex flex-col gap-3 rounded-2xl border border-white/70 bg-white/65 p-3 shadow-[0_4px_20px_rgba(28,25,23,0.05)] backdrop-blur-md sm:flex-row sm:items-center sm:p-4"
                     >
                       <Link
                         href={`/product/${ci.product.slug}`}
@@ -232,14 +277,15 @@ export default function CartPage() {
                             {busy === ci.id ? (
                               <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
                             ) : (
-                              <Trash2 className="h-4 w-4" aria-hidden />
+                              <AnimatedIcon name="trash" size={16} trigger="hover" fallback={Trash2} />
                             )}
                           </button>
                         </div>
                       </div>
-                    </li>
+                    </motion.li>
                   );
                 })}
+                </AnimatePresence>
               </ul>
 
               <Link
@@ -253,7 +299,7 @@ export default function CartPage() {
 
             {/* Summary — desktop card CTA; on mobile the sticky bar is the CTA */}
             <aside className="lg:sticky lg:top-20 lg:self-start">
-              <div className="rounded-2xl border border-stone-200 bg-white p-5">
+              <div className="rounded-2xl border border-white/70 bg-white/65 p-5 shadow-[0_6px_28px_rgba(28,25,23,0.07)] backdrop-blur-md">
                 <h2 className="flex items-center gap-2 text-base font-semibold text-stone-900">
                   <ShoppingBag className="h-4 w-4 text-emerald-700" aria-hidden />{" "}
                   Order Summary
@@ -306,7 +352,7 @@ export default function CartPage() {
           </div>
 
           {/* Sticky mobile checkout bar — sits above the bottom nav */}
-          <div className="fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] left-0 right-0 z-30 border-t border-stone-200 bg-white/95 px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] backdrop-blur lg:hidden">
+          <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] left-0 right-0 z-30 border-t border-white/60 bg-white/70 px-4 py-3 shadow-[0_-8px_32px_rgba(28,25,23,0.16)] backdrop-blur-2xl lg:hidden">
             <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
               <div>
                 <p className="text-[11px] text-stone-500">Total</p>

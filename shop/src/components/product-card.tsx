@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Plus, Check, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import { resolveProductImage } from "@/lib/config";
+import { AnimatedIcon } from "@/components/animated-icon";
 import type { ProductListItem } from "@/lib/types";
 
 interface ProductCardProps {
@@ -20,6 +21,7 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const [status, setStatus] = useState<"idle" | "loading" | "added">("idle");
   const [imgError, setImgError] = useState(false);
+  const [addSignal, setAddSignal] = useState(0);
   const outOfStock = product.stock <= 0;
   const discount =
     product.compareAtPrice && product.compareAtPrice > product.price
@@ -34,6 +36,7 @@ export function ProductCard({ product }: ProductCardProps) {
     e.stopPropagation();
     if (status === "loading" || outOfStock) return;
     setStatus("loading");
+    setAddSignal((s) => s + 1);
     try {
       const res = await fetch("/api/cart", {
         method: "POST",
@@ -60,22 +63,22 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <Link
       href={`/product/${product.slug}`}
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/70 bg-white/65 shadow-[0_4px_20px_rgba(28,25,23,0.05)] backdrop-blur-md transition-[transform,box-shadow,background-color,border-color] duration-200 hover:-translate-y-0.5 hover:border-white/90 hover:bg-white/85 hover:shadow-[0_14px_36px_rgba(28,25,23,0.12)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none"
     >
-      {/* Real product photo — consistent square ratio, no zoom gimmicks */}
-      <div className="relative aspect-square w-full overflow-hidden bg-stone-50">
+      {/* Real product photo — consistent square ratio; gentle zoom on hover */}
+      <div className="relative aspect-square w-full overflow-hidden bg-stone-100">
         <img
           src={image}
           alt={product.name}
           loading="lazy"
           decoding="async"
           onError={() => setImgError(true)}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
         />
 
-        {/* Discount badge — functional (retail convention) */}
+        {/* Discount badge — frosted glass over the photo */}
         {discount > 0 && (
-          <span className="absolute left-2 top-2 rounded-md bg-rose-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+          <span className="absolute left-2 top-2 rounded-full bg-rose-600/90 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm backdrop-blur-sm">
             {discount}% off
           </span>
         )}
@@ -121,23 +124,30 @@ export function ProductCard({ product }: ProductCardProps) {
             disabled={outOfStock}
             aria-label={`Add ${product.name} to cart`}
             className={cn(
-              "inline-flex h-10 min-w-[72px] items-center justify-center gap-1 rounded-xl px-3 text-xs font-bold transition-colors",
+              "inline-flex h-10 min-w-[72px] items-center justify-center gap-1 rounded-full px-3.5 text-xs font-bold shadow-sm transition-[background-color,transform] duration-150 active:scale-[0.96] motion-reduce:active:scale-100",
               outOfStock
-                ? "cursor-not-allowed bg-stone-100 text-stone-400"
+                ? "cursor-not-allowed bg-stone-200/80 text-stone-400"
                 : status === "added"
-                  ? "bg-emerald-700 text-white"
-                  : "bg-emerald-50 text-emerald-800 hover:bg-emerald-100",
+                  ? "bg-emerald-600 text-white"
+                  : "bg-emerald-800 text-white hover:bg-emerald-900",
             )}
           >
             {status === "loading" ? (
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
             ) : status === "added" ? (
               <>
-                <Check className="h-4 w-4" aria-hidden /> Added
+                <AnimatedIcon name="check-white" size={14} trigger="once" />{" "}
+                Added
               </>
             ) : (
               <>
-                <Plus className="h-4 w-4" aria-hidden /> Add
+                <AnimatedIcon
+                  name="plus"
+                  size={14}
+                  trigger="hover"
+                  playSignal={addSignal}
+                />
+                Add
               </>
             )}
           </button>

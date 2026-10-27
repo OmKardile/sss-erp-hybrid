@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { History } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
+import { AnimatedIcon } from "@/components/animated-icon";
 import { getRecentlyViewedSnapshot } from "@/lib/recently-viewed";
 import type { ProductListItem } from "@/lib/types";
 
@@ -44,7 +45,13 @@ export function RecentlyViewed({
       <div className="mb-3 flex items-end justify-between">
         <div>
           <h2 className="font-display flex items-center gap-2 text-xl font-semibold text-stone-900 sm:text-2xl">
-            <History className="h-5 w-5 text-stone-400" aria-hidden />
+            <AnimatedIcon
+              name="clock"
+              size={18}
+              trigger="hover"
+              fallback={History}
+              className="text-stone-400"
+            />
             Recently viewed
           </h2>
           <p className="mt-0.5 text-xs text-stone-500">

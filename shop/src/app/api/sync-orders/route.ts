@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { dbErrorResponse } from "@/lib/api-error";
 
 export const dynamic = "force-dynamic";
 
@@ -17,8 +18,11 @@ export async function POST() {
 
     if (!erpSyncUrl || !syncToken) {
       return NextResponse.json(
-        { error: "ERP_API_URL or ERP_SYNC_TOKEN not configured" },
-        { status: 500 }
+        {
+          error: "ERP_API_URL or ERP_SYNC_TOKEN not configured",
+          code: "ERP_ENV_MISSING",
+        },
+        { status: 503 },
       );
     }
 
@@ -85,9 +89,6 @@ export async function POST() {
       errors: result.errors,
     });
   } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Sync failed" },
-      { status: 500 }
-    );
+    return dbErrorResponse("sync-orders POST", err);
   }
 }

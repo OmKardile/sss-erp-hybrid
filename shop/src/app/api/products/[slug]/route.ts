@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { dbErrorResponse } from "@/lib/api-error";
 import { averageRating } from "@/lib/utils";
 import type { ProductDetail, ProductListItem } from "@/lib/types";
 
@@ -52,11 +53,7 @@ export async function GET(
       );
     }
     return NextResponse.json({ product: mapDetail(product) });
-  } catch (err: any) {
-    console.error("[product GET]", err);
-    return NextResponse.json(
-      { error: "Failed to load product", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("product GET", err);
   }
 }

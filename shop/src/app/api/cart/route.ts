@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { dbErrorResponse } from "@/lib/api-error";
 import { ensureCartSessionId } from "@/lib/session";
 import { DELIVERY_FEE, FREE_DELIVERY_THRESHOLD } from "@/lib/config";
 import type { CartItemView, CartTotals } from "@/lib/types";
@@ -48,12 +49,8 @@ export async function GET() {
     });
     const totals = computeTotals(items);
     return NextResponse.json(totals);
-  } catch (err: any) {
-    console.error("[cart GET]", err);
-    return NextResponse.json(
-      { error: "Failed to load cart", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("cart GET", err);
   }
 }
 
@@ -108,12 +105,8 @@ export async function POST(req: NextRequest) {
     });
     const totals = computeTotals(items);
     return NextResponse.json({ ok: true, item: cartItem, ...totals });
-  } catch (err: any) {
-    console.error("[cart POST]", err);
-    return NextResponse.json(
-      { error: "Failed to add to cart", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("cart POST", err);
   }
 }
 
@@ -150,12 +143,8 @@ export async function PATCH(req: NextRequest) {
     });
     const totals = computeTotals(items);
     return NextResponse.json({ ok: true, ...totals });
-  } catch (err: any) {
-    console.error("[cart PATCH]", err);
-    return NextResponse.json(
-      { error: "Failed to update cart", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("cart PATCH", err);
   }
 }
 
@@ -187,11 +176,7 @@ export async function DELETE(req: NextRequest) {
     });
     const totals = computeTotals(items);
     return NextResponse.json({ ok: true, ...totals });
-  } catch (err: any) {
-    console.error("[cart DELETE]", err);
-    return NextResponse.json(
-      { error: "Failed to remove item", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("cart DELETE", err);
   }
 }

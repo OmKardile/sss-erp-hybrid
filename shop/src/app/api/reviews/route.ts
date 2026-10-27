@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { dbErrorResponse } from "@/lib/api-error";
 
 export const dynamic = "force-dynamic";
 
@@ -29,11 +30,7 @@ export async function POST(req: NextRequest) {
       data: { productId: product.id, customerName, rating, comment },
     });
     return NextResponse.json({ review }, { status: 201 });
-  } catch (err: any) {
-    console.error("[reviews POST]", err);
-    return NextResponse.json(
-      { error: "Failed to add review", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("reviews POST", err);
   }
 }

@@ -1,0 +1,139 @@
+{
+  "cart": {
+    "id": "uisoczqi",
+    "url": "https://cdn.lordicon.com/uisoczqi.json",
+    "description": "Shopping trolley/cart: basket and handle draw in with stroke animation, teal-accented wheels; subtle bounce. Lordicon 'wired' outline family.",
+    "colors": [
+      "#121331",
+      "#08a88a",
+      "#ffff00",
+      "#000000"
+    ],
+    "sizeBytes": 17879
+  },
+  "search": {
+    "id": "wjyqkiew",
+    "url": "https://cdn.lordicon.com/wjyqkiew.json",
+    "description": "Magnifying glass zooming/searching: lens and handle draw in, glass rim in teal with motion. Lordicon 'wired' outline family.",
+    "colors": [
+      "#000000",
+      "#121331",
+      "#08a88a",
+      "#ffff00",
+      "#e3e300"
+    ],
+    "sizeBytes": 62297
+  },
+  "home": {
+    "id": "jeuxydnh",
+    "url": "https://cdn.lordicon.com/jeuxydnh.json",
+    "description": "House with roof, door and window; outlines draw in, teal accents on door/window details. Lordicon 'wired' outline family.",
+    "colors": [
+      "#000000",
+      "#121331",
+      "#08a88a",
+      "#ff0000"
+    ],
+    "sizeBytes": 183851
+  },
+  "grid": {
+    "id": "blvehchq",
+    "url": "https://cdn.lordicon.com/blvehchq.json",
+    "description": "Grid of rectangular tiles (page-view array) with teal accent lines - category-tiles metaphor. Lordicon 'wired' outline family.",
+    "colors": [
+      "#121331",
+      "#08a88a",
+      "#000000"
+    ],
+    "sizeBytes": 17764
+  },
+  "plus": {
+    "id": "vjgknpfx",
+    "url": "https://cdn.lordicon.com/vjgknpfx.json",
+    "description": "Plus sign inside a circle that morphs between + and x (add/remove toggle), teal symbol on navy circle. Lordicon 'wired' outline family.",
+    "colors": [
+      "#000000",
+      "#08a88a",
+      "#121331",
+      "#ffffff"
+    ],
+    "sizeBytes": 31242
+  },
+  "check": {
+    "id": "lvrxlmju",
+    "url": "https://cdn.lordicon.com/lvrxlmju.json",
+    "description": "Checkmark that draws itself (approve-checked), clean single-stroke line in navy. Lordicon 'wired' outline family.",
+    "colors": [
+      "#121331",
+      "#000000"
+    ],
+    "sizeBytes": 14610
+  },
+  "fire": {
+    "id": "puebsmel",
+    "url": "https://cdn.lordicon.com/puebsmel.json",
+    "description": "Bonfire: flickering flame above two crossed logs, yellow flame accents on navy outline. Lordicon 'wired' outline family.",
+    "colors": [
+      "#121331",
+      "#ffff00",
+      "#08a88a",
+      "#ffffff",
+      "#ff0000"
+    ],
+    "sizeBytes": 53979
+  },
+  "truck": {
+    "id": "byupthur",
+    "url": "https://cdn.lordicon.com/byupthur.json",
+    "description": "Delivery truck (box truck side profile) with teal wheels and yellow chassis detail; drives with slight motion. Lordicon 'wired' outline family.",
+    "colors": [
+      "#08a88a",
+      "#121331",
+      "#ffff00",
+      "#000000"
+    ],
+    "sizeBytes": 41277
+  },
+  "clock": {
+    "id": "warimioc",
+    "url": "https://cdn.lordicon.com/warimioc.json",
+    "description": "Clock face with moving hour/minute hands, green + teal hands on navy outline. Lordicon 'wired' outline family.",
+    "colors": [
+      "#2ebf00",
+      "#08a88a",
+      "#121331",
+      "#ffffff",
+      "#000000"
+    ],
+    "sizeBytes": 20789
+  },
+  "sparkle": {
+    "id": "vgwutnhw",
+    "url": "https://cdn.lordicon.com/vgwutnhw.json",
+    "description": "Shooting stars / sparkles: colorful star bursts with motion trails (black, yellow, red, green accents) - festive. Lordicon 'wired' outline family.",
+    "colors": [
+      "#000000",
+      "#ffff00",
+      "#ff0000",
+      "#00ff00",
+      "#121331"
+    ],
+    "sizeBytes": 141094
+  },
+  "trash": {
+    "id": "jzinekkv",
+    "url": "https://cdn.lordicon.com/jzinekkv.json",
+    "description": "Trash bin with lid and vertical slats, teal lid rim, red accents; lid animates. Lordicon 'wired' outline family.",
+    "colors": [
+      "#08a88a",
+      "#121331",
+      "#ffffff",
+      "#ff0000",
+      "#ffff00"
+    ],
+    "sizeBytes": 41236
+  },
+  "_source": "Lordicon free 'wired' (outline) animated icon family - https://lordicon.com/icons",
+  "_license": "Lordicon Free license: CC BY-ND 4.0 (Attribution-NoDerivatives) with modifications - commercial use allowed, author attribution (credit to Lordicon) required, no attribution-free redistribution of modified icons; 1M CDN request cap applies only to their Embed HTML player (we self-host the JSON). See https://lordicon.com/licenses",
+  "_verification": "All 11 icons rendered via lottie-web (svg) in a local preview grid and passed VLM semantic + color verification on 2026-10-26."
+}

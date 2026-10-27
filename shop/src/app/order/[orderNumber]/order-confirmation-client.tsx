@@ -20,6 +20,7 @@ import {
   StickyNote,
 } from "lucide-react";
 import { Button } from "@/components/ui-button";
+import { AnimatedIcon } from "@/components/animated-icon";
 import { formatCurrency, estimatedDeliveryDate } from "@/lib/utils";
 import { STORE_CONFIG } from "@/lib/config";
 import type { OrderView } from "@/lib/types";
@@ -51,7 +52,13 @@ export function OrderConfirmationClient({ order }: Props) {
       {/* Success header */}
       <div className="relative flex flex-col items-center text-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg">
-          <CheckCircle2 className="h-11 w-11" strokeWidth={2.5} />
+          <AnimatedIcon
+            name="check-white"
+            size={44}
+            trigger="once"
+            speed={0.8}
+            fallback={CheckCircle2}
+          />
         </div>
 
         <h1 className="mt-5 text-3xl font-extrabold text-slate-900 sm:text-4xl">
@@ -85,8 +92,14 @@ export function OrderConfirmationClient({ order }: Props) {
       {/* Estimated delivery — track your order */}
       <div className="mt-8 overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 p-0.5 shadow-md">
         <div className="flex items-center gap-4 rounded-[15px] bg-white p-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-inner">
-            <Truck className="h-7 w-7" />
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-emerald-50 ring-1 ring-emerald-100">
+            <AnimatedIcon
+              name="truck"
+              size={30}
+              trigger="loop"
+              speed={0.5}
+              fallback={Truck}
+            />
           </div>
           <div className="flex-1 text-left">
             <p className="text-sm font-bold text-slate-900">
@@ -114,7 +127,7 @@ export function OrderConfirmationClient({ order }: Props) {
       {/* Order details */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         {/* Items */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:col-span-2">
+        <div className="rounded-2xl border border-white/70 bg-white/65 p-5 shadow-[0_6px_28px_rgba(28,25,23,0.07)] backdrop-blur-md sm:col-span-2">
           <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900">
             <Package className="h-4 w-4 text-emerald-600" /> Items in your
             order
@@ -185,7 +198,7 @@ export function OrderConfirmationClient({ order }: Props) {
         </div>
 
         {/* Delivery address */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-white/70 bg-white/65 p-5 shadow-[0_6px_28px_rgba(28,25,23,0.07)] backdrop-blur-md">
           <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900">
             <MapPin className="h-4 w-4 text-rose-500" /> Delivery address
           </h2>
@@ -204,7 +217,7 @@ export function OrderConfirmationClient({ order }: Props) {
         </div>
 
         {/* Payment */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="rounded-2xl border border-white/70 bg-white/65 p-5 shadow-[0_6px_28px_rgba(28,25,23,0.07)] backdrop-blur-md">
           <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900">
             {order.paymentMethod === "UPI" ? (
               <Smartphone className="h-4 w-4 text-blue-500" />
@@ -242,7 +255,7 @@ export function OrderConfirmationClient({ order }: Props) {
       </div>
 
       {order.notes && (
-        <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="mt-4 rounded-2xl border border-white/70 bg-white/65 p-5 shadow-[0_6px_28px_rgba(28,25,23,0.07)] backdrop-blur-md">
           <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900">
             <StickyNote className="h-4 w-4 text-emerald-600" aria-hidden /> Order
             notes

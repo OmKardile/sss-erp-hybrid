@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { dbErrorResponse } from "@/lib/api-error";
 import { formatDate } from "@/lib/utils";
 import type { OrderView } from "@/lib/types";
 
@@ -52,11 +53,7 @@ export async function GET(
       );
     }
     return NextResponse.json({ order: mapOrder(order) });
-  } catch (err: any) {
-    console.error("[order GET]", err);
-    return NextResponse.json(
-      { error: "Failed to load order", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("order GET", err);
   }
 }

@@ -133,6 +133,17 @@ The ERP syncs its product catalogue to the e-commerce DB (via API or scheduled j
 
 Recommendation: Deploy ERP on **Render** (Web Service), E-Commerce on **Vercel** for best of both.
 
+## Storefront (`shop/`) — Vercel
+
+The storefront deploys from this repo with **Root Directory = `shop/`**.
+
+1. Import the repo in Vercel; set Root Directory to `shop/`.
+2. Set the environment variables listed in `shop/README.md` (the critical ones: `SHOP_DATABASE_URL` on the **6543 transaction pooler** with `?pgbouncer=true&connection_limit=1`, `SHOP_DIRECT_URL` on 5432, `ERP_SYNC_TOKEN`, `NEXT_PUBLIC_STORE_*`).
+3. Deploy, then verify: `curl https://<your-shop>.vercel.app/api/health` → `{"ok":true,"db":{"connected":true}}`.
+4. If APIs return `503 DB_ENV_MISSING`, the env vars were not set (or not redeployed after setting them) — the response body names the exact fix.
+
+Without the env vars, every DB-backed API fails with actionable 503s (never opaque 500s) and the storefront shows the fix hint on the home page.
+
 ---
 
 <sub>Designed & developed by [Omkar Kardile](https://omkardile.is-a.dev/)</sub>

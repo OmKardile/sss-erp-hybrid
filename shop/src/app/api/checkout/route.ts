@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { dbErrorResponse } from "@/lib/api-error";
 import { ensureCartSessionId } from "@/lib/session";
 import { generateOrderNumber } from "@/lib/utils";
 import { validateCoupon, computeTotals } from "@/lib/coupons";
@@ -136,11 +137,7 @@ export async function POST(req: NextRequest) {
     await db.cartItem.deleteMany({ where: { sessionId } });
 
     return NextResponse.json({ order: mapOrder(order) }, { status: 201 });
-  } catch (err: any) {
-    console.error("[checkout POST]", err);
-    return NextResponse.json(
-      { error: "Failed to place order", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("checkout POST", err);
   }
 }

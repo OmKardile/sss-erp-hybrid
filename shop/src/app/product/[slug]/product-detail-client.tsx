@@ -131,7 +131,7 @@ export function ProductDetailClient({ product, related }: Props) {
       <div className="grid gap-6 lg:grid-cols-2 lg:gap-10">
         {/* Real product photo — 4/3 on mobile keeps the buy box above the
             sticky CTA's pin line at first paint; square on desktop */}
-        <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-md lg:aspect-square">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-white/80 bg-slate-50 shadow-[0_12px_36px_rgba(28,25,23,0.14)] lg:aspect-square">
           <img
             src={image}
             alt={product.name}
@@ -232,7 +232,7 @@ export function ProductDetailClient({ product, related }: Props) {
 
           {/* Quantity + actions — sticks above the bottom nav on mobile so
               the primary CTA is never hidden behind it (cart-page pattern) */}
-          <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] z-30 mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-stone-200 bg-white/95 p-2 shadow-[0_4px_16px_rgba(0,0,0,0.08)] backdrop-blur lg:static lg:z-auto lg:mt-6 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-none">
+          <div className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] z-30 mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-white/70 bg-white/70 p-2 shadow-[0_12px_36px_rgba(28,25,23,0.16)] backdrop-blur-2xl lg:static lg:z-auto lg:mt-6 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none lg:backdrop-blur-none">
             <QuantityStepper
               value={qty}
               min={1}
@@ -313,7 +313,7 @@ export function ProductDetailClient({ product, related }: Props) {
 
         <div className="mt-4 grid gap-6 lg:grid-cols-3">
           {/* Rating summary */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="rounded-2xl border border-white/70 bg-white/65 p-5 shadow-[0_6px_28px_rgba(28,25,23,0.07)] backdrop-blur-md">
             <p className="text-4xl font-bold text-slate-900">
               {product.avgRating.toFixed(1)}
             </p>
@@ -341,7 +341,7 @@ export function ProductDetailClient({ product, related }: Props) {
                 {product.reviews.map((r) => (
                   <li
                     key={r.id}
-                    className="rounded-2xl border border-slate-200 bg-white p-4"
+                    className="rounded-2xl border border-white/70 bg-white/65 p-4 shadow-[0_4px_20px_rgba(28,25,23,0.05)] backdrop-blur-md"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">

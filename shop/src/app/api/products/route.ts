@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { dbErrorResponse } from "@/lib/api-error";
 import { generateSlug } from "@/lib/utils";
 import type { ProductListItem } from "@/lib/types";
 
@@ -58,12 +59,8 @@ export async function GET(req: NextRequest) {
         new Set(products.map((p) => p.category).filter(Boolean) as string[]),
       ),
     });
-  } catch (err: any) {
-    console.error("[products GET]", err);
-    return NextResponse.json(
-      { error: "Failed to load products", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("products GET", err);
   }
 }
 
@@ -96,11 +93,7 @@ export async function POST(req: NextRequest) {
       },
     });
     return NextResponse.json({ product: mapProduct(product) }, { status: 201 });
-  } catch (err: any) {
-    console.error("[products POST]", err);
-    return NextResponse.json(
-      { error: "Failed to create product", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("products POST", err);
   }
 }

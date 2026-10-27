@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { dbErrorResponse } from "@/lib/api-error";
 import type { OrderView } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -52,11 +53,7 @@ export async function GET(req: NextRequest) {
       orders: orders.map(mapOrder),
       count: orders.length,
     });
-  } catch (err: any) {
-    console.error("[orders GET]", err);
-    return NextResponse.json(
-      { error: "Failed to load orders", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("orders GET", err);
   }
 }

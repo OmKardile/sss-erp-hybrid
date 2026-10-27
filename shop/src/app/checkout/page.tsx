@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui-button";
 import { Toast } from "@/components/toast";
+import { AnimatedIcon } from "@/components/animated-icon";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
   STORE_CONFIG,
@@ -187,7 +188,14 @@ export default function CheckoutPage() {
       {items.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-emerald-100 bg-emerald-50/40 px-6 py-20 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm">
-            <ShoppingCart className="h-8 w-8 text-emerald-500" />
+            <AnimatedIcon
+              name="cart"
+              size={36}
+              trigger="loop"
+              speed={0.6}
+              fallback={ShoppingCart}
+              className="text-emerald-500"
+            />
           </div>
           <h2 className="mt-4 text-lg font-bold text-slate-900">
             Your cart is empty
@@ -208,7 +216,7 @@ export default function CheckoutPage() {
           {/* Form */}
           <div className="space-y-6 lg:col-span-2">
             {/* Coupon — festive + store offers */}
-            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <section className="overflow-hidden rounded-2xl border border-white/70 bg-white/65 shadow-[0_4px_20px_rgba(28,25,23,0.05)] backdrop-blur-md">
               <div className="flex items-center gap-2 bg-emerald-800 px-5 py-3 text-white">
                 <TicketPercent className="h-4 w-4" aria-hidden />
                 <h2 className="text-sm font-bold">Coupon &amp; Offers</h2>
@@ -217,7 +225,8 @@ export default function CheckoutPage() {
                 {coupon?.ok ? (
                   <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
                     <div>
-                      <p className="text-sm font-bold text-emerald-900">
+                      <p className="flex items-center gap-1.5 text-sm font-bold text-emerald-900">
+                        <AnimatedIcon name="check" size={14} trigger="once" />
                         {coupon.coupon?.code} applied
                       </p>
                       <p className="text-xs text-emerald-700">{couponMsg}</p>
@@ -271,7 +280,7 @@ export default function CheckoutPage() {
             </section>
 
             {/* Delivery details */}
-            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <section className="overflow-hidden rounded-2xl border border-white/70 bg-white/65 shadow-[0_4px_20px_rgba(28,25,23,0.05)] backdrop-blur-md">
               <div className="flex items-center gap-2 bg-emerald-800 px-5 py-3 text-white">
                 <MapPin className="h-4 w-4" />
                 <h2 className="text-sm font-bold">Delivery Details</h2>
@@ -345,7 +354,7 @@ export default function CheckoutPage() {
             </section>
 
             {/* Payment */}
-            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <section className="overflow-hidden rounded-2xl border border-white/70 bg-white/65 shadow-[0_4px_20px_rgba(28,25,23,0.05)] backdrop-blur-md">
               <div className="flex items-center gap-2 bg-emerald-800 px-5 py-3 text-white">
                 <Banknote className="h-4 w-4" />
                 <h2 className="text-sm font-bold">Payment Method</h2>
@@ -422,7 +431,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {paymentMethod === "UPI" && (
-                  <div className="mt-4 flex flex-col items-center gap-4 rounded-2xl bg-stone-50 p-5 sm:flex-row">
+                  <div className="mt-4 flex flex-col items-center gap-4 rounded-2xl border border-white/60 bg-white/50 p-5 backdrop-blur-md sm:flex-row">
                     <div className="flex h-32 w-32 shrink-0 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-stone-300 bg-white">
                       <QrCode className="h-16 w-16 text-slate-700" />
                       <p className="mt-1 text-[10px] text-slate-400">
@@ -453,7 +462,7 @@ export default function CheckoutPage() {
 
           {/* Summary */}
           <aside className="lg:sticky lg:top-20 lg:self-start">
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="overflow-hidden rounded-2xl border border-white/70 bg-white/65 shadow-[0_4px_20px_rgba(28,25,23,0.05)] backdrop-blur-md">
               <div className="flex items-center gap-2 bg-emerald-800 px-5 py-3 text-white">
                 <Truck className="h-4 w-4" />
                 <h2 className="text-sm font-bold">Order Summary</h2>
@@ -557,7 +566,7 @@ export default function CheckoutPage() {
 
         {/* Sticky mobile place-order bar — sits above the bottom nav
             (same pattern as the cart page) */}
-        <div className="fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom,0px))] left-0 right-0 z-30 border-t border-stone-200 bg-white/95 px-4 py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] backdrop-blur lg:hidden">
+        <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] left-0 right-0 z-30 border-t border-white/60 bg-white/70 px-4 py-3 shadow-[0_-8px_32px_rgba(28,25,23,0.16)] backdrop-blur-2xl lg:hidden">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
             <div>
               <p className="text-[11px] text-stone-500">Total</p>

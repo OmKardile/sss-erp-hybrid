@@ -2,18 +2,18 @@
   "version": 1,
   "note": "Written by the auto-improver service (mini-services/improver). deal.slug pins the Deal of the Day; featured slugs mirror the last merchandising pass (the DB isFeatured flags are the real source for the storefront rail).",
   "deal": {
-    "slug": "basmati-rice-5kg",
-    "reason": "Diwali cooking essentials with festive discounts",
-    "setAt": "2026-10-26T06:07:54.496Z",
+    "slug": "fortune-sunflower-refined-oil",
+    "reason": "Diwali cooking essentials with high discount",
+    "setAt": "2026-10-26T06:22:52.714Z",
     "setBy": "auto-improver"
   },
   "featured": [
     "aashirvaad-atta-whole-wheat",
+    "basmati-rice-5kg",
     "dabur-honey-250g",
-    "britannia-marie-gold",
     "coca-cola-pet-bottle",
-    "onion-loose",
-    "banana-robusta"
+    "britannia-marie-gold",
+    "amul-gold-milk-500ml"
   ],
-  "updatedAt": "2026-10-26T06:07:54.496Z"
+  "updatedAt": "2026-10-26T06:22:52.714Z"
 }

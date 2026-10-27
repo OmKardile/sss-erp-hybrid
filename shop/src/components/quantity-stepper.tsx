@@ -1,6 +1,8 @@
 "use client";
 
-import { Minus, Plus } from "lucide-react";
+import { useState } from "react";
+import { Minus } from "lucide-react";
+import { AnimatedIcon } from "@/components/animated-icon";
 import { cn } from "@/lib/utils";
 
 interface QuantityStepperProps {
@@ -23,9 +25,13 @@ export function QuantityStepper({
   const btn =
     size === "sm" ? "h-7 w-7" : "h-9 w-9";
   const txt = size === "sm" ? "text-xs w-7" : "text-sm w-10";
+  const [plusSignal, setPlusSignal] = useState(0);
 
   const dec = () => onChange(Math.max(min, value - 1));
-  const inc = () => onChange(Math.min(max, value + 1));
+  const inc = () => {
+    setPlusSignal((s) => s + 1);
+    onChange(Math.min(max, value + 1));
+  };
 
   return (
     <div
@@ -61,7 +67,12 @@ export function QuantityStepper({
           btn,
         )}
       >
-        <Plus className="h-3.5 w-3.5" />
+        <AnimatedIcon
+          name="plus"
+          size={size === "sm" ? 14 : 16}
+          trigger="hover"
+          playSignal={plusSignal}
+        />
       </button>
     </div>
   );

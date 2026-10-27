@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { dbErrorResponse } from "@/lib/api-error";
 
 /**
  * Merchandising endpoint for the auto-improver service.
@@ -39,11 +40,8 @@ export async function GET(req: NextRequest) {
       featured: products.filter((p) => p.isFeatured).map((p) => p.slug),
       total: products.length,
     });
-  } catch (err: any) {
-    return NextResponse.json(
-      { error: "Failed to read merchandising", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("merch GET", err);
   }
 }
 
@@ -95,10 +93,7 @@ export async function POST(req: NextRequest) {
       featuredApplied: featuredSlugs,
       deal,
     });
-  } catch (err: any) {
-    return NextResponse.json(
-      { error: "Failed to apply merchandising", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("merch GET", err);
   }
 }

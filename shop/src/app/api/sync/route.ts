@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { dbErrorResponse } from "@/lib/api-error";
 import { generateSlug } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -118,12 +119,8 @@ export async function POST(req: NextRequest) {
       updated,
       errors,
     });
-  } catch (err: any) {
-    console.error("[sync POST]", err);
-    return NextResponse.json(
-      { error: "Sync failed", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("sync POST", err);
   }
 }
 
@@ -136,10 +133,7 @@ export async function GET() {
       where: { isFeatured: true, isActive: true },
     });
     return NextResponse.json({ total, active, featured });
-  } catch (err: any) {
-    return NextResponse.json(
-      { error: "Failed to read sync status", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("sync GET", err);
   }
 }

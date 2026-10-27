@@ -18,8 +18,8 @@ This directory contains the SQL migration for the ERP database.
 ## Environment Variables (for Vercel)
 
 ```
-DATABASE_URL=postgresql://postgres.mslhrgxicvnqddwkdzwv:SFQAh7VkJWG0ZIyO@aws-0-ap-south-1.pooler.supabase.com:5432/postgres
-DIRECT_URL=postgresql://postgres.mslhrgxicvnqddwkdzwv:SFQAh7VkJWG0ZIyO@aws-0-ap-south-1.pooler.supabase.com:5432/postgres
+DATABASE_URL=postgresql://postgres.mslhrgxicvnqddwkdzwv:[YOUR-PASSWORD]@aws-0-ap-south-1.pooler.supabase.com:5432/postgres
+DIRECT_URL=postgresql://postgres.mslhrgxicvnqddwkdzwv:[YOUR-PASSWORD]@aws-0-ap-south-1.pooler.supabase.com:5432/postgres
 NEXT_PUBLIC_SUPABASE_URL=https://mslhrgxicvnqddwkdzwv.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_FFf0V4iWbjtS11AyHi0SwA_724isZwM
 ```

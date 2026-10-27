@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ShoppingCart } from "lucide-react";
+import { AnimatedIcon } from "@/components/animated-icon";
 
 export function CartButton() {
   const [count, setCount] = useState(0);
@@ -34,7 +34,12 @@ export function CartButton() {
       href="/cart"
       className="relative inline-flex h-11 items-center justify-center gap-2 rounded-full bg-emerald-600 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
     >
-      <ShoppingCart className="h-5 w-5" />
+      <AnimatedIcon
+        name="cart-light"
+        size={20}
+        trigger="hover"
+        playOnEvent="sss:cart-changed"
+      />
       <span>Cart</span>
       {count > 0 && (
         <span className="ml-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-emerald-700">

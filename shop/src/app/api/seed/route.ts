@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { dbErrorResponse } from "@/lib/api-error";
 import { generateSlug } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -265,11 +266,7 @@ export async function POST(req: NextRequest) {
       updated,
       total: await db.shopProduct.count(),
     });
-  } catch (err: any) {
-    console.error("[seed POST]", err);
-    return NextResponse.json(
-      { error: "Seed failed", detail: err?.message },
-      { status: 500 },
-    );
+  } catch (err) {
+    return dbErrorResponse("seed POST", err);
   }
 }

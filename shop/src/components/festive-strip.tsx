@@ -2,6 +2,7 @@
 
 import { Flame, Sparkles, Star, Heart, Moon, Flag, Gift, TicketPercent } from "lucide-react";
 import { useActiveTheme } from "@/lib/use-active-theme";
+import { AnimatedIcon } from "@/components/animated-icon";
 
 const STRIP_ICONS = {
   flame: Flame,
@@ -18,14 +19,14 @@ const STRIP_ICONS = {
  * the way quick-commerce apps (Blinkit/Zepto) surface festival offers.
  *
  * Snapshot-based: nothing on the server, the strip appears post-hydration
- * when a festival window is active. Static — no animation.
+ * when a festival window is active. Animated sparkle (reduced-motion safe).
  */
 export function FestiveStrip() {
   const theme = useActiveTheme();
 
   if (!theme) return null;
 
-  const Icon = STRIP_ICONS[theme.stripIcon] ?? Flame;
+  const FallbackIcon = STRIP_ICONS[theme.stripIcon] ?? Star;
 
   return (
     <section
@@ -34,11 +35,17 @@ export function FestiveStrip() {
     >
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-2 text-center sm:px-6 lg:px-8">
         <span className="inline-flex items-center gap-1.5 text-xs font-semibold sm:text-sm">
-          <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          <AnimatedIcon
+            name="sparkle"
+            size={14}
+            trigger="loop"
+            speed={0.7}
+            fallback={FallbackIcon}
+          />
           {theme.greeting}
         </span>
         {theme.coupon && (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-current/25 bg-black/10 px-2.5 py-0.5 text-[11px] font-semibold tracking-wide">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/15 px-2.5 py-0.5 text-[11px] font-semibold tracking-wide backdrop-blur-md">
             <TicketPercent className="h-3 w-3 shrink-0" aria-hidden />
             Use code {theme.coupon.code}
           </span>

@@ -2,17 +2,21 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Truck,
-  Loader2,
   ChevronRight,
   PackageSearch,
   Clock,
   BadgeCheck,
+  Star,
 } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { DealOfDay } from "@/components/deal-of-day";
 import { RecentlyViewed } from "@/components/recently-viewed";
+import { Reveal, EASE_OUT } from "@/components/reveal";
+import { ProductGridSkeleton } from "@/components/product-grid-skeleton";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import {
   DEFAULT_CATEGORIES,
   STORE_CONFIG,
@@ -38,6 +42,7 @@ export default function HomePage() {
   const [seeded, setSeeded] = useState(false);
   // Festive theme is date-derived and client-only (hydration-safe snapshot).
   const theme = useActiveTheme();
+  const reduceMotion = useReducedMotion();
 
   // Read query params on mount (search bar submits ?q=...)
   useEffect(() => {
@@ -56,7 +61,18 @@ export default function HomePage() {
       try {
         setLoading(true);
         const res = await fetch("/api/products", { cache: "no-store" });
-        if (!res.ok) throw new Error("Failed to load");
+        if (!res.ok) {
+          // Surface actionable deployment errors (DB not configured etc.)
+          let msg = "Failed to load products";
+          try {
+            const body = await res.json();
+            if (body?.hint) msg = body.hint;
+            else if (body?.error) msg = body.error;
+          } catch {
+            /* not JSON */
+          }
+          throw new Error(msg);
+        }
         const data = await res.json();
         if (!mounted) return;
         setProducts(data.items || []);
@@ -75,9 +91,10 @@ export default function HomePage() {
     };
   }, []);
 
-  // Auto-seed if no products found (idempotent on the server)
+  // Auto-seed only when the DB works but the store is genuinely empty
+  // (never when products failed to load — that just piles on 500s).
   useEffect(() => {
-    if (!loading && products.length === 0 && !seeded) {
+    if (!loading && !error && products.length === 0 && !seeded) {
       setSeeded(true);
       (async () => {
         try {
@@ -155,11 +172,23 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/45 to-stone-950/10" />
 
         <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
-          <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300">
+          {/* Staggered entrance — kicker → headline → subline (mount, not
+              whileInView: the hero is already in view). */}
+          <motion.p
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300"
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: EASE_OUT }}
+          >
             <Clock className="h-3.5 w-3.5" aria-hidden />
             {theme ? theme.kicker : `${STORE_CONFIG.name} · Pune`}
-          </p>
-          <h1 className="font-display mt-2 max-w-md text-[2rem] font-semibold leading-[1.1] sm:text-4xl lg:text-5xl">
+          </motion.p>
+          <motion.h1
+            className="font-display mt-2 max-w-md text-[2rem] font-semibold leading-[1.1] sm:text-4xl lg:text-5xl"
+            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.08, ease: EASE_OUT }}
+          >
             {theme ? (
               theme.headline.split("\n").map((line, i) => (
                 <span key={i} className="block">
@@ -173,12 +202,38 @@ export default function HomePage() {
                 delivered fast.
               </>
             )}
-          </h1>
-          <p className="mt-2 max-w-sm text-sm text-stone-200 sm:text-base">
+          </motion.h1>
+          <motion.p
+            className="mt-2 max-w-sm text-sm text-stone-200 sm:text-base"
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.16, ease: EASE_OUT }}
+          >
             {theme
               ? theme.subline
               : "Your trusted local store — quality products, fair prices, COD & UPI accepted."}
-          </p>
+          </motion.p>
+
+          {/* Trust chips — frosted glass over the hero photo */}
+          <motion.div
+            className="mt-5 flex flex-wrap gap-2"
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.24, ease: EASE_OUT }}
+          >
+            <span className="glass-dark inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-white">
+              <Truck className="h-3.5 w-3.5 text-emerald-300" aria-hidden />
+              2-hour delivery
+            </span>
+            <span className="glass-dark inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-white">
+              <Star className="h-3.5 w-3.5 fill-amber-300 text-amber-300" aria-hidden />
+              4.8 · loved locally
+            </span>
+            <span className="glass-dark inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-white">
+              <BadgeCheck className="h-3.5 w-3.5 text-emerald-300" aria-hidden />
+              COD &amp; UPI
+            </span>
+          </motion.div>
         </div>
       </section>
 
@@ -188,101 +243,135 @@ export default function HomePage() {
         id="categories"
         className="mx-auto max-w-7xl scroll-mt-28 px-4 pt-6 sm:px-6 lg:px-8"
       >
-        <div className="mb-3 flex items-end justify-between">
-          <h2 className="font-display text-xl font-semibold text-stone-900 sm:text-2xl">
-            Shop by category
-          </h2>
-        </div>
-        <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 no-scrollbar sm:mx-0 sm:px-0">
-          {TILE_CATEGORIES.map((cat) => {
-            const img = CATEGORY_IMAGE[cat] ?? "/products/cat-groceries.jpg";
-            return (
-              <Link
-                key={cat}
-                href={`/?category=${encodeURIComponent(cat)}`}
-                onClick={() => setActiveCat(cat)}
-                className="group flex w-[84px] shrink-0 flex-col items-center gap-2 sm:w-24"
-              >
-                <span className="block h-[84px] w-[84px] overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 sm:h-24 sm:w-24">
-                  <img
-                    src={img}
-                    alt={cat}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-cover"
-                  />
-                </span>
-                <span className="line-clamp-2 text-center text-[11px] font-medium leading-tight text-stone-700">
-                  {cat}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
+        <Reveal>
+          <div className="mb-3 flex items-end justify-between">
+            <h2 className="font-display text-xl font-semibold text-stone-900 sm:text-2xl">
+              Shop by category
+            </h2>
+          </div>
+          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 no-scrollbar sm:mx-0 sm:px-0">
+            {TILE_CATEGORIES.map((cat) => {
+              const img = CATEGORY_IMAGE[cat] ?? "/products/cat-groceries.jpg";
+              return (
+                <Link
+                  key={cat}
+                  href={`/?category=${encodeURIComponent(cat)}`}
+                  onClick={() => setActiveCat(cat)}
+                  className="group flex w-[84px] shrink-0 flex-col items-center gap-2 sm:w-24"
+                >
+                  <span className="block h-[84px] w-[84px] overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 transition-[transform,box-shadow] duration-200 group-hover:-translate-y-1 group-hover:shadow-md group-hover:shadow-stone-900/10 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 sm:h-24 sm:w-24">
+                    <img
+                      src={img}
+                      alt={cat}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                    />
+                  </span>
+                  <span className="line-clamp-2 text-center text-[11px] font-medium leading-tight text-stone-700 transition-colors group-hover:text-emerald-800">
+                    {cat}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </Reveal>
       </section>
 
       {/* DEAL OF THE DAY — wide scannable card, rotates daily IST */}
-      <DealOfDay deal={deal} />
+      <Reveal className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
+        <DealOfDay deal={deal} />
+      </Reveal>
 
-      {/* PROMO — flat block, single accent, no gradient.
-          During a festive window it carries the festival coupon. */}
+      {/* PROMO — frosted glass over a deep emerald gradient; carries the
+          festival coupon during a festive window. */}
       <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-emerald-800 px-5 py-4 text-white">
-          <div>
-            <p className="font-display text-base font-semibold sm:text-lg">
-              {theme?.coupon
-                ? `${theme.festival} offer — code ${theme.coupon.code}`
-                : `Free delivery above ₹${FREE_DELIVERY_THRESHOLD}`}
-            </p>
-            <p className="mt-0.5 text-xs text-emerald-100">
-              {theme?.coupon
-                ? `${theme.coupon.text} · applies at checkout`
-                : "Stock up your kitchen — we bring it to your door."}
-            </p>
+        <Reveal>
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-700 via-emerald-800 to-emerald-950 px-5 py-5 text-white shadow-[0_16px_44px_rgba(6,78,59,0.28)] transition-shadow duration-300 hover:shadow-[0_20px_54px_rgba(6,78,59,0.36)] motion-reduce:transition-none sm:px-6">
+            {/* Glass orbs — light refracting through the card */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full bg-white/10 blur-3xl"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -bottom-20 right-28 h-44 w-44 rounded-full bg-emerald-400/20 blur-3xl"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent"
+            />
+            <div className="relative flex flex-wrap items-center justify-between gap-3">
+              <div>
+                {theme?.coupon ? (
+                  <p className="inline-flex flex-wrap items-center gap-2 font-display text-base font-semibold sm:text-lg">
+                    {theme.festival} offer
+                    <span className="inline-flex items-center rounded-full border border-white/25 bg-white/15 px-2.5 py-0.5 text-xs font-bold tracking-wider backdrop-blur">
+                      {theme.coupon.code}
+                    </span>
+                  </p>
+                ) : (
+                  <p className="font-display text-base font-semibold sm:text-lg">
+                    Free delivery above ₹{FREE_DELIVERY_THRESHOLD}
+                  </p>
+                )}
+                <p className="mt-0.5 text-xs text-emerald-100">
+                  {theme?.coupon
+                    ? `${theme.coupon.text} · applies at checkout`
+                    : "Stock up your kitchen — we bring it to your door."}
+                </p>
+              </div>
+              <a
+                href="#shop"
+                className="group inline-flex h-10 items-center gap-1 rounded-full bg-white px-5 text-xs font-bold text-emerald-900 shadow-md transition-shadow hover:shadow-lg"
+              >
+                Order now{" "}
+                <ChevronRight
+                  className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+                  aria-hidden
+                />
+              </a>
+            </div>
           </div>
-          <a
-            href="#shop"
-            className="inline-flex h-10 items-center gap-1 rounded-xl bg-white px-4 text-xs font-bold text-emerald-900"
-          >
-            Order now <ChevronRight className="h-3.5 w-3.5" aria-hidden />
-          </a>
-        </div>
+        </Reveal>
       </section>
 
       {/* FEATURED — horizontal rail; festive title during a window */}
       {featured.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
-          <div className="mb-3 flex items-end justify-between">
-            <div>
-              <h2 className="font-display text-xl font-semibold text-stone-900 sm:text-2xl">
-                {theme ? theme.sectionTitle : "Featured picks"}
-              </h2>
-              <p className="mt-0.5 text-xs text-stone-500">
-                {theme ? theme.sectionSub : "Best-sellers from our shelves"}
-              </p>
-            </div>
-            <Link
-              href="#shop"
-              className="inline-flex h-10 items-center text-sm font-semibold text-emerald-700"
-            >
-              View all
-            </Link>
-          </div>
-          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 no-scrollbar sm:mx-0 sm:px-0">
-            {featured.map((p) => (
-              <div key={p.id} className="w-40 shrink-0 sm:w-48">
-                <ProductCard product={p} />
+          <Reveal>
+            <div className="mb-3 flex items-end justify-between">
+              <div>
+                <h2 className="font-display text-xl font-semibold text-stone-900 sm:text-2xl">
+                  {theme ? theme.sectionTitle : "Featured picks"}
+                </h2>
+                <p className="mt-0.5 text-xs text-stone-500">
+                  {theme ? theme.sectionSub : "Best-sellers from our shelves"}
+                </p>
               </div>
-            ))}
-          </div>
+              <Link
+                href="#shop"
+                className="inline-flex h-10 items-center text-sm font-semibold text-emerald-700"
+              >
+                View all
+              </Link>
+            </div>
+            <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 no-scrollbar sm:mx-0 sm:px-0">
+              {featured.map((p) => (
+                <div key={p.id} className="w-40 shrink-0 sm:w-48">
+                  <ProductCard product={p} />
+                </div>
+              ))}
+            </div>
+          </Reveal>
         </section>
       )}
 
       {/* RECENTLY VIEWED — resurfaces browsing history (no account needed) */}
       <RecentlyViewed products={products} />
 
-      {/* STICKY CATEGORY CHIPS — mini-nav, sticks below the single-row header */}
-      <section className="sticky top-14 z-30 mt-8 border-y border-stone-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85 sm:top-16">
+      {/* STICKY CATEGORY CHIPS — frosted glass bar, sticks below the header */}
+      <section className="sticky top-14 z-30 mt-8 border-y border-white/50 bg-white/55 shadow-[0_2px_18px_rgba(28,25,23,0.07)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/45 sm:top-16">
         <div
           className="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-4 py-2.5 no-scrollbar sm:px-6 lg:px-8"
           role="tablist"
@@ -297,10 +386,10 @@ export default function HomePage() {
                 aria-selected={isActive}
                 onClick={() => setActiveCat(c)}
                 className={
-                  "inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-xl px-4 text-xs font-semibold " +
+                  "inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-full px-4 text-xs font-semibold transition-colors " +
                   (isActive
-                    ? "bg-emerald-800 text-white"
-                    : "bg-stone-100 text-stone-700")
+                    ? "bg-emerald-800 text-white shadow-md shadow-emerald-900/25"
+                    : "glass text-stone-700 hover:bg-white/80")
                 }
               >
                 {c}
@@ -328,13 +417,13 @@ export default function HomePage() {
         </div>
 
         {loading ? (
-          <div className="flex h-64 flex-col items-center justify-center gap-3 text-stone-500">
-            <Loader2 className="h-7 w-7 animate-spin text-emerald-600" aria-hidden />
-            <p className="text-sm">Loading fresh products…</p>
-          </div>
+          <>
+            <p className="sr-only">Loading fresh products…</p>
+            <ProductGridSkeleton count={8} />
+          </>
         ) : error ? (
           <EmptyState
-            title="Something went wrong"
+            title="Couldn’t load the store"
             message={error}
             actionLabel="Try again"
             onAction={() => window.location.reload()}
@@ -358,37 +447,43 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* STORE PROMISE — one full-bleed photo, one takeaway.
-          Replaces the old 3-up icon+heading+paragraph cards. */}
+      {/* STORE PROMISE — premium photo with a frosted glass card. */}
       <section className="relative overflow-hidden bg-stone-950 text-white">
         <img
-          src="/products/cat-fruits-vegetables.jpg"
-          alt="Fresh fruits and vegetables at the store"
+          src="/products/promise.jpg"
+          alt="Fresh vegetables and greens spilling from a basket"
           loading="lazy"
           decoding="async"
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-stone-950/70" />
+        <div className="absolute inset-0 bg-stone-950/60" />
         <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-          <h2 className="font-display max-w-lg text-2xl font-semibold leading-tight sm:text-3xl">
-            Hand-checked freshness, from our shelves to your door.
-          </h2>
-          <ul className="mt-5 space-y-2.5 text-sm text-stone-200">
-            <li className="flex items-center gap-2.5">
-              <BadgeCheck className="h-4 w-4 shrink-0 text-emerald-300" aria-hidden />
-              Every item checked before it leaves the store
-            </li>
-            <li className="flex items-center gap-2.5">
-              <Truck className="h-4 w-4 shrink-0 text-emerald-300" aria-hidden />
-              Delivery across Pune in as little as 2 hours
-            </li>
-            <li className="flex items-center gap-2.5">
-              <Clock className="h-4 w-4 shrink-0 text-emerald-300" aria-hidden />
-              Open daily, 7 AM – 10 PM
-            </li>
-          </ul>
+          <Reveal>
+            <div className="glass-dark max-w-xl rounded-3xl p-6 sm:p-8">
+              <h2 className="font-display text-2xl font-semibold leading-tight sm:text-3xl">
+                Hand-checked freshness, from our shelves to your door.
+              </h2>
+              <ul className="mt-5 space-y-2.5 text-sm text-stone-100">
+                <li className="flex items-center gap-2.5">
+                  <BadgeCheck className="h-4 w-4 shrink-0 text-emerald-300" aria-hidden />
+                  Every item checked before it leaves the store
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Truck className="h-4 w-4 shrink-0 text-emerald-300" aria-hidden />
+                  Delivery across Pune in as little as 2 hours
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Clock className="h-4 w-4 shrink-0 text-emerald-300" aria-hidden />
+                  Open daily, 7 AM – 10 PM
+                </li>
+              </ul>
+            </div>
+          </Reveal>
         </div>
       </section>
+
+      {/* Back-to-top for the long product grid */}
+      <ScrollToTop />
     </div>
   );
 }

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" role="img" aria-label="Shubham Super Shopee mark">
+  <title>Shubham Super Shopee</title>
+  <g transform="translate(10 10)">
+    <rect width="120" height="120" rx="28" fill="#065f46"/>
+    <path d="M60 36C58 24 68 16 82 16C84 28 74 38 60 36Z" fill="#F2A93B"/>
+    <path d="M47 56V46C47 32 73 32 73 46V56" fill="none" stroke="#FFF8EC" stroke-width="5" stroke-linecap="round"/>
+    <rect x="32" y="52" width="56" height="48" rx="9" fill="#FFF8EC"/>
+    <path d="M69 66C66 60 51 60 51 69C51 78 69 74 69 83C69 92 54 92 51 86" fill="none" stroke="#065f46" stroke-width="6.5" stroke-linecap="round"/>
+  </g>
+</svg>
