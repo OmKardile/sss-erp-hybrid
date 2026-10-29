@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.1] — 2026-10-29
+
+### Fixed — storefront (shop)
+- **framer-motion "non-static position" dev warning**: `useScroll({ target })` measures against the document scroll container (`<html>`), which was `position: static` — every parallax component warned in dev and risked imprecise scroll offsets. Fixed with `html { position: relative }` in `shop/src/app/globals.css`.
+- Sandbox-recovery audit: `.env` restored (a sandbox reset had wiped it, taking every DB-backed API down with 500/503), stale Turbopack CSS cache cleared (`rm -rf .next`), and the full API surface re-verified green (health, products, cart CRUD, reviews, checkout → order page, sync, merch, orders).
+
 ## [3.1.0] — 2026-10-23
 
 ### Changed — storefront: real photography everywhere (no emojis/animations)

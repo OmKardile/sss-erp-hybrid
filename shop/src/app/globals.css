@@ -221,7 +221,10 @@ input[type="number"] {
 .safe-area-pt { padding-top: env(safe-area-inset-top, 0px); }
 .safe-area-px { padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
 
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-behavior: smooth; }
+/* position:relative on <html> — framer-motion useScroll({ target }) uses the
+   document scroll container for offset math; a static root triggers its
+   "non-static position" dev warning and imprecise parallax offsets. */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-behavior: smooth; position: relative; }
 * { -webkit-tap-highlight-color: transparent; }
 body { overscroll-behavior-y: none; }
 
