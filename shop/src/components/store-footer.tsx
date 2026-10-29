@@ -1,5 +1,6 @@
 import { Phone, MapPin, Clock, Truck, ShieldCheck, Heart } from "lucide-react";
 import { STORE_CONFIG } from "@/lib/config";
+import { BrandLogoLockup } from "@/components/brand-logo";
 
 export function StoreFooter() {
   const year = new Date().getFullYear();
@@ -14,13 +15,9 @@ export function StoreFooter() {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div>
-            <img
-              src="/logo.svg"
-              alt={STORE_CONFIG.name}
-              width={149}
-              height={40}
-              className="h-10 w-auto"
-            />
+            {/* Hard-coded inline logo (brand-logo.tsx) — immune to
+                CDN/browser asset caching. */}
+            <BrandLogoLockup className="h-10 w-auto" />
             <p className="mt-4 text-sm leading-relaxed text-stone-400">
               Fresh groceries, dairy and household essentials delivered to your
               doorstep across Pune. Order online — pay by COD or UPI.

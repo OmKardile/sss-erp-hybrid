@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.3] — 2026-10-29
+
+### Changed — storefront (shop): logo hard-coded inline (production cache-proof)
+- Production kept showing the old logo after deploys: header/footer referenced `/logo.svg`/`logo-mark.svg` as asset URLs, and same-URL-new-content is a cache trap (CDN + browser). The logo is now hard-coded as inline SVG markup — `shop/src/components/brand-logo.tsx` (`BrandLogoMark` mobile tile, `BrandLogoLockup` full lockup) wired into header + footer; the logo ships inside the HTML, so no cache can ever serve a stale one. Poppins (500/600/800) loaded via next/font so the wordmark renders in its designed typeface on every device.
+
 ## [3.1.2] — 2026-10-29
 
 ### Fixed — storefront (shop): React 19 hydration mismatch for prefers-reduced-motion users

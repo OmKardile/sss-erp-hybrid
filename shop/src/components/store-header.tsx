@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { AnimatedIcon } from "@/components/animated-icon";
 import { CartBadge } from "@/components/cart-badge";
+import { BrandLogoLockup, BrandLogoMark } from "@/components/brand-logo";
 import { cn } from "@/lib/utils";
 import { STORE_CONFIG } from "@/lib/config";
 
@@ -62,26 +63,16 @@ export function StoreHeader() {
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-800/15 to-transparent"
       />
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 px-3 sm:h-16 sm:gap-4 sm:px-6 lg:px-8">
-        {/* Logo — brand mark on mobile, full lockup on desktop */}
+        {/* Logo — brand mark on mobile, full lockup on desktop.
+            Hard-coded inline SVG (brand-logo.tsx): no /logo.svg asset
+            fetch, so CDN/browser caches can never serve a stale logo. */}
         <Link
           href="/"
           className="flex h-11 shrink-0 items-center"
           aria-label={`${STORE_CONFIG.name} — home`}
         >
-          <img
-            src="/logo-mark.svg"
-            alt=""
-            width={36}
-            height={36}
-            className="h-9 w-9 drop-shadow-[0_2px_10px_rgba(6,78,59,0.25)] sm:hidden"
-          />
-          <img
-            src="/logo.svg"
-            alt=""
-            width={163}
-            height={44}
-            className="hidden h-11 w-auto drop-shadow-[0_2px_12px_rgba(6,78,59,0.22)] sm:block"
-          />
+          <BrandLogoMark className="h-9 w-9 drop-shadow-[0_2px_10px_rgba(6,78,59,0.25)] sm:hidden" />
+          <BrandLogoLockup className="hidden h-11 w-auto drop-shadow-[0_2px_12px_rgba(6,78,59,0.22)] sm:block" />
         </Link>
 
         {/* Search — the single search on mobile. Frosted pill. */}

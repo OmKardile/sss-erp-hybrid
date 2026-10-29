@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Bricolage_Grotesque } from "next/font/google";
+import { Fraunces, Bricolage_Grotesque, Poppins } from "next/font/google";
 import "./globals.css";
 import { STORE_CONFIG } from "@/lib/config";
 import { StoreHeader } from "@/components/store-header";
@@ -22,6 +22,15 @@ const fraunces = Fraunces({
   variable: "--font-fraunces",
   axes: ["opsz"],
   style: ["normal", "italic"],
+});
+// Brand wordmark face — the hard-coded inline logo (brand-logo.tsx)
+// typesets "Shubham / Super Shopee" in Poppins for pixel-true rendering
+// on every device (no system-font roulette).
+const poppins = Poppins({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["500", "600", "800"],
+  variable: "--font-poppins",
 });
 
 export const metadata: Metadata = {
@@ -68,7 +77,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bricolage.variable} ${fraunces.variable}`}
+      className={`${bricolage.variable} ${fraunces.variable} ${poppins.variable}`}
       data-scroll-behavior="smooth"
     >
       <body className="min-h-[100dvh] flex flex-col bg-transparent text-stone-900">
