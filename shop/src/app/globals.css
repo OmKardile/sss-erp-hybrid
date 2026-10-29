@@ -2,13 +2,10 @@
 
 /* ----------------------------------------------------------------
    Shubham Super Shopee — storefront theme
-   Mobile-first editorial system (2026-10-23 redesign, glass pass 2026-10-27):
-   - Type: Fraunces (display) + system sans (body), big scale contrast
-   - Color: warm white / charcoal / slate neutrals + ONE accent (emerald).
-     Rose is functional only (discount / out-of-stock, retail convention).
-   - Glassmorphism: frosted translucent surfaces (.glass / .glass-strong /
-     .glass-dark) layered over the ambient color-field backdrop in layout.tsx.
-   - 8pt spacing rhythm, 44px minimum touch targets on mobile.
+   v0.10.0 "Sunlit Pop Market": bright ivory base, saturated
+   emerald/lime/amber/coral gradients, huge grotesque display type,
+   glassmorphism over a vivid ambient color field, marquee tickers,
+   grain texture. Mobile-first, 44px touch targets, 8pt rhythm.
    ---------------------------------------------------------------- */
 
 @theme {
@@ -25,45 +22,45 @@
 }
 
 :root {
-  --background: #faf9f7;
+  --background: #fff9f0;
   --foreground: #1c1917;
-  --muted: #f5f5f4;
+  --muted: #f7f3ea;
   --muted-foreground: #57534e;
-  --border: #e7e5e4;
+  --border: #eee4d4;
   --card: #ffffff;
   --card-foreground: #1c1917;
-  --ring: #059669;
+  --ring: #10b981;
   --brand: #047857;
   --brand-foreground: #ffffff;
 }
 
 /* ── Glassmorphism system ───────────────────────────────────────
-   Surfaces refract the ambient backdrop (layout.tsx color fields).
+   Surfaces refract the vivid ambient backdrop (layout.tsx blobs).
    Specular top edge (inset highlight) gives the "pane of glass" read. */
 
 .glass {
-  background: rgba(255, 255, 255, 0.68);
+  background: rgba(255, 255, 255, 0.62);
   -webkit-backdrop-filter: blur(18px) saturate(1.6);
   backdrop-filter: blur(18px) saturate(1.6);
   border: 1px solid rgba(255, 255, 255, 0.65);
   box-shadow:
-    0 8px 32px rgba(28, 25, 23, 0.08),
+    0 8px 32px rgba(120, 90, 40, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.78);
   -webkit-backdrop-filter: blur(26px) saturate(1.7);
   backdrop-filter: blur(26px) saturate(1.7);
   border: 1px solid rgba(255, 255, 255, 0.7);
   box-shadow:
-    0 14px 44px rgba(28, 25, 23, 0.14),
+    0 14px 44px rgba(120, 90, 40, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
-/* Dark glass — for surfaces over photography / dark gradients */
+/* Dark glass — for surfaces over photography / vivid gradients */
 .glass-dark {
-  background: rgba(4, 27, 20, 0.5);
+  background: rgba(10, 40, 30, 0.5);
   -webkit-backdrop-filter: blur(20px) saturate(1.25);
   backdrop-filter: blur(20px) saturate(1.25);
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -76,7 +73,7 @@
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .glass { background: rgba(255, 255, 255, 0.94); }
   .glass-strong { background: rgba(255, 255, 255, 0.97); }
-  .glass-dark { background: rgba(4, 27, 20, 0.85); }
+  .glass-dark { background: rgba(10, 40, 30, 0.85); }
 }
 
 * {
@@ -100,12 +97,81 @@ body {
   line-height: 1.5;
 }
 
-/* Display face — section headlines, hero, editorial moments.
-   References the next/font variable set on <html> in layout.tsx. */
+/* Display face — Bricolage Grotesque: chunky, contemporary,
+   award-site energy. Variable set on <html> by layout.tsx. */
 .font-display {
+  font-family: var(--font-bricolage), var(--font-fraunces), ui-sans-serif,
+    system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Serif accent — Fraunces italic for editorial contrast words */
+.font-serif-accent {
   font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
   font-optical-sizing: auto;
+  font-style: italic;
   letter-spacing: -0.01em;
+}
+
+/* Gradient display words (Awwwards staple) */
+.text-gradient-fresh {
+  background: linear-gradient(100deg, #059669 10%, #65a30d 55%, #a3e635 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.text-gradient-sun {
+  background: linear-gradient(100deg, #f59e0b 5%, #f97316 55%, #f43f5e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Giant outlined word — drifting parallax backdrop typography */
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(28, 25, 23, 0.14);
+}
+
+/* ── Marquee ticker ───────────────────────────────────────────── */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll var(--marquee-duration, 28s) linear infinite;
+}
+.marquee-paused:hover .marquee-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}
+
+/* ── Gentle idle float for produce / orbs ─────────────────────── */
+@keyframes float-idle {
+  0%, 100% { transform: translateY(0) rotate(var(--float-rot, 0deg)); }
+  50% { transform: translateY(-14px) rotate(calc(var(--float-rot, 0deg) + 3deg)); }
+}
+.float-idle {
+  animation: float-idle var(--float-duration, 6s) ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+@media (prefers-reduced-motion: reduce) {
+  .float-idle { animation: none; }
+}
+
+/* ── Film grain — subtle premium texture over the color field ── */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
 }
 
 /* Global visible focus (accessibility — WCAG 2.4.7) */

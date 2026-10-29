@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces } from "next/font/google";
+import { Fraunces, Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 import { STORE_CONFIG } from "@/lib/config";
 import { StoreHeader } from "@/components/store-header";
@@ -8,13 +8,20 @@ import { StoreFooter } from "@/components/store-footer";
 import { MobileNav } from "@/components/mobile-nav";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-// Expressive display face — used for headlines & editorial moments.
+// Display faces — Bricolage Grotesque (chunky, contemporary) for
+// headlines + Fraunces italic for editorial accent words.
 // Self-hosted by next/font (no runtime requests to Google).
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-bricolage",
+});
 const fraunces = Fraunces({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-fraunces",
   axes: ["opsz"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -50,7 +57,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#03291f",
+  themeColor: "#FFF9F0",
 };
 
 export default function RootLayout({
@@ -61,21 +68,26 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={fraunces.variable}
+      className={`${bricolage.variable} ${fraunces.variable}`}
       data-scroll-behavior="smooth"
     >
       <body className="min-h-[100dvh] flex flex-col bg-transparent text-stone-900">
-        {/* Ambient backdrop — soft color fields the glass surfaces refract.
-            Fixed + pointer-events-none: zero scroll cost, never intercepts. */}
+        {/* Ambient backdrop — a vivid sunlit color field the glass
+            surfaces refract. Fixed + pointer-events-none: zero scroll
+            cost, never intercepts. Saturated market hues. */}
         <div
           aria-hidden
-          className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#faf9f7]"
+          className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#fff9f0]"
         >
-          <div className="absolute -top-44 right-[-14%] h-[30rem] w-[30rem] rounded-full bg-emerald-300/30 blur-[110px]" />
-          <div className="absolute top-[28%] left-[-16%] h-[27rem] w-[27rem] rounded-full bg-amber-200/45 blur-[110px]" />
-          <div className="absolute bottom-[-12%] right-[14%] h-[26rem] w-[26rem] rounded-full bg-emerald-200/40 blur-[110px]" />
-          <div className="absolute top-[58%] left-[28%] h-[19rem] w-[19rem] rounded-full bg-rose-100/40 blur-[110px]" />
+          <div className="absolute -top-40 right-[-10%] h-[32rem] w-[32rem] rounded-full bg-emerald-300/45 blur-[110px]" />
+          <div className="absolute top-[24%] left-[-14%] h-[28rem] w-[28rem] rounded-full bg-amber-300/50 blur-[110px]" />
+          <div className="absolute top-[8%] left-[30%] h-[20rem] w-[20rem] rounded-full bg-lime-300/35 blur-[110px]" />
+          <div className="absolute bottom-[-14%] right-[8%] h-[30rem] w-[30rem] rounded-full bg-rose-300/40 blur-[110px]" />
+          <div className="absolute top-[55%] left-[24%] h-[22rem] w-[22rem] rounded-full bg-sky-300/35 blur-[110px]" />
+          <div className="absolute top-[72%] right-[32%] h-[18rem] w-[18rem] rounded-full bg-orange-300/40 blur-[110px]" />
         </div>
+        {/* Film grain — premium texture over the whole composition */}
+        <div aria-hidden className="grain" />
         <StoreHeader />
         {/* Festive strip — visible on every page during a festival window.
             Scrolls away naturally; header stays h-14 so sticky offsets

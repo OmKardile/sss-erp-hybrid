@@ -4,11 +4,11 @@ import { STORE_CONFIG } from "@/lib/config";
 export function StoreFooter() {
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-auto w-full bg-stone-950 text-stone-300">
-      {/* Specular top edge — glass divider into the page */}
+    <footer className="mt-auto w-full bg-emerald-950 text-stone-300">
+      {/* Specular top edge — colorful gradient divider into the page */}
       <div
         aria-hidden
-        className="h-px w-full bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent"
+        className="h-[3px] w-full bg-gradient-to-r from-emerald-400/70 via-amber-400/70 to-rose-400/70"
       />
       <div className="mx-auto max-w-7xl px-4 py-10 pb-[calc(6rem+env(safe-area-inset-bottom,0px))] sm:px-6 lg:px-8 lg:pb-10">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
