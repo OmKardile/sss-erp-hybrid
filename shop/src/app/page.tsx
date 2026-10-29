@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { useRef } from "react";
 import {
   Truck,
@@ -60,7 +61,7 @@ export default function HomePage() {
   const [seeded, setSeeded] = useState(false);
   // Festive theme is date-derived and client-only (hydration-safe snapshot).
   const theme = useActiveTheme();
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = usePrefersReducedMotion();
 
   // Hero parallax — the whole hero layer drifts up slower than scroll
   const heroRef = useRef<HTMLElement>(null);

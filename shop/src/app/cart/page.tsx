@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import {
   Trash2,
   ChevronLeft,
@@ -23,7 +24,7 @@ export default function CartPage() {
   const [data, setData] = useState<CartTotals | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
 
   async function refresh() {
     try {

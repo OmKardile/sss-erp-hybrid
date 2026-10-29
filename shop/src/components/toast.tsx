@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { CheckCircle2, AlertCircle, Info, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,7 +27,7 @@ interface ToastProps {
  * Reduced-motion: instant appear/disappear.
  */
 export function Toast({ open, message, type = "success", action, onClose }: ToastProps) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
 
   useEffect(() => {
     if (!open) return;

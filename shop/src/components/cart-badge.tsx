@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { POP_SPRING } from "@/components/reveal";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +22,7 @@ export function CartBadge({
   className?: string;
   "aria-label"?: string;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
 
   return (
     <motion.span

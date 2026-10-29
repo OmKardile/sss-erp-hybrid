@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 /**
  * FloatingProduce — the "images everywhere" hero layer: circular
@@ -98,7 +99,7 @@ const PRODUCE: ProduceSpec[] = [
 
 /** One floater — its own component so the hook stays top-level. */
 function ProduceItem({ spec, scrollYProgress }: { spec: ProduceSpec; scrollYProgress: any }) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const y = useTransform(scrollYProgress, [0, 1], [0, spec.depth]);
 
   return (

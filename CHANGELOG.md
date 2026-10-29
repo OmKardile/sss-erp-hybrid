@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.2] — 2026-10-29
+
+### Fixed — storefront (shop): React 19 hydration mismatch for prefers-reduced-motion users
+- framer-motion's `useReducedMotion()` returns `null` during SSR but the real preference on reduced-motion clients, so every `initial={reduce ? false : {...}}` / `style={reduce ? undefined : { y }}` / Reveal tree-swap produced hydration mismatches (server HTML carried animated initial states; client rendered static ones). Replaced with a hydration-safe `useSyncExternalStore` hook (`shop/src/hooks/use-prefers-reduced-motion.ts`, server snapshot `false`) in all consumers (hero, reveal, parallax, floating produce, cart page, cart badge, countdown, scroll-to-top, toast). Verified with emulated `prefers-reduced-motion: reduce`: home/cart/product hydrate with a clean console; default mode animations unchanged.
+
 ## [3.1.1] — 2026-10-29
 
 ### Fixed — storefront (shop)

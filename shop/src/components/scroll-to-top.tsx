@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { ArrowUp } from "lucide-react";
 
 /**
@@ -11,7 +12,7 @@ import { ArrowUp } from "lucide-react";
  */
 export function ScrollToTop() {
   const [visible, setVisible] = useState(false);
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
 
   useEffect(() => {
     let ticking = false;

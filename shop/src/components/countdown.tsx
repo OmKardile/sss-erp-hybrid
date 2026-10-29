@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { cn } from "@/lib/utils";
 
 /**
@@ -37,7 +38,7 @@ function pad(n: number): string {
 }
 
 function DigitSlot({ value }: { value: string }) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
 
   if (reduce) {
     return <span className="tabular-nums">{value}</span>;
