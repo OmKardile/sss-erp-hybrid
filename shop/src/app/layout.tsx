@@ -1,31 +1,39 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Bricolage_Grotesque, Poppins } from "next/font/google";
+import {
+  Unbounded,
+  Schibsted_Grotesk,
+  Space_Mono,
+  Poppins,
+} from "next/font/google";
 import "./globals.css";
 import { STORE_CONFIG } from "@/lib/config";
 import { StoreHeader } from "@/components/store-header";
 import { FestiveStrip } from "@/components/festive-strip";
 import { StoreFooter } from "@/components/store-footer";
 import { MobileNav } from "@/components/mobile-nav";
+import { Motion } from "@/components/Motion";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-// Display faces — Bricolage Grotesque (chunky, contemporary) for
-// headlines + Fraunces italic for editorial accent words.
-// Self-hosted by next/font (no runtime requests to Google).
-const bricolage = Bricolage_Grotesque({
+// Type system (DESIGN.md): Unbounded = the pop display voice,
+// Schibsted Grotesk = text/UI, Space Mono = price stickers, hours,
+// the bill. Poppins stays for the hard-coded logo wordmark only.
+const unbounded = Unbounded({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-bricolage",
+  weight: ["500", "700", "900"],
+  variable: "--font-unbounded",
 });
-const fraunces = Fraunces({
+const schibsted = Schibsted_Grotesk({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-fraunces",
-  axes: ["opsz"],
-  style: ["normal", "italic"],
+  variable: "--font-schibsted",
 });
-// Brand wordmark face — the hard-coded inline logo (brand-logo.tsx)
-// typesets "Shubham / Super Shopee" in Poppins for pixel-true rendering
-// on every device (no system-font roulette).
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+  variable: "--font-space",
+});
 const poppins = Poppins({
   subsets: ["latin"],
   display: "swap",
@@ -66,8 +74,12 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#FFF9F0",
+  themeColor: "#f4efe2",
 };
+
+// Runs before first paint: hidden-until-revealed styles only apply when
+// JS and motion are on (engine contract from the /awwwards skill).
+const flags = `document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('motion')`;
 
 export default function RootLayout({
   children,
@@ -77,35 +89,41 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bricolage.variable} ${fraunces.variable} ${poppins.variable}`}
-      data-scroll-behavior="smooth"
+      className={`${unbounded.variable} ${schibsted.variable} ${spaceMono.variable} ${poppins.variable}`}
+      suppressHydrationWarning
     >
-      <body className="min-h-[100dvh] flex flex-col bg-transparent text-stone-900">
-        {/* Ambient backdrop — a vivid sunlit color field the glass
-            surfaces refract. Fixed + pointer-events-none: zero scroll
-            cost, never intercepts. Saturated market hues. */}
-        <div
-          aria-hidden
-          className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#fff9f0]"
-        >
-          <div className="absolute -top-40 right-[-10%] h-[32rem] w-[32rem] rounded-full bg-emerald-300/45 blur-[110px]" />
-          <div className="absolute top-[24%] left-[-14%] h-[28rem] w-[28rem] rounded-full bg-amber-300/50 blur-[110px]" />
-          <div className="absolute top-[8%] left-[30%] h-[20rem] w-[20rem] rounded-full bg-lime-300/35 blur-[110px]" />
-          <div className="absolute bottom-[-14%] right-[8%] h-[30rem] w-[30rem] rounded-full bg-rose-300/40 blur-[110px]" />
-          <div className="absolute top-[55%] left-[24%] h-[22rem] w-[22rem] rounded-full bg-sky-300/35 blur-[110px]" />
-          <div className="absolute top-[72%] right-[32%] h-[18rem] w-[18rem] rounded-full bg-orange-300/40 blur-[110px]" />
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: flags }} />
+      </head>
+      <body className="min-h-[100dvh] flex flex-col">
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
+        <div id="curtain" aria-hidden="true">
+          <div className="curtain__panel curtain__panel--1" />
+          <div className="curtain__panel curtain__panel--2" />
+          <div className="curtain__panel curtain__panel--3" />
         </div>
-        {/* Film grain — premium texture over the whole composition */}
-        <div aria-hidden className="grain" />
+        <div id="loader" role="status" aria-label="Opening the store">
+          <div className="loader__inner" data-loader-out>
+            <span className="loader__label">SHUBHAM SUPER SHOPEE</span>
+            <span className="loader__count" data-loader-count>
+              0%
+            </span>
+          </div>
+          <div className="loader__bar" data-loader-bar />
+        </div>
         <StoreHeader />
-        {/* Festive strip — visible on every page during a festival window.
-            Scrolls away naturally; header stays h-14 so sticky offsets
-            elsewhere (top-14/sm:top-16) are unaffected. */}
+        {/* Festive strip — visible on every page during a festival window. */}
         <FestiveStrip />
-        <main className="flex-1 w-full pb-20 lg:pb-0">{children}</main>
+        <main id="main" tabIndex={-1} className="flex-1 w-full pb-20 lg:pb-0">
+          {children}
+        </main>
         <StoreFooter />
         <MobileNav />
         <SpeedInsights />
+        {/* Engine adapter — LAST child so page effects register first. */}
+        <Motion />
       </body>
     </html>
   );

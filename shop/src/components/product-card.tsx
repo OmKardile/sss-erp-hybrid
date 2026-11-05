@@ -13,10 +13,9 @@ interface ProductCardProps {
 }
 
 /**
- * Quick-commerce product card — scannable in one glance:
- * photo → name → unit → price → add. Consistent square photo ratio.
- * The add control is a wide 40px-tall button (44px with card padding),
- * thumb-reachable inside the card's lower-right corner.
+ * Candy shelf card (DESIGN.md): white rounded card, photo zooms in its
+ * clip on hover, mango price sticker, ink pill Add. The card lifts and
+ * glows (one treatment per role).
  */
 export function ProductCard({ product }: ProductCardProps) {
   const [status, setStatus] = useState<"idle" | "loading" | "added">("idle");
@@ -63,81 +62,74 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <Link
       href={`/product/${product.slug}`}
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/70 bg-white/65 shadow-[0_4px_20px_rgba(28,25,23,0.05)] backdrop-blur-md transition-[transform,box-shadow,background-color,border-color] duration-200 hover:-translate-y-0.5 hover:border-white/90 hover:bg-white/85 hover:shadow-[0_14px_36px_rgba(28,25,23,0.12)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none"
+      className={cn(
+        "candy-card group relative flex h-full flex-col overflow-hidden",
+        outOfStock && "opacity-70",
+      )}
     >
-      {/* Real product photo — consistent square ratio; gentle zoom on hover */}
-      <div className="relative aspect-square w-full overflow-hidden bg-stone-100">
+      {/* Photo — zooms inside the rounded clip */}
+      <div className="relative aspect-square w-full overflow-hidden rounded-t-[calc(1.5rem-1.5px)] bg-cream">
         <img
           src={image}
           alt={product.name}
           loading="lazy"
           decoding="async"
           onError={() => setImgError(true)}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+          className="h-full w-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-[1.06] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
         />
 
-        {/* Discount badge — frosted glass over the photo */}
         {discount > 0 && (
-          <span className="absolute left-2 top-2 rounded-full bg-rose-600/90 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm backdrop-blur-sm">
-            {discount}% off
+          <span className="sticker sticker--heat absolute left-2.5 top-2.5 !rotate-[-4deg] text-[11px]">
+            −{discount}%
           </span>
         )}
 
-        {/* Out of stock overlay */}
         {outOfStock && (
-          <div className="absolute inset-0 flex items-center justify-center bg-stone-900/55">
-            <span className="rounded-lg bg-white px-3 py-1 text-[11px] font-bold text-stone-900">
-              Out of stock
+          <div className="absolute inset-0 flex items-center justify-center bg-cream/70 backdrop-blur-[2px]">
+            <span className="rounded-full bg-ink px-4 py-1.5 font-data text-[11px] font-bold text-cream">
+              OUT OF STOCK
             </span>
           </div>
         )}
       </div>
 
-      {/* Body — one line each: name, unit */}
-      <div className="flex flex-1 flex-col gap-0.5 p-2.5 sm:p-3">
+      {/* Body */}
+      <div className="flex flex-1 flex-col gap-1 p-3.5">
         {product.brand && (
-          <p className="truncate text-[10px] font-medium uppercase tracking-wide text-stone-400">
+          <p className="font-data text-[10px] uppercase tracking-[0.1em] text-sage">
             {product.brand}
           </p>
         )}
-        <p className="line-clamp-2 min-h-[2.5rem] text-[13px] font-semibold leading-tight text-stone-900 sm:text-sm">
+        <p className="line-clamp-2 min-h-[2.5rem] text-[13px] font-semibold leading-tight text-ink sm:text-sm">
           {product.name}
         </p>
-        <p className="text-[11px] text-stone-500">{product.unitType}</p>
+        <p className="text-[11px] text-sage">{product.unitType}</p>
 
-        {/* Price + wide add button */}
-        <div className="mt-auto flex items-center justify-between gap-2 pt-2">
-          <div className="flex flex-col leading-tight">
+        <div className="mt-auto flex items-end justify-between gap-2 pt-3">
+          <span className={cn("sticker", outOfStock && "opacity-60")}>
             {discount > 0 && product.compareAtPrice && (
-              <span className="text-[10px] text-stone-400 line-through">
-                {formatCurrency(product.compareAtPrice)}
-              </span>
+              <s>{formatCurrency(product.compareAtPrice)}</s>
             )}
-            <span className="font-display text-[15px] font-semibold text-stone-900 sm:text-base">
-              {formatCurrency(product.price)}
-            </span>
-          </div>
+            {formatCurrency(product.price)}
+          </span>
 
           <button
             type="button"
             onClick={addToCart}
             disabled={outOfStock}
-            aria-label={`Add ${product.name} to cart`}
+            aria-label={`Add ${product.name} to basket`}
             className={cn(
-              "inline-flex h-10 min-w-[72px] items-center justify-center gap-1 rounded-full px-3.5 text-xs font-bold shadow-sm transition-[background-color,transform] duration-150 active:scale-[0.96] motion-reduce:active:scale-100",
-              outOfStock
-                ? "cursor-not-allowed bg-stone-200/80 text-stone-400"
-                : status === "added"
-                  ? "bg-emerald-600 text-white"
-                  : "bg-emerald-800 text-white hover:bg-emerald-900",
+              "pop-btn inline-flex h-10 min-w-[72px] items-center justify-center gap-1 px-4 text-xs font-bold",
+              outOfStock &&
+                "cursor-not-allowed bg-cream text-sage shadow-none hover:bg-cream hover:translate-y-0",
+              status === "added" && "bg-pine hover:bg-pine",
             )}
           >
             {status === "loading" ? (
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
             ) : status === "added" ? (
               <>
-                <AnimatedIcon name="check-white" size={14} trigger="once" />{" "}
-                Added
+                <AnimatedIcon name="check-white" size={14} trigger="once" /> Added
               </>
             ) : (
               <>

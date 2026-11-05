@@ -105,3 +105,45 @@ export function BrandLogoLockup({ className, ...props }: LogoProps) {
     </svg>
   );
 }
+
+/** Light lockup — same tile, wordmark re-inked for paper (sack) grounds.
+ *  The dark lockup's cream text disappears on light backgrounds. */
+export function BrandLogoLockupLight({ className, ...props }: LogoProps) {
+  return (
+    <svg
+      viewBox="0 0 520 140"
+      role="img"
+      aria-label="Shubham Super Shopee — fresh groceries, delivered in Pune"
+      className={className}
+      {...props}
+    >
+      <title>Shubham Super Shopee</title>
+      <LogoTile />
+      <g fontFamily={POPPINS_STACK}>
+        <text
+          x={150}
+          y={68}
+          fontSize={46}
+          fontWeight={800}
+          fill="#16261b"
+          letterSpacing="-1"
+        >
+          Shubham
+        </text>
+        <text x={151} y={102} fontSize={29} fontWeight={600} fill="#d89426">
+          Super Shopee
+        </text>
+        <text
+          x={152}
+          y={124}
+          fontSize={13}
+          fontWeight={500}
+          fill="#5f6b58"
+          letterSpacing="0.5"
+        >
+          Fresh groceries, delivered in Pune
+        </text>
+      </g>
+    </svg>
+  );
+}

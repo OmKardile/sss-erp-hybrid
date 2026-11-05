@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.2.0] — 2026-11-05
+
+### Added — storefront (shop): "Fresh Cart" redesign (v0.11.0), built with the /awwwards skill
+- Candy-bright pop market: electric lime `#c8f135` + tomato coral `#ff5233` + mango `#ffc531` on fresh cream, deep-emerald fields, Unbounded display type, Space Mono data, sticker price chips, pill buttons with springy hovers. Color-field section journey (lime marquee → coral deal → pine promise → ink footer). Festive strips retinted vivid (Diwali = coral).
+- Ported the skill's motion engine: Lenis on the GSAP ticker, declarative reveals (`data-split/reveal/parallax/intro`), real-progress loader, and page transitions as three color panels (lime→coral→pine) stagger-wiping between routes. Deps added: `gsap`, `lenis`.
+- Engine hardened for this client-fetched storefront: ScrollTrigger refresh on fonts/load, MutationObserver wiring late-mounted reveals, and Tailwind 4 cascade-layer fix (element resets now in `@layer base` so utilities like `sm:hidden` work — this had duplicated the header logo).
+- QA: desktop + mobile 390 (no overflow) + reduced motion (0 hidden) + golden path (cart → checkout COD → order) verified; VLM-reviewed; lint clean. Production build passes (19 routes).
+
 ## [3.1.3] — 2026-10-29
 
 ### Changed — storefront (shop): logo hard-coded inline (production cache-proof)

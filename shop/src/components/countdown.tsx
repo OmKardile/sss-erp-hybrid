@@ -98,6 +98,28 @@ export function DealCountdown({ className, variant = "default" }: DealCountdownP
 
   const onDark = variant === "onDark";
 
+  // compact: inline HH:MM:SS only (for the deal card / bill rows)
+  if (variant === "compact") {
+    return (
+      <span
+        className={cn("font-data inline-flex items-center gap-0.5 font-bold tabular-nums text-ink", className)}
+        role="timer"
+        aria-label="Time remaining for today's deal"
+      >
+        {segments === null ? (
+          <span>--:--:--</span>
+        ) : (
+          segments.map((s, i) => (
+            <span key={s.key} className="inline-flex items-center">
+              {i > 0 && <span className="opacity-50">:</span>}
+              <DigitSlot value={s.value} />
+            </span>
+          ))
+        )}
+      </span>
+    );
+  }
+
   return (
     <div
       className={cn("flex flex-col items-center gap-1 sm:items-end", className)}
@@ -107,7 +129,7 @@ export function DealCountdown({ className, variant = "default" }: DealCountdownP
       <p
         className={cn(
           "text-[10px] font-semibold uppercase tracking-wider",
-          onDark ? "text-amber-100/90" : "text-stone-500",
+          onDark ? "text-amber-100/90" : "text-sage",
         )}
       >
         Deal ends in

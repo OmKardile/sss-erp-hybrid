@@ -2,13 +2,25 @@
 
 /* ----------------------------------------------------------------
    Shubham Super Shopee — storefront theme
-   v0.10.0 "Sunlit Pop Market": bright ivory base, saturated
-   emerald/lime/amber/coral gradients, huge grotesque display type,
-   glassmorphism over a vivid ambient color field, marquee tickers,
-   grain texture. Mobile-first, 44px touch targets, 8pt rhythm.
+   v0.11.0 "Fresh Cart" (built with the /awwwards skill):
+   a candy-bright pop market. Electric lime, tomato coral, mango on
+   cream; Unbounded display type; sticker prices; pill buttons;
+   bouncy springs; color-field sections. DESIGN.md is the contract.
    ---------------------------------------------------------------- */
 
 @theme {
+  /* palette by role (names from DESIGN.md) */
+  --color-cream: #f7f9ef;
+  --color-ink: #0e1b12;
+  --color-pop: #c8f135; /* electric lime */
+  --color-pop-deep: #a8d40f;
+  --color-heat: #ff5233; /* tomato coral */
+  --color-heat-deep: #e63e22;
+  --color-mango: #ffc531; /* price sticker amber */
+  --color-pine: #07332a; /* deep emerald field */
+  --color-sage: #55654f; /* muted text */
+
+  /* legacy brand ramp (older pages reference brand-*) */
   --color-brand-50: #ecfdf5;
   --color-brand-100: #d1fae5;
   --color-brand-200: #a7f3d0;
@@ -19,169 +31,518 @@
   --color-brand-700: #047857;
   --color-brand-800: #065f46;
   --color-brand-900: #064e3b;
+
+  /* colored soft glows */
+  --shadow-glow-pop: 0 14px 38px rgb(168 212 15 / 0.35);
+  --shadow-glow-heat: 0 14px 38px rgb(230 62 34 / 0.32);
+  --shadow-glow-ink: 0 16px 40px rgb(14 27 18 / 0.18);
+  --shadow-card: 0 10px 30px rgb(14 27 18 / 0.08);
 }
 
 :root {
-  --background: #fff9f0;
-  --foreground: #1c1917;
-  --muted: #f7f3ea;
-  --muted-foreground: #57534e;
-  --border: #eee4d4;
+  /* engine + shadcn tokens mapped to the palette */
+  --c-bg: #f7f9ef;
+  --c-fg: #0e1b12;
+  --c-muted: #55654f;
+  --c-line: rgb(14 27 18 / 0.14);
+  --c-accent: #ff5233;
+  --c-curtain: #0e1b12;
+
+  --background: #f7f9ef;
+  --foreground: #0e1b12;
+  --muted: #eef2e2;
+  --muted-foreground: #55654f;
+  --border: rgb(14 27 18 / 0.14);
   --card: #ffffff;
-  --card-foreground: #1c1917;
-  --ring: #10b981;
-  --brand: #047857;
-  --brand-foreground: #ffffff;
+  --card-foreground: #0e1b12;
+  --ring: #ff5233;
+  --brand: #07332a;
+  --brand-foreground: #f7f9ef;
+
+  /* type families (set on <html> by layout.tsx) */
+  --f-display: var(--font-unbounded), "Archivo", system-ui, sans-serif;
+  --f-body: var(--font-schibsted), system-ui, sans-serif;
+  --f-data: var(--font-space), ui-monospace, monospace;
+
+  /* fluid scale */
+  --t-mega: clamp(2.6rem, 1.2rem + 8.5vw, 8rem);
+  --t-xl: clamp(2.1rem, 1.3rem + 3.6vw, 4.5rem);
+  --t-l: clamp(1.6rem, 1.25rem + 1.6vw, 2.6rem);
+  --t-m: clamp(1.2rem, 1.08rem + 0.5vw, 1.5rem);
+  --t-body: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  --t-s: 0.875rem;
+  --t-xs: 0.75rem;
+
+  --u: clamp(0.5rem, 0.35rem + 0.6vw, 1rem);
+  --gutter: clamp(1rem, 0.6rem + 1.6vw, 2.5rem);
+
+  --z-header: 50;
+  --z-curtain: 90;
+  --z-loader: 100;
 }
 
-/* ── Glassmorphism system ───────────────────────────────────────
-   Surfaces refract the vivid ambient backdrop (layout.tsx blobs).
-   Specular top edge (inset highlight) gives the "pane of glass" read. */
+/* Foundation resets live in @layer base so Tailwind utilities
+   (sm:hidden, h-full, border-*, max-w-*) override them. Unlayered
+   element rules would beat ALL layered utilities in Tailwind 4. */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
 
-.glass {
-  background: rgba(255, 255, 255, 0.62);
-  -webkit-backdrop-filter: blur(18px) saturate(1.6);
-  backdrop-filter: blur(18px) saturate(1.6);
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  box-shadow:
-    0 8px 32px rgba(120, 90, 40, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    position: relative; /* keep: framer useScroll offset math (help.md #33) */
+    background: var(--c-bg);
+    color: var(--c-fg);
+  }
+  body {
+    background: var(--c-bg);
+    color: var(--c-fg);
+    font-family: var(--f-body);
+    font-size: var(--t-body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+    overscroll-behavior-y: none;
+  }
+  ::selection {
+    background: var(--color-pop);
+    color: var(--c-fg);
+  }
+
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+  img {
+    height: auto;
+  }
 }
 
-.glass-strong {
-  background: rgba(255, 255, 255, 0.78);
-  -webkit-backdrop-filter: blur(26px) saturate(1.7);
-  backdrop-filter: blur(26px) saturate(1.7);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  box-shadow:
-    0 14px 44px rgba(120, 90, 40, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.85);
-}
-
-/* Dark glass — for surfaces over photography / vivid gradients */
-.glass-dark {
-  background: rgba(10, 40, 30, 0.5);
-  -webkit-backdrop-filter: blur(20px) saturate(1.25);
-  backdrop-filter: blur(20px) saturate(1.25);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-/* Fallback: no backdrop-filter support → raise alpha for legibility */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass { background: rgba(255, 255, 255, 0.94); }
-  .glass-strong { background: rgba(255, 255, 255, 0.97); }
-  .glass-dark { background: rgba(10, 40, 30, 0.85); }
-}
-
-* {
-  border-color: var(--border);
-}
-
-html,
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  font-family:
-    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  /* comfortable mobile reading size */
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-/* Display face — Bricolage Grotesque: chunky, contemporary,
-   award-site energy. Variable set on <html> by layout.tsx. */
+/* ── Type system ─────────────────────────────────────────────────
+   Display = Unbounded (wide, rounded, pop). Data = Space Mono. */
 .font-display {
-  font-family: var(--font-bricolage), var(--font-fraunces), ui-sans-serif,
-    system-ui, sans-serif;
-  letter-spacing: -0.02em;
-}
-
-/* Serif accent — Fraunces italic for editorial contrast words */
-.font-serif-accent {
-  font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
-  font-optical-sizing: auto;
-  font-style: italic;
+  font-family: var(--f-display);
+  font-weight: 800;
   letter-spacing: -0.01em;
+  text-transform: uppercase;
+  line-height: 0.98;
+}
+.font-data {
+  font-family: var(--f-data);
+  font-variant-numeric: tabular-nums;
+}
+.font-serif-accent {
+  font-style: italic;
 }
 
-/* Gradient display words (Awwwards staple) */
-.text-gradient-fresh {
-  background: linear-gradient(100deg, #059669 10%, #65a30d 55%, #a3e635 95%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* ── Candy surfaces (glass remaps to white candy cards) ──────── */
+.glass,
+.glass-strong {
+  background: #ffffff;
+  border: 1.5px solid rgb(14 27 18 / 0.08);
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-card);
 }
-.text-gradient-sun {
-  background: linear-gradient(100deg, #f59e0b 5%, #f97316 55%, #f43f5e 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* Giant outlined word — drifting parallax backdrop typography */
-.text-outline {
-  color: transparent;
-  -webkit-text-stroke: 1.5px rgba(28, 25, 23, 0.14);
+.glass-dark {
+  background: var(--color-pine);
+  border: 1px solid rgb(247 249 239 / 0.16);
 }
 
-/* ── Marquee ticker ───────────────────────────────────────────── */
-@keyframes marquee-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+/* ── Engine: hidden-until-revealed + split masks ─────────────── */
+.motion [data-split],
+.motion [data-reveal] {
+  visibility: hidden;
 }
-.marquee-track {
-  display: flex;
-  width: max-content;
-  animation: marquee-scroll var(--marquee-duration, 28s) linear infinite;
+.split-line {
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
 }
-.marquee-paused:hover .marquee-track {
-  animation-play-state: paused;
+[data-split] > *,
+[data-split] > * > * {
+  text-indent: 0;
 }
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track { animation: none; }
-}
-
-/* ── Gentle idle float for produce / orbs ─────────────────────── */
-@keyframes float-idle {
-  0%, 100% { transform: translateY(0) rotate(var(--float-rot, 0deg)); }
-  50% { transform: translateY(-14px) rotate(calc(var(--float-rot, 0deg) + 3deg)); }
-}
-.float-idle {
-  animation: float-idle var(--float-duration, 6s) ease-in-out infinite;
-  animation-delay: var(--float-delay, 0s);
-}
-@media (prefers-reduced-motion: reduce) {
-  .float-idle { animation: none; }
+[data-split] > :first-child,
+[data-split] > :first-child > :first-child {
+  text-indent: inherit;
 }
 
-/* ── Film grain — subtle premium texture over the color field ── */
-.grain {
+/* ── Skip link + focus ────────────────────────────────────────── */
+.skip-link {
   position: fixed;
-  inset: 0;
-  z-index: 60;
-  pointer-events: none;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 240px 240px;
+  left: var(--gutter);
+  top: var(--gutter);
+  z-index: 120;
+  padding: 0.6em 1.2em;
+  background: var(--c-fg);
+  color: var(--color-pop);
+  border-radius: 999px;
+  font-weight: 700;
+  transform: translateY(-300%);
 }
-
-/* Global visible focus (accessibility — WCAG 2.4.7) */
+.skip-link:focus-visible {
+  transform: none;
+}
 :focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
+  outline: 3px solid var(--c-accent);
+  outline-offset: 3px;
   border-radius: 4px;
 }
 
-/* Custom scrollbar for the cart / review lists */
+/* ── Curtain: three color panels, stagger-wiped by GSAP ──────── */
+#curtain {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-curtain);
+  pointer-events: none;
+  visibility: hidden;
+  overflow: hidden;
+}
+.curtain__panel {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.curtain__panel--1 {
+  background: var(--color-pop);
+}
+.curtain__panel--2 {
+  background: var(--color-heat);
+}
+.curtain__panel--3 {
+  background: var(--color-pine);
+}
+
+/* ── Loader: cream sheet, three color bars, mono percent ─────── */
+#loader {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-loader);
+  display: grid;
+  align-content: end;
+  padding: var(--gutter);
+  background: var(--c-bg);
+  color: var(--c-fg);
+}
+.loader__inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  overflow: hidden;
+  font-family: var(--f-data);
+  font-size: var(--t-s);
+  letter-spacing: 0.06em;
+}
+.loader__count {
+  font-family: var(--f-display);
+  font-weight: 900;
+  font-size: var(--t-l);
+  line-height: 1;
+  color: var(--color-heat);
+}
+.loader__bar {
+  height: 10px;
+  margin-top: calc(var(--u) * 1.2);
+  border-radius: 999px;
+  background: var(--color-pop);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+html:not(.js) #loader,
+#loader[hidden] {
+  display: none;
+}
+
+/* ── Lenis ────────────────────────────────────────────────────── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* ── Micro-interactions (one treatment per role) ──────────────── */
+
+/* nav links: lime pill fill */
+.pill-link {
+  border-radius: 999px;
+  transition:
+    background-color 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    color 0.35s ease;
+}
+@media (hover: hover) {
+  .pill-link:hover {
+    background: var(--color-pop);
+    color: var(--c-fg);
+  }
+}
+.pill-link:focus-visible {
+  background: var(--color-pop);
+  color: var(--c-fg);
+}
+.pill-link[aria-current="page"],
+.pill-link.is-active {
+  background: var(--color-pop);
+  color: var(--c-fg);
+}
+
+/* primary CTAs: ink pill, coral fill + spring lift */
+.pop-btn {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  border-radius: 999px;
+  background: var(--c-fg);
+  color: var(--c-bg);
+  transition:
+    background-color 0.35s ease,
+    translate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.35s ease;
+}
+@media (hover: hover) {
+  .pop-btn:hover {
+    background: var(--color-heat);
+    translate: 0 -2px;
+    box-shadow: var(--shadow-glow-heat);
+  }
+}
+.pop-btn:focus-visible {
+  background: var(--color-heat);
+  translate: 0 -2px;
+  box-shadow: var(--shadow-glow-heat);
+}
+.pop-btn:active {
+  translate: 0 0;
+  scale: 0.97;
+}
+/* ghost variant: cream outline */
+.pop-btn--ghost {
+  background: transparent;
+  color: var(--c-fg);
+  box-shadow: inset 0 0 0 2px var(--c-fg);
+}
+@media (hover: hover) {
+  .pop-btn--ghost:hover {
+    background: var(--color-pop);
+    color: var(--c-fg);
+    box-shadow: inset 0 0 0 2px var(--c-fg), var(--shadow-glow-pop);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pop-btn,
+  .pop-btn--ghost {
+    transition: background-color 0.01ms;
+  }
+  .pop-btn:active {
+    scale: none;
+  }
+}
+
+/* underline rise: inline links */
+.link {
+  text-decoration: none;
+  background: linear-gradient(var(--color-heat) 0 0) left bottom / 100% 2px
+    no-repeat;
+  border-radius: 2px;
+  transition: background-size 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+@media (hover: hover) {
+  .link:hover {
+    background-size: 100% 0.45em;
+  }
+}
+.link:focus-visible {
+  background-size: 100% 0.45em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .link {
+    transition: none;
+  }
+}
+
+/* arrows nudge */
+.arrow {
+  transition: translate 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@media (hover: hover) {
+  a:hover .arrow,
+  button:hover .arrow {
+    translate: 4px 0;
+  }
+  a:hover .arrow--down,
+  button:hover .arrow--down {
+    translate: 0 4px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .arrow {
+    transition: none;
+  }
+}
+
+/* ── Sticker system (prices, badges) ──────────────────────────── */
+.sticker {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35em;
+  font-family: var(--f-data);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.5em 0.8em;
+  background: var(--color-mango);
+  color: var(--c-fg);
+  border: 2.5px solid #ffffff;
+  border-radius: 999px;
+  box-shadow: 0 6px 16px rgb(14 27 18 / 0.18);
+  rotate: -2.5deg;
+  transition:
+    rotate 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@media (hover: hover) {
+  .group:hover .sticker,
+  .sticker:hover {
+    rotate: 0deg;
+    scale: 1.06;
+  }
+}
+.sticker s {
+  opacity: 0.6;
+  font-size: 0.85em;
+  text-decoration-thickness: 2px;
+}
+.sticker--pop {
+  background: var(--color-pop);
+}
+.sticker--heat {
+  background: var(--color-heat);
+  color: #fff;
+}
+
+/* sticker idle bob (the market breathes at rest) */
+@keyframes bob {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: var(--tilt, -2.5deg);
+  }
+  50% {
+    translate: 0 -8px;
+    rotate: calc(var(--tilt, -2.5deg) + 1.5deg);
+  }
+}
+.bob {
+  --tilt: -3deg;
+  animation: bob 4.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bob {
+    animation: none;
+  }
+}
+
+/* ── Candy cards (shelf, deal) ────────────────────────────────── */
+.candy-card {
+  background: #ffffff;
+  border: 1.5px solid rgb(14 27 18 / 0.08);
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-card);
+  transition:
+    translate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.35s ease;
+}
+@media (hover: hover) {
+  .candy-card:hover {
+    translate: 0 -5px;
+    box-shadow: var(--shadow-glow-ink);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .candy-card {
+    transition: none;
+  }
+}
+
+/* ── Marquee (GSAP-driven) ────────────────────────────────────── */
+[data-marquee] {
+  overflow: clip;
+}
+[data-marquee] [data-track] {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+/* ── Index list: rows + floating preview ─────────────────────── */
+.index-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  gap: 1rem;
+  padding-block: 1.05rem;
+  border-bottom: 1.5px solid var(--c-line);
+  transition: padding-left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@media (hover: hover) {
+  .index-row:hover {
+    padding-left: 0.9rem;
+  }
+}
+.index-preview {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: min(20vw, 250px);
+  aspect-ratio: 4 / 5;
+  pointer-events: none;
+  translate: -50% -55%;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 5;
+  border-radius: 1.25rem;
+  border: 3px solid #ffffff;
+  box-shadow: var(--shadow-glow-ink);
+  background: #fff;
+  overflow: hidden;
+}
+.index-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@media (hover: none), (pointer: coarse) {
+  .index-preview {
+    display: none;
+  }
+}
+
+/* ── Reduced motion: everything settles, nothing hidden ───────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Utilities kept from earlier versions ─────────────────────── */
 .scroll-soft::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -190,14 +551,9 @@ body {
   background: transparent;
 }
 .scroll-soft::-webkit-scrollbar-thumb {
-  background-color: #d6d3d1;
+  background-color: rgb(14 27 18 / 0.25);
   border-radius: 9999px;
 }
-.scroll-soft::-webkit-scrollbar-thumb:hover {
-  background-color: #a8a29e;
-}
-
-/* Hide number input spinners */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -206,8 +562,6 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
-
-/* Hide horizontal scrollbar but keep functionality (for rails) */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -215,27 +569,27 @@ input[type="number"] {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.safe-area-pt {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.safe-area-px {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+* {
+  -webkit-tap-highlight-color: transparent;
+}
 
-/* Capacitor / Mobile safe area support */
-.safe-area-pb { padding-bottom: env(safe-area-inset-bottom, 0px); }
-.safe-area-pt { padding-top: env(safe-area-inset-top, 0px); }
-.safe-area-px { padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
-
-/* position:relative on <html> — framer-motion useScroll({ target }) uses the
-   document scroll container for offset math; a static root triggers its
-   "non-static position" dev warning and imprecise parallax offsets. */
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-behavior: smooth; position: relative; }
-* { -webkit-tap-highlight-color: transparent; }
-body { overscroll-behavior-y: none; }
-
-/* Mobile: enforce comfortable touch targets on interactive controls */
+/* Mobile: comfortable touch targets */
 @media (max-width: 768px) {
   button:not(:disabled),
   a[role="button"],
   [tabindex]:not([tabindex="-1"]) {
     min-height: 44px;
   }
-  /* inputs inside forms still need their natural height */
   input[type="text"],
   input[type="tel"],
   input[type="email"],
