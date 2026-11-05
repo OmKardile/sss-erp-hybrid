@@ -1,12 +1,20 @@
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
 import {
   Unbounded,
   Schibsted_Grotesk,
   Space_Mono,
   Poppins,
+  Noto_Sans_Devanagari,
 } from "next/font/google";
 import "./globals.css";
 import { STORE_CONFIG } from "@/lib/config";
+import {
+  LOCALE_COOKIE,
+  localeFromCookieValue,
+  translate,
+} from "@/lib/i18n";
+import { LocaleProvider, SkipLink } from "@/components/locale-provider";
 import { StoreHeader } from "@/components/store-header";
 import { FestiveStrip } from "@/components/festive-strip";
 import { StoreFooter } from "@/components/store-footer";
@@ -39,6 +47,15 @@ const poppins = Poppins({
   display: "swap",
   weight: ["500", "600", "800"],
   variable: "--font-poppins",
+});
+// Marathi voice (v0.12): per-character fallback AFTER the Latin faces in
+// every stack — Devanagari glyphs get a real typeface, Latin stays Unbounded
+// / Schibsted / Space Mono. No Latin fidelity is lost.
+const notoDevanagari = Noto_Sans_Devanagari({
+  subsets: ["devanagari"],
+  display: "swap",
+  weight: ["400", "500", "700", "800"],
+  variable: "--font-devanagari",
 });
 
 export const metadata: Metadata = {
@@ -81,49 +98,57 @@ export const viewport: Viewport = {
 // JS and motion are on (engine contract from the /awwwards skill).
 const flags = `document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('motion')`;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Locale from the cookie so the SERVER renders Marathi directly for
+  // returning Marathi visitors — no English flash, no hydration mismatch
+  // (server HTML and the first client render share the same prop).
+  const cookieStore = await cookies();
+  const locale = localeFromCookieValue(
+    cookieStore.get(LOCALE_COOKIE)?.value,
+  );
+
   return (
     <html
-      lang="en"
-      className={`${unbounded.variable} ${schibsted.variable} ${spaceMono.variable} ${poppins.variable}`}
+      lang={locale === "mr" ? "mr" : "en"}
+      className={`${unbounded.variable} ${schibsted.variable} ${spaceMono.variable} ${poppins.variable} ${notoDevanagari.variable}`}
       suppressHydrationWarning
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: flags }} />
       </head>
       <body className="min-h-[100dvh] flex flex-col">
-        <a className="skip-link" href="#main">
-          Skip to content
-        </a>
-        <div id="curtain" aria-hidden="true">
-          <div className="curtain__panel curtain__panel--1" />
-          <div className="curtain__panel curtain__panel--2" />
-          <div className="curtain__panel curtain__panel--3" />
-        </div>
-        <div id="loader" role="status" aria-label="Opening the store">
-          <div className="loader__inner" data-loader-out>
-            <span className="loader__label">SHUBHAM SUPER SHOPEE</span>
-            <span className="loader__count" data-loader-count>
-              0%
-            </span>
+        <LocaleProvider initialLocale={locale}>
+          <SkipLink />
+          <div id="curtain" aria-hidden="true">
+            <div className="curtain__panel curtain__panel--1" />
+            <div className="curtain__panel curtain__panel--2" />
+            <div className="curtain__panel curtain__panel--3" />
           </div>
-          <div className="loader__bar" data-loader-bar />
-        </div>
-        <StoreHeader />
-        {/* Festive strip — visible on every page during a festival window. */}
-        <FestiveStrip />
-        <main id="main" tabIndex={-1} className="flex-1 w-full pb-20 lg:pb-0">
-          {children}
-        </main>
-        <StoreFooter />
-        <MobileNav />
-        <SpeedInsights />
-        {/* Engine adapter — LAST child so page effects register first. */}
-        <Motion />
+          <div id="loader" role="status" aria-label={translate(locale, "loader.aria")}>
+            <div className="loader__inner" data-loader-out>
+              <span className="loader__label">SHUBHAM SUPER SHOPEE</span>
+              <span className="loader__count" data-loader-count>
+                0%
+              </span>
+            </div>
+            <div className="loader__bar" data-loader-bar />
+          </div>
+          <StoreHeader />
+          {/* Festive strip — visible on every page during a festival window. */}
+          <FestiveStrip />
+          <main id="main" tabIndex={-1} className="flex-1 w-full pb-20 lg:pb-0">
+            {children}
+          </main>
+          <StoreFooter />
+          <MobileNav />
+          <SpeedInsights />
+          {/* Engine adapter — LAST child so page effects register first. */}
+          <Motion />
+        </LocaleProvider>
       </body>
     </html>
   );

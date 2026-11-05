@@ -59,10 +59,13 @@
   --brand: #07332a;
   --brand-foreground: #f7f9ef;
 
-  /* type families (set on <html> by layout.tsx) */
-  --f-display: var(--font-unbounded), "Archivo", system-ui, sans-serif;
-  --f-body: var(--font-schibsted), system-ui, sans-serif;
-  --f-data: var(--font-space), ui-monospace, monospace;
+  /* type families (set on <html> by layout.tsx) — Noto Sans Devanagari
+     sits after the Latin faces as a per-character fallback: Latin text
+     keeps its design voice, Marathi (देवनागरी) gets a real typeface
+     instead of a random system font (v0.12). */
+  --f-display: var(--font-unbounded), var(--font-devanagari), "Archivo", system-ui, sans-serif;
+  --f-body: var(--font-schibsted), var(--font-devanagari), system-ui, sans-serif;
+  --f-data: var(--font-space), var(--font-devanagari), ui-monospace, monospace;
 
   /* fluid scale */
   --t-mega: clamp(2.6rem, 1.2rem + 8.5vw, 8rem);

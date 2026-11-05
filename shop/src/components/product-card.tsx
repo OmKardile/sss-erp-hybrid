@@ -6,6 +6,8 @@ import { Loader2 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import { resolveProductImage } from "@/lib/config";
 import { AnimatedIcon } from "@/components/animated-icon";
+import { useI18n } from "@/components/locale-provider";
+import { useMrName } from "@/lib/mr-names";
 import type { ProductListItem } from "@/lib/types";
 
 interface ProductCardProps {
@@ -21,6 +23,10 @@ export function ProductCard({ product }: ProductCardProps) {
   const [status, setStatus] = useState<"idle" | "loading" | "added">("idle");
   const [imgError, setImgError] = useState(false);
   const [addSignal, setAddSignal] = useState(0);
+  const { t } = useI18n();
+  const name = useMrName(product.name);
+  const brand = useMrName(product.brand ?? "");
+  const unit = useMrName(product.unitType);
   const outOfStock = product.stock <= 0;
   const discount =
     product.compareAtPrice && product.compareAtPrice > product.price
@@ -71,7 +77,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="relative aspect-square w-full overflow-hidden rounded-t-[calc(1.5rem-1.5px)] bg-cream">
         <img
           src={image}
-          alt={product.name}
+          alt={name}
           loading="lazy"
           decoding="async"
           onError={() => setImgError(true)}
@@ -87,7 +93,7 @@ export function ProductCard({ product }: ProductCardProps) {
         {outOfStock && (
           <div className="absolute inset-0 flex items-center justify-center bg-cream/70 backdrop-blur-[2px]">
             <span className="rounded-full bg-ink px-4 py-1.5 font-data text-[11px] font-bold text-cream">
-              OUT OF STOCK
+              {t("card.out-of-stock")}
             </span>
           </div>
         )}
@@ -95,15 +101,15 @@ export function ProductCard({ product }: ProductCardProps) {
 
       {/* Body */}
       <div className="flex flex-1 flex-col gap-1 p-3.5">
-        {product.brand && (
+        {product.brand && brand && (
           <p className="font-data text-[10px] uppercase tracking-[0.1em] text-sage">
-            {product.brand}
+            {brand}
           </p>
         )}
         <p className="line-clamp-2 min-h-[2.5rem] text-[13px] font-semibold leading-tight text-ink sm:text-sm">
-          {product.name}
+          {name}
         </p>
-        <p className="text-[11px] text-sage">{product.unitType}</p>
+        <p className="text-[11px] text-sage">{unit}</p>
 
         <div className="mt-auto flex items-end justify-between gap-2 pt-3">
           <span className={cn("sticker", outOfStock && "opacity-60")}>
@@ -117,7 +123,7 @@ export function ProductCard({ product }: ProductCardProps) {
             type="button"
             onClick={addToCart}
             disabled={outOfStock}
-            aria-label={`Add ${product.name} to basket`}
+            aria-label={t("card.add-aria", { name })}
             className={cn(
               "pop-btn inline-flex h-10 min-w-[72px] items-center justify-center gap-1 px-4 text-xs font-bold",
               outOfStock &&
@@ -129,7 +135,8 @@ export function ProductCard({ product }: ProductCardProps) {
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
             ) : status === "added" ? (
               <>
-                <AnimatedIcon name="check-white" size={14} trigger="once" /> Added
+                <AnimatedIcon name="check-white" size={14} trigger="once" />{" "}
+                {t("card.added")}
               </>
             ) : (
               <>
@@ -139,7 +146,7 @@ export function ProductCard({ product }: ProductCardProps) {
                   trigger="hover"
                   playSignal={addSignal}
                 />
-                Add
+                {t("card.add")}
               </>
             )}
           </button>

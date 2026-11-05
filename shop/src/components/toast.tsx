@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { CheckCircle2, AlertCircle, Info, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/components/locale-provider";
 
 interface ToastAction {
   label: string;
@@ -28,11 +29,12 @@ interface ToastProps {
  */
 export function Toast({ open, message, type = "success", action, onClose }: ToastProps) {
   const reduce = usePrefersReducedMotion();
+  const { t } = useI18n();
 
   useEffect(() => {
     if (!open) return;
-    const t = setTimeout(onClose, action ? 4000 : 2600);
-    return () => clearTimeout(t);
+    const timer = setTimeout(onClose, action ? 4000 : 2600);
+    return () => clearTimeout(timer);
   }, [open, action, onClose]);
 
   const colors =
@@ -80,7 +82,7 @@ export function Toast({ open, message, type = "success", action, onClose }: Toas
               type="button"
               onClick={onClose}
               className="ml-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full opacity-80 transition-opacity hover:opacity-100"
-              aria-label="Close notification"
+              aria-label={t("toast.close")}
             >
               <X className="h-3.5 w-3.5" aria-hidden />
             </button>

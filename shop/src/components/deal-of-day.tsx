@@ -7,9 +7,12 @@ import { cn, formatCurrency } from "@/lib/utils";
 import { resolveProductImage } from "@/lib/config";
 import { discountPct } from "@/lib/deal";
 import { useActiveTheme } from "@/lib/use-active-theme";
+import { festiveFor } from "@/lib/i18n";
 import { QuantityStepper } from "@/components/quantity-stepper";
 import { AnimatedIcon } from "@/components/animated-icon";
 import { DealCountdown } from "@/components/countdown";
+import { useI18n } from "@/components/locale-provider";
+import { useMrName } from "@/lib/mr-names";
 import type { ProductListItem } from "@/lib/types";
 
 /**
@@ -22,6 +25,11 @@ export function DealOfDay({ deal }: { deal: ProductListItem | null }) {
   const [imgError, setImgError] = useState(false);
   const [addSignal, setAddSignal] = useState(0);
   const theme = useActiveTheme();
+  const { t, locale } = useI18n();
+  const name = useMrName(deal?.name ?? "");
+  const brand = useMrName(deal?.brand ?? "");
+  const unit = useMrName(deal?.unitType ?? "");
+  const loc = theme ? festiveFor(theme, locale) : null;
   if (!deal) return null;
   const pct = discountPct(deal);
   const image = resolveProductImage(imgError ? null : deal.image, deal.category);
@@ -49,7 +57,7 @@ export function DealOfDay({ deal }: { deal: ProductListItem | null }) {
   }
 
   return (
-    <section aria-label="Deal of the day" className="pt-0">
+    <section aria-label={t("deal.kicker")} className="pt-0">
       {/* Deep amber→rose gradient panel with refracting glass orbs.
           The photo sits in a frosted frame; the CTA is a white pill. */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-500 via-orange-600 to-rose-700 p-4 shadow-[0_16px_44px_rgba(190,60,20,0.28)] sm:p-5">
@@ -75,7 +83,7 @@ export function DealOfDay({ deal }: { deal: ProductListItem | null }) {
           >
             <img
               src={image}
-              alt={deal.name}
+              alt={name}
               className="h-full w-full rounded-xl object-cover"
             />
           </Link>
@@ -84,17 +92,17 @@ export function DealOfDay({ deal }: { deal: ProductListItem | null }) {
           <div className="min-w-0 flex-1">
             <p className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur">
               <AnimatedIcon name="fire" size={12} trigger="loop" speed={0.6} />
-              {theme ? theme.badgeLabel : "Deal of the day"}
+              {loc ? loc.badgeLabel : t("deal.kicker")}
             </p>
             <Link
               href={`/product/${deal.slug}`}
               className="mt-1.5 block truncate font-display text-lg font-semibold text-white drop-shadow-[0_1px_6px_rgba(120,30,0,0.35)] sm:text-xl"
             >
-              {deal.name}
+              {name}
             </Link>
             <p className="text-xs text-amber-100">
-              {deal.brand ? `${deal.brand} · ` : ""}
-              {deal.unitType}
+              {brand ? `${brand} · ` : ""}
+              {unit}
             </p>
             <div className="mt-1.5 flex items-baseline gap-2">
               <span className="font-display text-xl font-bold text-white">
@@ -106,7 +114,8 @@ export function DealOfDay({ deal }: { deal: ProductListItem | null }) {
                     {formatCurrency(deal.compareAtPrice)}
                   </span>
                   <span className="rounded-full bg-yellow-300 px-2 py-0.5 text-[10px] font-bold text-orange-950">
-                    {pct}% off
+                    {pct}
+                    {t("deal.off")}
                   </span>
                 </>
               )}
@@ -119,7 +128,7 @@ export function DealOfDay({ deal }: { deal: ProductListItem | null }) {
               type="button"
               onClick={addToCart}
               disabled={outOfStock}
-              aria-label={`Add ${deal.name} to cart`}
+              aria-label={t("card.add-aria", { name })}
               className={cn(
                 "inline-flex h-11 items-center justify-center gap-1.5 rounded-full px-6 text-sm font-bold shadow-lg transition-[background-color,transform] duration-150 active:scale-[0.97] motion-reduce:active:scale-100",
                 outOfStock
@@ -134,7 +143,7 @@ export function DealOfDay({ deal }: { deal: ProductListItem | null }) {
               ) : status === "added" ? (
                 <>
                   <AnimatedIcon name="check-white" size={14} trigger="once" />{" "}
-                  Added
+                  {t("deal.added")}
                 </>
               ) : (
                 <>
@@ -144,7 +153,7 @@ export function DealOfDay({ deal }: { deal: ProductListItem | null }) {
                     trigger="hover"
                     playSignal={addSignal}
                   />
-                  {outOfStock ? "Out of stock" : "Add to cart"}
+                  {outOfStock ? t("pd.out-of-stock") : t("deal.add")}
                 </>
               )}
             </button>

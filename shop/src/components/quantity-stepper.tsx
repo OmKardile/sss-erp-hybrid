@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Minus } from "lucide-react";
 import { AnimatedIcon } from "@/components/animated-icon";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/components/locale-provider";
 
 interface QuantityStepperProps {
   value: number;
@@ -26,6 +27,7 @@ export function QuantityStepper({
     size === "sm" ? "h-7 w-7" : "h-9 w-9";
   const txt = size === "sm" ? "text-xs w-7" : "text-sm w-10";
   const [plusSignal, setPlusSignal] = useState(0);
+  const { t } = useI18n();
 
   const dec = () => onChange(Math.max(min, value - 1));
   const inc = () => {
@@ -44,7 +46,7 @@ export function QuantityStepper({
         type="button"
         onClick={dec}
         disabled={value <= min}
-        aria-label="Decrease quantity"
+        aria-label={t("stepper.decrease")}
         className={cn(
           "inline-flex items-center justify-center rounded-full text-slate-700 transition",
           "hover:bg-emerald-50 hover:text-emerald-700 disabled:opacity-40 disabled:hover:bg-transparent",
@@ -60,7 +62,7 @@ export function QuantityStepper({
         type="button"
         onClick={inc}
         disabled={value >= max}
-        aria-label="Increase quantity"
+        aria-label={t("stepper.increase")}
         className={cn(
           "inline-flex items-center justify-center rounded-full text-slate-700 transition",
           "hover:bg-emerald-50 hover:text-emerald-700 disabled:opacity-40 disabled:hover:bg-transparent",

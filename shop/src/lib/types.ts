@@ -66,6 +66,9 @@ export interface OrderView {
   orderStatus: string;
   notes: string | null;
   createdAt: string;
+  /** Order-created + ~2 days, ISO — rendered as the ETA (server-computed
+   *  so the client never derives a date from `now`, v0.10.2 lesson). */
+  etaDate?: string;
   items: Array<{
     id: string;
     name: string;

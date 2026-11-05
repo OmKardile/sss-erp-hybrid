@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 import { History } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { AnimatedIcon } from "@/components/animated-icon";
+import { useI18n } from "@/components/locale-provider";
 import { getRecentlyViewedSnapshot } from "@/lib/recently-viewed";
 import type { ProductListItem } from "@/lib/types";
 
@@ -26,6 +27,7 @@ export function RecentlyViewed({
     getRecentlyViewedSnapshot,
     () => EMPTY,
   );
+  const { t } = useI18n();
 
   if (slugs.length === 0) return null;
 
@@ -39,7 +41,7 @@ export function RecentlyViewed({
 
   return (
     <section
-      aria-label="Recently viewed"
+      aria-label={t("recent.title")}
       className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8"
     >
       <div className="mb-3 flex items-end justify-between">
@@ -52,10 +54,10 @@ export function RecentlyViewed({
               fallback={History}
               className="text-stone-400"
             />
-            Recently viewed
+            {t("recent.title")}
           </h2>
           <p className="mt-0.5 text-xs text-stone-500">
-            Pick up where you left off
+            {t("recent.sub")}
           </p>
         </div>
       </div>

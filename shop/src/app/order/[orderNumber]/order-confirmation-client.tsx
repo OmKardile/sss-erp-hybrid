@@ -21,16 +21,25 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui-button";
 import { AnimatedIcon } from "@/components/animated-icon";
-import { formatCurrency, estimatedDeliveryDate } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import { STORE_CONFIG } from "@/lib/config";
+import { useI18n } from "@/components/locale-provider";
+import { useMrName } from "@/lib/mr-names";
+import { DICT, formatDateFor, formatDateOnlyFor } from "@/lib/i18n";
 import type { OrderView } from "@/lib/types";
 
 interface Props {
   order: OrderView;
 }
 
+/** Localize a status enum via the st.* dict (pass-through if unknown). */
+function statusFor(t: ReturnType<typeof useI18n>["t"], s: string): string {
+  return DICT[`st.${s}`] ? t(`st.${s}`) : s;
+}
+
 export function OrderConfirmationClient({ order }: Props) {
   const [copied, setCopied] = useState(false);
+  const { t, locale } = useI18n();
 
   useEffect(() => {
     // scroll top on mount
@@ -47,6 +56,11 @@ export function OrderConfirmationClient({ order }: Props) {
       .catch(() => {});
   }
 
+  const firstName = order.customerName.split(" ")[0];
+  const etaLabel = order.etaDate
+    ? formatDateOnlyFor(locale, order.etaDate)
+    : null;
+
   return (
     <div className="relative mx-auto max-w-3xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
       {/* Success header */}
@@ -62,23 +76,22 @@ export function OrderConfirmationClient({ order }: Props) {
         </div>
 
         <h1 className="mt-5 text-3xl font-extrabold text-slate-900 sm:text-4xl">
-          Order Placed!
+          {t("order.placed")}
         </h1>
         <p className="mt-2 text-sm text-slate-500">
-          Thank you, {order.customerName.split(" ")[0]}. We&apos;ve received your
-          order and will call you shortly to confirm.
+          {t("order.thanks", { name: firstName })}
         </p>
 
         {/* Order number */}
         <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm">
-          <span className="text-xs text-slate-500">Order number</span>
+          <span className="text-xs text-slate-500">{t("order.number")}</span>
           <span className="font-mono text-sm font-bold text-slate-900">
             {order.orderNumber}
           </span>
           <button
             onClick={copyOrderNumber}
             className="ml-1 inline-flex h-6 w-6 items-center justify-center rounded-full text-slate-400 transition hover:bg-emerald-50 hover:text-emerald-600"
-            aria-label="Copy order number"
+            aria-label={t("order.copy")}
           >
             {copied ? (
               <Check className="h-3.5 w-3.5 text-emerald-600" />
@@ -102,23 +115,36 @@ export function OrderConfirmationClient({ order }: Props) {
             />
           </div>
           <div className="flex-1 text-left">
-            <p className="text-sm font-bold text-slate-900">
-              Estimated delivery: {estimatedDeliveryDate(2)}
-            </p>
+            {etaLabel && (
+              <p className="text-sm font-bold text-slate-900">
+                {t("order.eta", { date: etaLabel })}
+              </p>
+            )}
             <p className="text-xs text-slate-600">
-              Our team will call{" "}
-              <span className="font-semibold">{order.customerPhone}</span> to
-              confirm the delivery time.
+              {t("order.confirm-call", { phone: order.customerPhone })}
             </p>
             {/* Mini tracker */}
             <div className="mt-3 flex items-center gap-1">
-              <TrackerStep label="Placed" icon={<CheckCircle2 className="h-4 w-4" />} active />
+              <TrackerStep
+                label={t("order.step-placed")}
+                icon={<CheckCircle2 className="h-4 w-4" />}
+                active
+              />
               <div className="h-0.5 flex-1 bg-emerald-200" />
-              <TrackerStep label="Confirmed" icon={<PhoneCall className="h-4 w-4" />} />
+              <TrackerStep
+                label={t("order.step-confirmed")}
+                icon={<PhoneCall className="h-4 w-4" />}
+              />
               <div className="h-0.5 flex-1 bg-slate-200" />
-              <TrackerStep label="On the way" icon={<Truck className="h-4 w-4" />} />
+              <TrackerStep
+                label={t("order.step-ontheway")}
+                icon={<Truck className="h-4 w-4" />}
+              />
               <div className="h-0.5 flex-1 bg-slate-200" />
-              <TrackerStep label="Delivered" icon={<Home className="h-4 w-4" />} />
+              <TrackerStep
+                label={t("order.step-delivered")}
+                icon={<Home className="h-4 w-4" />}
+              />
             </div>
           </div>
         </div>
@@ -129,44 +155,26 @@ export function OrderConfirmationClient({ order }: Props) {
         {/* Items */}
         <div className="rounded-2xl border border-white/70 bg-white/65 p-5 shadow-[0_6px_28px_rgba(28,25,23,0.07)] backdrop-blur-md sm:col-span-2">
           <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900">
-            <Package className="h-4 w-4 text-emerald-600" /> Items in your
-            order
+            <Package className="h-4 w-4 text-emerald-600" />{" "}
+            {t("order.items")}
           </h2>
           <ul className="mt-3 divide-y divide-slate-100">
             {order.items.map((it) => (
-              <li
-                key={it.id}
-                className="flex items-center justify-between py-3 text-sm"
-              >
-                <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 text-emerald-600">
-                    <ShoppingCart className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="truncate font-medium text-slate-900">
-                      {it.name}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      {it.quantity} × {formatCurrency(it.price)}
-                    </p>
-                  </div>
-                </div>
-                <span className="font-semibold text-slate-900">
-                  {formatCurrency(it.lineTotal)}
-                </span>
-              </li>
+              <OrderRow key={it.id} name={it.name} quantity={it.quantity} price={it.price} lineTotal={it.lineTotal} />
             ))}
           </ul>
 
           <dl className="mt-4 space-y-2 border-t border-slate-100 pt-4 text-sm">
             <div className="flex justify-between">
-              <dt className="text-slate-600">Subtotal</dt>
+              <dt className="text-slate-600">{t("cart.subtotal")}</dt>
               <dd className="font-semibold">{formatCurrency(order.subtotal)}</dd>
             </div>
             {order.discountTotal > 0 && (
               <div className="flex justify-between">
                 <dt className="text-slate-600">
-                  Coupon {order.couponCode ? `(${order.couponCode})` : ""}
+                  {t("order.coupon-line", {
+                    code: order.couponCode ?? "",
+                  })}
                 </dt>
                 <dd className="font-semibold text-emerald-600">
                   −{formatCurrency(order.discountTotal)}
@@ -174,17 +182,17 @@ export function OrderConfirmationClient({ order }: Props) {
               </div>
             )}
             <div className="flex justify-between">
-              <dt className="text-slate-600">Delivery fee</dt>
+              <dt className="text-slate-600">{t("cart.delivery-fee")}</dt>
               <dd className="font-semibold">
                 {order.deliveryFee === 0 ? (
-                  <span className="text-emerald-600">FREE</span>
+                  <span className="text-emerald-600">{t("cart.free")}</span>
                 ) : (
                   formatCurrency(order.deliveryFee)
                 )}
               </dd>
             </div>
             <div className="flex justify-between border-t border-slate-100 pt-2">
-              <dt className="font-semibold text-slate-900">Total</dt>
+              <dt className="font-semibold text-slate-900">{t("cart.total")}</dt>
               <dd className="text-lg font-bold text-slate-900">
                 {formatCurrency(order.total)}
               </dd>
@@ -192,7 +200,7 @@ export function OrderConfirmationClient({ order }: Props) {
           </dl>
           {order.discountTotal > 0 && (
             <p className="mt-3 rounded-xl bg-emerald-50 px-4 py-2.5 text-center text-sm font-semibold text-emerald-800">
-              You saved {formatCurrency(order.discountTotal)} on this order
+              {t("order.you-saved", { amount: formatCurrency(order.discountTotal) })}
             </p>
           )}
         </div>
@@ -200,7 +208,7 @@ export function OrderConfirmationClient({ order }: Props) {
         {/* Delivery address */}
         <div className="rounded-2xl border border-white/70 bg-white/65 p-5 shadow-[0_6px_28px_rgba(28,25,23,0.07)] backdrop-blur-md">
           <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900">
-            <MapPin className="h-4 w-4 text-rose-500" /> Delivery address
+            <MapPin className="h-4 w-4 text-rose-500" /> {t("order.address")}
           </h2>
           <p className="mt-3 text-sm font-medium text-slate-900">
             {order.customerName}
@@ -224,31 +232,31 @@ export function OrderConfirmationClient({ order }: Props) {
             ) : (
               <Banknote className="h-4 w-4 text-emerald-500" />
             )}{" "}
-            Payment
+            {t("order.payment")}
           </h2>
           <p className="mt-3 text-sm font-medium text-slate-900">
             {order.paymentMethod === "UPI"
-              ? "UPI Payment"
-              : "Cash on Delivery"}
+              ? t("checkout.upi")
+              : t("checkout.cod")}
           </p>
           {order.paymentMethod === "UPI" && (
             <p className="mt-1 text-xs text-slate-500">
-              UPI ID:{" "}
+              {t("order.upi-id")}{" "}
               <span className="font-mono font-semibold text-slate-700">
                 {STORE_CONFIG.upiId}
               </span>
             </p>
           )}
           <p className="mt-2 text-xs text-slate-500">
-            Status:{" "}
+            {t("order.status")}{" "}
             <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
-              {order.paymentStatus}
+              {statusFor(t, order.paymentStatus)}
             </span>
           </p>
           <p className="mt-2 text-xs text-slate-500">
-            Order status:{" "}
+            {t("order.order-status")}{" "}
             <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
-              {order.orderStatus}
+              {statusFor(t, order.orderStatus)}
             </span>
           </p>
         </div>
@@ -257,8 +265,8 @@ export function OrderConfirmationClient({ order }: Props) {
       {order.notes && (
         <div className="mt-4 rounded-2xl border border-white/70 bg-white/65 p-5 shadow-[0_6px_28px_rgba(28,25,23,0.07)] backdrop-blur-md">
           <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900">
-            <StickyNote className="h-4 w-4 text-emerald-600" aria-hidden /> Order
-            notes
+            <StickyNote className="h-4 w-4 text-emerald-600" aria-hidden />{" "}
+            {t("order.notes")}
           </h2>
           <p className="mt-1 text-sm text-slate-600">{order.notes}</p>
         </div>
@@ -267,10 +275,11 @@ export function OrderConfirmationClient({ order }: Props) {
       {/* Footer */}
       <div className="mt-8 flex flex-col items-center gap-3 text-center">
         <p className="flex items-center gap-1.5 text-xs text-slate-500">
-          <Clock className="h-3.5 w-3.5" /> Order placed on {order.createdAt}
+          <Clock className="h-3.5 w-3.5" />{" "}
+          {t("order.placed-on", { date: formatDateFor(locale, order.createdAt) })}
         </p>
         <p className="text-xs text-slate-500">
-          Need help? Call us at{" "}
+          {t("order.help")}{" "}
           <a
             href={`tel:${STORE_CONFIG.phone.replace(/\s+/g, "")}`}
             className="font-medium text-emerald-700 hover:underline"
@@ -284,17 +293,50 @@ export function OrderConfirmationClient({ order }: Props) {
               size="lg"
               className="bg-gradient-to-r from-emerald-600 to-teal-600 shadow-md hover:shadow-lg"
             >
-              Continue Shopping <ArrowRight className="h-4 w-4" />
+              {t("order.continue")} <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
           <Link href="/cart">
             <Button variant="outline" size="lg">
-              View Cart
+              {t("order.view-cart")}
             </Button>
           </Link>
         </div>
       </div>
     </div>
+  );
+}
+
+/** One order item row — resolves its Marathi name via useMrName. */
+function OrderRow({
+  name,
+  quantity,
+  price,
+  lineTotal,
+}: {
+  name: string;
+  quantity: number;
+  price: number;
+  lineTotal: number;
+}) {
+  const mrName = useMrName(name);
+  return (
+    <li className="flex items-center justify-between py-3 text-sm">
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 text-emerald-600">
+          <ShoppingCart className="h-5 w-5" />
+        </div>
+        <div className="min-w-0">
+          <p className="truncate font-medium text-slate-900">{mrName}</p>
+          <p className="text-xs text-slate-500">
+            {quantity} × {formatCurrency(price)}
+          </p>
+        </div>
+      </div>
+      <span className="font-semibold text-slate-900">
+        {formatCurrency(lineTotal)}
+      </span>
+    </li>
   );
 }
 

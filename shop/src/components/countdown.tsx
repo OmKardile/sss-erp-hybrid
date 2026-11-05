@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/components/locale-provider";
 
 /**
  * DealCountdown — live "deal ends in HH:MM:SS" timer to the next
@@ -72,6 +73,7 @@ interface DealCountdownProps {
 }
 
 export function DealCountdown({ className, variant = "default" }: DealCountdownProps) {
+  const { t } = useI18n();
   const [remaining, setRemaining] = useState<number | null>(null);
 
   useEffect(() => {
@@ -91,9 +93,9 @@ export function DealCountdown({ className, variant = "default" }: DealCountdownP
     hours === null || minutes === null || seconds === null
       ? null
       : [
-          { key: "h", value: pad(hours), label: "hrs" },
-          { key: "m", value: pad(minutes), label: "min" },
-          { key: "s", value: pad(seconds), label: "sec" },
+          { key: "h", value: pad(hours), label: t("countdown.hrs") },
+          { key: "m", value: pad(minutes), label: t("countdown.min") },
+          { key: "s", value: pad(seconds), label: t("countdown.sec") },
         ];
 
   const onDark = variant === "onDark";
@@ -104,7 +106,7 @@ export function DealCountdown({ className, variant = "default" }: DealCountdownP
       <span
         className={cn("font-data inline-flex items-center gap-0.5 font-bold tabular-nums text-ink", className)}
         role="timer"
-        aria-label="Time remaining for today's deal"
+        aria-label={t("deal.ends-aria")}
       >
         {segments === null ? (
           <span>--:--:--</span>
@@ -124,7 +126,7 @@ export function DealCountdown({ className, variant = "default" }: DealCountdownP
     <div
       className={cn("flex flex-col items-center gap-1 sm:items-end", className)}
       role="timer"
-      aria-label="Time remaining for today's deal"
+      aria-label={t("deal.ends-aria")}
     >
       <p
         className={cn(

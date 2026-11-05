@@ -5,22 +5,26 @@ import { useEffect, useState } from "react";
 import { Search, ShoppingBasket } from "lucide-react";
 import { CartBadge } from "@/components/cart-badge";
 import { BrandLogoLockupLight, BrandLogoMark } from "@/components/brand-logo";
+import { LanguageToggle } from "@/components/language-toggle";
+import { useI18n } from "@/components/locale-provider";
 import { cn } from "@/lib/utils";
 import { STORE_CONFIG } from "@/lib/config";
 
 /**
  * Storefront header — the cart bar. Cream glass, pill search, lime pill
- * nav, coral basket chip (DESIGN.md, v0.11 Fresh Cart).
+ * nav, coral basket chip (DESIGN.md, v0.11 Fresh Cart). One-click language
+ * toggle for the whole site (v0.12).
  */
 const NAV = [
-  { href: "/#shop", label: "Shop" },
-  { href: "/#deal", label: "Deal" },
-  { href: "/#promise", label: "Why us" },
+  { href: "/#shop", key: "nav.shop" },
+  { href: "/#deal", key: "nav.deal" },
+  { href: "/#promise", key: "nav.why-us" },
 ];
 
 export function StoreHeader() {
   const [count, setCount] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+  const { t } = useI18n();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -61,7 +65,7 @@ export function StoreHeader() {
         <Link
           href="/"
           className="flex h-11 shrink-0 items-center"
-          aria-label={`${STORE_CONFIG.name} — home`}
+          aria-label={`${STORE_CONFIG.name}${t("header.home-aria")}`}
         >
           <BrandLogoMark className="h-9 w-9 sm:hidden" />
           <BrandLogoLockupLight className="hidden h-10 w-auto sm:block" />
@@ -78,34 +82,37 @@ export function StoreHeader() {
               type="search"
               name="q"
               defaultValue=""
-              placeholder="Search atta, milk, soap…"
-              aria-label="Search products"
+              placeholder={t("header.search-placeholder")}
+              aria-label={t("header.search-aria")}
               className="h-10 w-full rounded-full border-[1.5px] border-ink/10 bg-white pl-10 pr-4 text-sm text-ink shadow-[0_4px_16px_rgb(14_27_18/0.05)] placeholder:text-sage transition-[border-color,box-shadow] focus:border-pop focus:outline-none focus:ring-4 focus:ring-pop/40 sm:h-11"
             />
           </div>
         </form>
 
         {/* Nav — lime pill fill (desktop) */}
-        <nav aria-label="Store" className="hidden items-center gap-1 md:flex">
+        <nav aria-label={t("nav.shop")} className="hidden items-center gap-1 md:flex">
           {NAV.map((item) => (
             <a
               key={item.href}
               href={item.href}
               className="pill-link px-3.5 py-2 text-sm font-semibold"
             >
-              {item.label}
+              {t(item.key)}
             </a>
           ))}
         </nav>
+
+        {/* One-click language toggle — desktop (mobile uses the dock) */}
+        <LanguageToggle className="hidden md:inline-flex" />
 
         {/* Basket — coral chip */}
         <Link
           href="/cart"
           className="pop-btn relative ml-1 flex h-11 shrink-0 items-center gap-2 px-4 md:ml-2"
-          aria-label={`Basket${count > 0 ? ` — ${count} items` : ""}`}
+          aria-label={`${t("header.basket-aria")}${count > 0 ? ` — ${count} ${t("header.basket-items")}` : ""}`}
         >
           <ShoppingBasket className="h-4.5 w-4.5" aria-hidden />
-          <span className="hidden text-sm font-bold sm:inline">Basket</span>
+          <span className="hidden text-sm font-bold sm:inline">{t("header.basket")}</span>
           {count > 0 && (
             <CartBadge
               count={count}

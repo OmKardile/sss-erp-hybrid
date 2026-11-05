@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { formatDate } from "@/lib/utils";
 import { OrderConfirmationClient } from "./order-confirmation-client";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +21,11 @@ export default async function OrderConfirmationPage({
     notFound();
   }
 
+  // ETA = order placed + ~2 days (server-computed so the client never
+  // derives dates from `now` — deterministic SSR, no hydration drift).
+  const eta = new Date(order.createdAt);
+  eta.setDate(eta.getDate() + 2);
+
   const serialized = {
     id: order.id,
     orderNumber: order.orderNumber,
@@ -40,7 +44,8 @@ export default async function OrderConfirmationPage({
     paymentStatus: order.paymentStatus,
     orderStatus: order.orderStatus,
     notes: order.notes ?? null,
-    createdAt: formatDate(order.createdAt),
+    createdAt: order.createdAt.toISOString(),
+    etaDate: eta.toISOString(),
     items: order.items.map((it) => ({
       id: it.id,
       name: it.name,

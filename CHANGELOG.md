@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.3.0] — 2026-11-05
+
+### Added — storefront (shop): one-click Marathi for the entire site (v0.12.0)
+- A single click flips the whole storefront between English and Marathi — pill button in the desktop header + 4th slot in the mobile bottom dock. Instant client-side switch via React context; the locale persists in the `sss_locale` cookie (1 year) which the root layout reads server-side, so returning Marathi visitors get Marathi **server-rendered** (`<html lang="mr">`, no English flash, hydration-safe by construction).
+- Static strings via a 227-key dictionary + category map + festive overrides (`shop/src/lib/i18n.ts`) — every page covered: home, product detail, cart, checkout, order confirmation, 404, festive strips, and all aria-labels.
+- DB-driven strings (product names/brands/units/descriptions) resolve in three layers: built-in grocery glossary → unit-pattern regex → batched `POST /api/translate` (LLM, ≤120 strings/request, server-side in-memory cache + client localStorage cache). Search matches both scripts (typing "दूध" finds "Amul Taaza Toned Milk"). Dep added: `z-ai-web-dev-sdk` (the route degrades gracefully to glossary-only if the LLM is unavailable).
+- Noto Sans Devanagari appended as a per-character fallback after the Latin faces; deterministic hand-written Marathi month tables for dates; order ETAs server-computed (`OrderView.etaDate`).
+- QA: full Marathi render verified on every page + a Marathi E2E COD order; cookie hard-reload server-render checks; zero hydration errors; mobile 390px no-overflow; lint clean.
+
+### Fixed — pre-existing bugs surfaced by the v0.12 QA sweep
+- `<RecentlyViewed />` crashed the home page for any visitor with browsing history (the v0.11 redesign dropped its `products` prop) — prop restored.
+- The marquee rendered raw dictionary keys ("marquee.1 …") in both locales — now translated.
+- `data-split="lines"` on locale-dynamic text (the promise statement) downgraded to `data-reveal` — never data-split anything that can re-render.
+- Footer address was hardcoded English — now localized (पुणे, महाराष्ट्र, भारत).
+
 ## [3.2.0] — 2026-11-05
 
 ### Added — storefront (shop): "Fresh Cart" redesign (v0.11.0), built with the /awwwards skill

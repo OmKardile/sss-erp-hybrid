@@ -19,9 +19,12 @@ import { StarRating } from "@/components/star-rating";
 import { QuantityStepper } from "@/components/quantity-stepper";
 import { Toast } from "@/components/toast";
 import { Button } from "@/components/ui-button";
-import { cn, formatCurrency, formatDate } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { resolveProductImage } from "@/lib/config";
 import { recordRecentlyViewed } from "@/lib/recently-viewed";
+import { useI18n } from "@/components/locale-provider";
+import { useMrName } from "@/lib/mr-names";
+import { formatDateFor } from "@/lib/i18n";
 import type { ProductDetail, ProductListItem } from "@/lib/types";
 
 interface Props {
@@ -36,6 +39,12 @@ export function ProductDetailClient({ product, related }: Props) {
     open: boolean;
     msg: string;
   }>({ open: false, msg: "" });
+  const { t, locale } = useI18n();
+  const name = useMrName(product.name);
+  const brand = useMrName(product.brand ?? "");
+  const category = useMrName(product.category ?? "");
+  const unit = useMrName(product.unitType);
+  const description = useMrName(product.description ?? "");
 
   // Track browsing history for the home-page "Recently viewed" rail
   useEffect(() => {
@@ -64,16 +73,19 @@ export function ProductDetailClient({ product, related }: Props) {
       });
       if (res.ok) {
         setStatus("added");
-        setToast({ open: true, msg: `${qty} × ${product.name} added to cart` });
+        setToast({
+          open: true,
+          msg: t("pd.added-toast", { qty, name }),
+        });
         window.dispatchEvent(new Event("sss:cart-changed"));
         setTimeout(() => setStatus("idle"), 1500);
       } else {
         setStatus("idle");
-        setToast({ open: true, msg: "Failed to add to cart" });
+        setToast({ open: true, msg: t("pd.add-failed") });
       }
     } catch {
       setStatus("idle");
-      setToast({ open: true, msg: "Network error" });
+      setToast({ open: true, msg: t("t.network-short") });
     }
   }
 
@@ -91,11 +103,11 @@ export function ProductDetailClient({ product, related }: Props) {
         window.location.href = "/checkout";
       } else {
         setStatus("idle");
-        setToast({ open: true, msg: "Failed — please try again" });
+        setToast({ open: true, msg: t("pd.try-again") });
       }
     } catch {
       setStatus("idle");
-      setToast({ open: true, msg: "Network error" });
+      setToast({ open: true, msg: t("t.network-short") });
     }
   }
 
@@ -111,21 +123,21 @@ export function ProductDetailClient({ product, related }: Props) {
       {/* Breadcrumb */}
       <nav className="mb-4 flex items-center gap-1 text-xs text-slate-500">
         <Link href="/" className="hover:text-emerald-700">
-          Home
+          {t("pd.home")}
         </Link>
         <ChevronLeft className="h-3 w-3 rotate-180" />
-        {product.category && (
+        {product.category && category && (
           <>
             <Link
               href={`/?category=${encodeURIComponent(product.category)}`}
               className="hover:text-emerald-700"
             >
-              {product.category}
+              {category}
             </Link>
             <ChevronLeft className="h-3 w-3 rotate-180" />
           </>
         )}
-        <span className="truncate text-slate-700">{product.name}</span>
+        <span className="truncate text-slate-700">{name}</span>
       </nav>
 
       <div className="grid gap-6 lg:grid-cols-2 lg:gap-10">
@@ -134,7 +146,7 @@ export function ProductDetailClient({ product, related }: Props) {
         <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-white/80 bg-slate-50 shadow-[0_12px_36px_rgba(28,25,23,0.14)] lg:aspect-square">
           <img
             src={image}
-            alt={product.name}
+            alt={name}
             className="relative h-full w-full object-cover"
           />
 
@@ -142,7 +154,7 @@ export function ProductDetailClient({ product, related }: Props) {
           <div className="absolute left-4 top-4 flex flex-col gap-1.5">
             {discount > 0 && (
               <span className="rounded-md bg-rose-600 px-2 py-1 text-xs font-bold text-white">
-                -{discount}% OFF
+                -{discount}% {t("pd.off")}
               </span>
             )}
           </div>
@@ -151,23 +163,23 @@ export function ProductDetailClient({ product, related }: Props) {
         {/* Details */}
         <div className="flex flex-col">
           <div className="flex flex-wrap items-center gap-2">
-            {product.category && (
+            {product.category && category && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-                {product.category}
+                {category}
               </span>
             )}
-            {product.brand && (
+            {product.brand && brand && (
               <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-                {product.brand}
+                {brand}
               </span>
             )}
             <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
-              {product.unitType}
+              {unit}
             </span>
           </div>
 
           <h1 className="font-display mt-3 text-2xl font-semibold leading-tight text-stone-900 sm:text-3xl">
-            {product.name}
+            {name}
           </h1>
 
           {product.reviewCount > 0 ? (
@@ -181,12 +193,12 @@ export function ProductDetailClient({ product, related }: Props) {
                 href="#reviews"
                 className="text-xs text-emerald-700 hover:underline"
               >
-                Read reviews
+                {t("pd.read-reviews")}
               </a>
             </div>
           ) : (
             <p className="mt-2 text-xs text-slate-500">
-              No reviews yet — be the first to review!
+              {t("pd.no-reviews-cta")}
             </p>
           )}
 
@@ -202,30 +214,30 @@ export function ProductDetailClient({ product, related }: Props) {
             )}
             {discount > 0 && (
               <span className="mb-1 rounded-full bg-rose-600 px-2 py-0.5 text-xs font-bold text-white">
-                Save {formatCurrency(product.compareAtPrice! - product.price)}
+                {t("pd.save", {
+                  amount: formatCurrency(product.compareAtPrice! - product.price),
+                })}
               </span>
             )}
           </div>
-          <p className="mt-1 text-xs text-slate-500">
-            Price inclusive of all taxes
-          </p>
+          <p className="mt-1 text-xs text-slate-500">{t("pd.tax-note")}</p>
 
           {/* Stock */}
           <div className="mt-4 flex items-center gap-2">
             {outOfStock ? (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-600">
                 <span className="h-2 w-2 rounded-full bg-rose-500" />
-                Out of stock
+                {t("pd.out-of-stock")}
               </span>
             ) : product.stock <= 10 ? (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">
                 <span className="h-2 w-2 rounded-full bg-rose-500" />
-                Only {product.stock} left — order soon
+                {t("pd.only-left", { n: product.stock })}
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
                 <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                In stock
+                {t("pd.in-stock")}
               </span>
             )}
           </div>
@@ -250,11 +262,11 @@ export function ProductDetailClient({ product, related }: Props) {
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : status === "added" ? (
                 <>
-                  <Check className="h-4 w-4" /> Added
+                  <Check className="h-4 w-4" /> {t("pd.added")}
                 </>
               ) : (
                 <>
-                  <ShoppingCart className="h-4 w-4" /> Add to Cart
+                  <ShoppingCart className="h-4 w-4" /> {t("pd.add")}
                 </>
               )}
             </Button>
@@ -264,7 +276,7 @@ export function ProductDetailClient({ product, related }: Props) {
               size="lg"
               className="min-w-[150px] flex-1"
             >
-              Buy Now <ArrowRight className="h-4 w-4" />
+              {t("pd.buy-now")} <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
 
@@ -273,27 +285,31 @@ export function ProductDetailClient({ product, related }: Props) {
             <div>
               <Truck className="mx-auto h-5 w-5 text-emerald-600" />
               <p className="mt-1 text-[11px] text-slate-600">
-                Free delivery ₹500+
+                {t("pd.perk-delivery")}
               </p>
             </div>
             <div>
               <ShieldCheck className="mx-auto h-5 w-5 text-emerald-600" />
-              <p className="mt-1 text-[11px] text-slate-600">Quality assured</p>
+              <p className="mt-1 text-[11px] text-slate-600">
+                {t("pd.perk-quality")}
+              </p>
             </div>
             <div>
               <Package className="mx-auto h-5 w-5 text-emerald-600" />
-              <p className="mt-1 text-[11px] text-slate-600">Easy returns</p>
+              <p className="mt-1 text-[11px] text-slate-600">
+                {t("pd.perk-returns")}
+              </p>
             </div>
           </div>
 
           {/* Description */}
-          {product.description && (
+          {product.description && description && (
             <div className="mt-6">
               <h2 className="text-sm font-semibold text-slate-900">
-                Description
+                {t("pd.description")}
               </h2>
               <p className="mt-2 whitespace-pre-line text-sm text-slate-600">
-                {product.description}
+                {description}
               </p>
             </div>
           )}
@@ -304,10 +320,12 @@ export function ProductDetailClient({ product, related }: Props) {
       <section id="reviews" className="mt-12">
         <div className="flex items-end justify-between">
           <h2 className="font-display text-xl font-semibold text-stone-900 sm:text-2xl">
-            Reviews
+            {t("pd.reviews")}
           </h2>
           <span className="text-sm text-slate-500">
-            {product.reviewCount} review{product.reviewCount === 1 ? "" : "s"}
+            {product.reviewCount === 1
+              ? t("pd.review-count-one", { n: product.reviewCount })
+              : t("pd.review-count", { n: product.reviewCount })}
           </span>
         </div>
 
@@ -319,8 +337,7 @@ export function ProductDetailClient({ product, related }: Props) {
             </p>
             <StarRating rating={product.avgRating} size={18} />
             <p className="mt-1 text-xs text-slate-500">
-              Based on {product.reviewCount} review
-              {product.reviewCount === 1 ? "" : "s"}
+              {t("pd.based-on", { n: product.reviewCount })}
             </p>
 
             <ReviewForm
@@ -334,7 +351,7 @@ export function ProductDetailClient({ product, related }: Props) {
             {product.reviews.length === 0 ? (
               <div className="flex h-48 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-emerald-100 bg-emerald-50/40 text-center">
                 <MessageSquarePlus className="h-10 w-10 text-emerald-400" />
-                <p className="text-sm text-slate-500">No reviews yet</p>
+                <p className="text-sm text-slate-500">{t("pd.no-reviews")}</p>
               </div>
             ) : (
               <ul className="space-y-3">
@@ -353,7 +370,7 @@ export function ProductDetailClient({ product, related }: Props) {
                             {r.customerName}
                           </p>
                           <p className="text-[11px] text-slate-400">
-                            {formatDate(r.createdAt)}
+                            {formatDateFor(locale, r.createdAt)}
                           </p>
                         </div>
                       </div>
@@ -374,7 +391,7 @@ export function ProductDetailClient({ product, related }: Props) {
       {related.length > 0 && (
         <section className="mt-12">
           <h2 className="mb-5 flex items-center gap-2 text-xl font-bold text-slate-900 sm:text-2xl">
-            You might also like
+            {t("pd.related")}
           </h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {related.map((p) => (
@@ -400,11 +417,12 @@ function ReviewForm({
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const { t } = useI18n();
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) {
-      setErr("Please enter your name");
+      setErr(t("pd.name-required"));
       return;
     }
     setLoading(true);
@@ -424,10 +442,10 @@ function ReviewForm({
         onAdded();
       } else {
         const d = await res.json().catch(() => ({}));
-        setErr(d.error || "Failed to submit");
+        setErr(d.error || t("pd.submit-failed"));
       }
     } catch {
-      setErr("Network error");
+      setErr(t("t.network-short"));
     } finally {
       setLoading(false);
     }
@@ -439,7 +457,7 @@ function ReviewForm({
         onClick={() => setOpen(true)}
         className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100 active:scale-95"
       >
-        Write a review
+        {t("pd.write-review")}
       </button>
     );
   }
@@ -451,7 +469,7 @@ function ReviewForm({
     >
       <input
         type="text"
-        placeholder="Your name"
+        placeholder={t("pd.your-name")}
         value={name}
         onChange={(e) => setName(e.target.value)}
         className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-emerald-400"
@@ -462,7 +480,7 @@ function ReviewForm({
             key={n}
             type="button"
             onClick={() => setRating(n)}
-            aria-label={`${n} star`}
+            aria-label={t("pd.star", { n })}
           >
             <Star
               className={cn(
@@ -476,7 +494,7 @@ function ReviewForm({
         ))}
       </div>
       <textarea
-        placeholder="Share your experience (optional)"
+        placeholder={t("pd.share")}
         value={comment}
         onChange={(e) => setComment(e.target.value)}
         rows={3}
@@ -491,10 +509,10 @@ function ReviewForm({
           onClick={() => setOpen(false)}
           className="flex-1"
         >
-          Cancel
+          {t("pd.cancel")}
         </Button>
         <Button type="submit" size="sm" disabled={loading} className="flex-1">
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Submit"}
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("pd.submit")}
         </Button>
       </div>
     </form>

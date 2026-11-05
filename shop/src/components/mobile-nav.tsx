@@ -5,15 +5,19 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatedIcon } from "@/components/animated-icon";
 import { CartBadge } from "@/components/cart-badge";
+import { LanguageToggle } from "@/components/language-toggle";
+import { useI18n } from "@/components/locale-provider";
 import { cn } from "@/lib/utils";
 
 /**
  * Mobile bottom navigation — thumb-zone primary nav.
- * Visible below lg. Shows the live cart badge and the active section.
+ * Visible below lg. Shows the live cart badge, the active section and
+ * the one-click language toggle (v0.12).
  */
 export function MobileNav() {
   const pathname = usePathname();
   const [count, setCount] = useState(0);
+  const { t } = useI18n();
 
   useEffect(() => {
     let mounted = true;
@@ -42,7 +46,7 @@ export function MobileNav() {
 
   return (
     <nav
-      aria-label="Primary"
+      aria-label={t("mnav.primary")}
       className="fixed bottom-0 left-0 right-0 z-40 lg:hidden safe-area-pb"
     >
       {/* Floating glass pill (iOS-style dock). Geometry preserved: the
@@ -63,7 +67,7 @@ export function MobileNav() {
             key={isHome ? "active" : "idle"}
             trigger={isHome ? "once" : "hover"}
           />
-          Home
+          {t("mnav.home")}
         </Link>
         <div aria-hidden className="my-2.5 w-px bg-stone-900/8" />
         <Link
@@ -81,7 +85,7 @@ export function MobileNav() {
             key={!isHome && !isCart ? "active" : "idle"}
             trigger={!isHome && !isCart ? "once" : "hover"}
           />
-          Shop
+          {t("mnav.shop")}
         </Link>
         <div aria-hidden className="my-2.5 w-px bg-stone-900/8" />
         <Link
@@ -99,15 +103,17 @@ export function MobileNav() {
             trigger={isCart ? "once" : "hover"}
             playOnEvent="sss:cart-changed"
           />
-          Cart
+          {t("mnav.cart")}
           {count > 0 && (
             <CartBadge
               count={count}
-              aria-label={`${count} items in cart`}
+              aria-label={`${count} ${t("mnav.cart-items")}`}
               className="absolute right-1/2 top-1 translate-x-[26px] bg-emerald-700 text-white ring-2 ring-white/70"
             />
           )}
         </Link>
+        <div aria-hidden className="my-2.5 w-px bg-stone-900/8" />
+        <LanguageToggle variant="dock" />
       </div>
     </nav>
   );

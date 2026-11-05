@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { ArrowUp } from "lucide-react";
+import { useI18n } from "@/components/locale-provider";
 
 /**
  * ScrollToTop — floating back-to-top button for the long product grid.
@@ -13,6 +14,7 @@ import { ArrowUp } from "lucide-react";
 export function ScrollToTop() {
   const [visible, setVisible] = useState(false);
   const reduce = usePrefersReducedMotion();
+  const { t } = useI18n();
 
   useEffect(() => {
     let ticking = false;
@@ -39,7 +41,7 @@ export function ScrollToTop() {
         <motion.button
           type="button"
           onClick={scrollTop}
-          aria-label="Scroll back to top"
+          aria-label={t("scrolltop.aria")}
           initial={reduce ? false : { opacity: 0, scale: 0.8, y: 8 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 8 }}

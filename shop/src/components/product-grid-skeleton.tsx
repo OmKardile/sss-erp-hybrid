@@ -1,4 +1,7 @@
+"use client";
+
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/components/locale-provider";
 
 /**
  * ProductGridSkeleton — layout-matched shimmer placeholder for the
@@ -13,6 +16,7 @@ export function ProductGridSkeleton({
   count?: number;
   className?: string;
 }) {
+  const { t } = useI18n();
   return (
     <div
       className={cn(
@@ -20,7 +24,7 @@ export function ProductGridSkeleton({
         className,
       )}
       aria-busy="true"
-      aria-label="Loading products"
+      aria-label={t("home.loading-aria")}
     >
       {Array.from({ length: count }, (_, i) => (
         <div
