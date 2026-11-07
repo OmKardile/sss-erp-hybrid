@@ -20,6 +20,15 @@ A modern, full-stack retail ERP built with Next.js 16, TypeScript, Prisma ORM, a
 - Order confirmation with tracking number
 - Product sync from ERP
 
+### Mobile Apps (React Native)
+
+Two native Android companions (Expo SDK 58 / RN 0.88.1) under [`react-native/`](react-native/):
+
+- **`react-native/shop-app`** (`com.shubhamsupershopee.shop`) — the customer storefront in your pocket: browse, search, Deal of the Day, cart, coupons, COD/UPI checkout, order history, and one-click English ↔ मराठी.
+- **`react-native/erp-app`** (`com.shubhamsupershopee.erp`) — the admin ERP: passkey login, dashboard, POS, products/stock, udhar (credit) ledger, customers, reports.
+- **Dual-mode**: LIVE (Settings → point at your deployed web app's API) or DEMO (default — bundled data, fully explorable offline).
+- **Ready-to-install APKs** in [`react-native/apk/`](react-native/apk/) — signed release builds, sideload on any Android phone (arm64-v8a / armeabi-v7a); no Play Store needed. Build your own: see [`react-native/README.md`](react-native/README.md).
+
 ## Tech Stack
 - **Framework**: Next.js 16 (App Router) + TypeScript 5
 - **Database**: Supabase PostgreSQL (separate projects for ERP & e-commerce)

@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.4.0] — 2026-11-06
+
+### Added — React Native companion apps + release APKs (v0.13.0)
+- **Two new native Android apps at `react-native/`** (Expo SDK 58 / RN 0.88.1 / React 19.3, react-navigation bottom tabs, the Fresh Cart brand system from the web):
+  - `react-native/shop-app/` (`com.shubhamsupershopee.shop`) — the customer storefront: hero + category chips + search, Deal of the Day with a live IST-midnight countdown, 16-product grid with photos, product detail with reviews, AsyncStorage cart with qty steppers, coupons (`FIRST50`/`FREESHIP`/`DIWALI10`), COD + UPI-intent checkout, order confirmation + local order history, and one-click English ↔ मराठी (the same 227-key dictionary + grocery glossary as the web).
+  - `react-native/erp-app/` (`com.shubhamsupershopee.erp`) — the admin ERP: passkey login against the live ERP (same session cookie as the web admin), dashboard (today/month stats, 14-day income bars, low stock, pending udhar), POS (sale → stock decrement + income booking), products/stock with buy prices + alert levels, udhar credit ledger (add / part-pay / settle / reopen), customers, reports.
+  - Both apps are dual-mode: **LIVE** (Settings → point at the deployed web app's API) or **DEMO** (default; bundled catalog + realistic ledgers, fully explorable offline).
+- **Ready-to-sideload release APKs shipped in-repo** (`react-native/apk/`): `sss-shop-1.0.0.apk` (41 MB) and `sss-erp-1.0.0.apk` (40 MB), arm64-v8a + armeabi-v7a, each signed with its own release keystore and apksigner-verified — no Play Store needed.
+- `react-native/*/scripts/patch-mirrors.sh` — the complete post-prebuild patcher (registry mirrors, 2-ABI build, release signing, low-RAM Gradle profile). `android/` is gitignored and regenerated via `npx expo prebuild -p android --no-install`. Build/QA details: `react-native/README.md`.
+- QA: `tsc --noEmit` clean in both apps; expo-web bundles compile with zero console errors; full E2E browser passes (shop: browse → deal → detail → cart → coupon → COD order → confirmation → history; erp: login → dashboard → POS sale → stock → udhar part-payment → reports); `apksigner verify` passes on both APKs.
+
+### Fixed — RN QA bugs (browser-verified)
+- shop: checkout labels read "Email (optional) (optional)" (double suffix); Deal-of-the-Day button jumped the user into the Cart tab on add — now stays put and the button flips to "Added".
+- erp: Customers / Reports / Settings stack screens had no back affordance (headers hidden) — shared `BackBtn` atom wired into all three headers.
+
 ## [3.3.0] — 2026-11-05
 
 ### Added — storefront (shop): one-click Marathi for the entire site (v0.12.0)

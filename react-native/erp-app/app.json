@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "SSS ERP",
+    "slug": "sss-erp-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#f7f9ef",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#c8f135"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.shubhamsupershopee.erp"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#07332a",
+        "foregroundImage": "./assets/adaptive-icon.png"
+      },
+      "package": "com.shubhamsupershopee.erp",
+      "permissions": ["INTERNET"],
+      "blockedPermissions": []
+    },
+    "web": {
+      "favicon": "./assets/icon.png"
+    }
+  }
+}
